@@ -1,0 +1,1 @@
+- [Zustand store self-reference](zustand-store-typing.md) — calling the store singleton inside its own creator collapses all store types to `any`; use the `get` param instead.

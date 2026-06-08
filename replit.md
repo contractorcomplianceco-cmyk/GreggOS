@@ -1,44 +1,47 @@
-# [Project name]
+# Gregg + Landon Current Client Cockpit
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An internal operational web app for Contractor Compliance Authority that helps Gregg and Landon manage current-client relationships: triaging priorities, processing raw call notes into reviewed CRM-ready drafts, tracking tasks/escalations/opportunities, and running a weekly review. Frontend-only with localStorage persistence — no backend or live integrations.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/cockpit run dev` — run the cockpit web app (Vite)
+- `pnpm --filter @workspace/cockpit run typecheck` — typecheck the cockpit app
+- App runs via the `artifacts/cockpit: web` workflow; preview path is `/`
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- React + Vite (TypeScript), Tailwind + shadcn/ui components
+- Routing: wouter (base = `import.meta.env.BASE_URL`)
+- State: Zustand with `persist` middleware to localStorage (key `cockpit-storage`)
+- No backend, no database, no API codegen — all data lives client-side
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/cockpit/src/lib/types.ts` — data model (CurrentClient, CallNote, Task, OpportunitySignal, Escalation) and enums
+- `artifacts/cockpit/src/lib/store.ts` — Zustand store, persistence, and the `saveProcessedNote` action
+- `artifacts/cockpit/src/lib/seed.ts` — sample data (6 clients, 8 call notes, tasks/signals/escalations)
+- `artifacts/cockpit/src/pages/*.tsx` — six screens: gregg-today, work-queue, clients, client-detail, processor, weekly-review, admin
+- `artifacts/cockpit/src/components/layout/SidebarLayout.tsx` — sidebar nav + decision-boundary disclaimer
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- This is intentionally a no-backend product: api-server and mockup-sandbox artifacts exist in the monorepo but are NOT part of this app.
+- `saveProcessedNote` is the single source of truth for the Call Note Processor save flow: it upserts the call note and atomically regenerates the note's tasks/signals/escalations (matched by `sourceCallNoteId`) and recomputes the related client's `nextAction`, owner, due date, missing info, and counters.
+- Each `nextActions` line in the processor becomes a separate task.
+- Persist `version` is bumped when the seed shape changes so stale localStorage is replaced with the new seed.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Six screens: Gregg Today (priorities, escalations, filters), Landon Work Queue (call notes by routing status), Current Clients (search/filter list + detail), Call Note Processor (raw note in, CRM note / follow-up draft / task list / JSON out, all with copy buttons), Weekly Review, and Admin/Setup (reset + export data). The app separates raw RingCentral notes from reviewed summaries and shows decision-boundary disclaimers throughout (it drafts; it does not approve pricing/refunds/legal/compliance/qualifier decisions).
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Dense operational UI; no emojis.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Bump the persist `version` in `store.ts` whenever the seed/data shape changes, or existing users keep stale localStorage state.
+- In-app navigation that uses `window.location.href` must prepend `import.meta.env.BASE_URL` (see work-queue Process Note button) so it respects the artifact base path.
 
 ## Pointers
 

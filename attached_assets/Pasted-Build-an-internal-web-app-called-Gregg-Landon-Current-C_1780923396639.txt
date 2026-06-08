@@ -1,0 +1,356 @@
+Build an internal web app called “Gregg + Landon Current Client Cockpit.”
+
+Purpose:
+This app is an internal Replit-first cockpit for Contractor Compliance Authority. It helps Gregg manage high-level current-client relationships and helps Landon process Gregg’s RingCentral call notes into organized summaries, tasks, missing information, opportunity signals, and escalation flags.
+
+This is the first prototype. Do not connect to live Zoho, RingCentral, WorkDrive, or Company Brain yet. Store all data locally in browser state or localStorage. Include realistic sample data.
+
+Tech:
+Use React with Vite.
+Use clean, modern, operational UI.
+The app should feel like a working internal dashboard, not a marketing page.
+Use dense, organized layouts suitable for daily work.
+Use tabs or sidebar navigation.
+Use copy buttons for generated text.
+Use export JSON buttons where useful.
+
+Primary users:
+1. Gregg Taylor
+   Role: President / Chief Contractor Relations & Placement Officer.
+   Needs a simple executive view of current clients, urgent follow-ups, at-risk accounts, qualifier/placement mentions, and items needing his judgment.
+
+2. Landon Taylor
+   Role: Executive Support & Placement Operations Coordinator.
+   Needs a work queue for RingCentral notes, CRM-ready summaries, follow-up tasks, missing information, and escalation routing.
+
+Pilot scope:
+Current clients only for the first version.
+Qualifier, placement, audit, monitoring, renewal, expansion, and client-save opportunities should be captured only when they surface inside current-client conversations.
+
+Do not include:
+- Final pricing
+- Legal advice
+- Final compliance opinions
+- Refund approvals
+- Placement approvals
+- Live CRM writes
+- Live RingCentral API calls
+- Live WorkDrive access
+- Company Brain auto-updates
+
+Required screens:
+
+1. Gregg Today
+Show:
+- Priority current clients
+- Urgent callbacks
+- At-risk clients
+- Client-save items
+- Open follow-ups needing Gregg
+- Qualifier or placement mentions
+- Items needing Rose / leadership review
+- Overdue relationship tasks
+
+Include filters:
+- All
+- High priority
+- At risk
+- Waiting on Gregg
+- Waiting on client
+- Leadership review
+
+2. Landon Work Queue
+Show:
+- New RingCentral notes to process
+- Notes in review
+- CRM summaries drafted
+- Tasks needing creation
+- Missing information follow-ups
+- Items waiting on Gregg review
+- Items waiting on Rose review
+- Completed / archived notes
+
+Each queue item should show:
+- Client name
+- Call date
+- Caller
+- Summary preview
+- Status
+- Priority
+- Due date
+- Next owner
+
+3. Current Client Profile
+For each current client, show:
+- Client name
+- Company
+- Contact person
+- Phone/email
+- Client status
+- Gregg priority
+- Risk level
+- Last meaningful contact
+- Next action
+- Next owner
+- Due date
+- Open tasks
+- Missing information
+- Opportunity signals
+- Escalations
+- Call history
+- CRM-ready notes history
+
+Opportunity signal options:
+- Audit
+- Monitoring
+- Renewal
+- Expansion
+- Qualifier
+- Placement
+- Document collection
+- Client-save
+- Leadership review
+
+4. Call Note Processor
+This is the most important Landon screen.
+
+Include:
+- Raw RingCentral note input area
+- Client selector
+- Call date
+- Caller
+- Call type: inbound, outbound, scheduled check-in, escalation, qualifier discussion, placement discussion, renewal, monitoring, other
+- Clean internal summary field
+- Client concern field
+- Commitments made field
+- Missing information field
+- Next actions field
+- Suggested task list
+- Opportunity signal selector
+- Escalation flag selector
+- Routing status
+
+Statuses:
+- New
+- In review
+- Summary drafted
+- Gregg review
+- CRM-ready
+- Copied to CRM
+- Archived
+
+Escalation reasons:
+- Refund / payment issue
+- Pricing exception
+- Legal-sensitive issue
+- Compliance-sensitive issue
+- Placement approval needed
+- Qualifier concern
+- High-risk complaint
+- Possible promise / commitment risk
+- Rose review needed
+- Other leadership review
+
+Generated outputs:
+- CRM-ready note
+- Client-facing follow-up draft
+- Internal task list
+- JSON export
+
+Add copy buttons:
+- Copy CRM Note
+- Copy Client Follow-Up
+- Copy Task List
+- Copy JSON
+
+Important:
+RingCentral AI notes are draft source material. The app must visibly separate raw notes from reviewed summaries.
+
+5. Weekly Review
+Show:
+- Accounts touched this week
+- Stalled clients
+- Overdue follow-ups
+- High-risk accounts
+- At-risk clients
+- Open escalations
+- Opportunity signals captured
+- Documentation gaps
+- Items waiting on Gregg
+- Items waiting on Rose
+- Completed follow-ups
+
+Include simple charts or counters:
+- Calls processed
+- Tasks created
+- Tasks overdue
+- Escalations open
+- Opportunities captured
+- CRM notes ready
+
+6. Admin / Setup
+Allow editing sample configuration:
+- Client attention statuses
+- Call note statuses
+- Task statuses
+- Opportunity signal types
+- Escalation categories
+- Role permissions
+- Export templates
+
+Data objects:
+
+CurrentClient:
+- id
+- clientName
+- companyName
+- contactName
+- phone
+- email
+- clientStatus
+- greggPriority
+- riskLevel
+- lastMeaningfulContact
+- nextAction
+- nextOwner
+- dueDate
+- openTasks
+- missingInformation
+- opportunitySignals
+- escalations
+- callNotes
+
+CallNote:
+- id
+- clientId
+- callDate
+- caller
+- callType
+- rawRingCentralNote
+- cleanSummary
+- clientConcern
+- commitmentsMade
+- missingInformation
+- nextActions
+- opportunitySignals
+- escalationFlags
+- routingStatus
+- crmReadyNote
+- clientFollowUpDraft
+- taskList
+- createdAt
+- updatedAt
+
+Task:
+- id
+- clientId
+- sourceCallNoteId
+- title
+- owner
+- dueDate
+- priority
+- status
+- escalationFlag
+- notes
+
+OpportunitySignal:
+- id
+- clientId
+- sourceCallNoteId
+- type
+- description
+- status
+- routedTo
+- createdAt
+
+Escalation:
+- id
+- clientId
+- sourceCallNoteId
+- reason
+- riskLevel
+- routedTo
+- decisionNeeded
+- deadline
+- status
+
+Required behavior:
+
+When Landon processes a call note:
+1. He selects the client.
+2. He pastes the raw RingCentral note.
+3. He fills or edits summary fields.
+4. The app generates:
+   - CRM-ready note
+   - client-facing follow-up draft
+   - task list
+   - JSON export
+5. He can mark the note as:
+   - Gregg review
+   - CRM-ready
+   - Copied to CRM
+   - Escalated
+   - Archived
+6. The related client profile updates.
+7. Gregg Today updates if Gregg action is needed.
+
+CRM-ready note format:
+Use a factual paragraph format:
+“Call with [contact/client] on [date]. Discussed [summary]. Client concern/request: [concern]. Missing information: [missing info]. Next steps: [next actions]. Owner: [next owner]. Due date: [due date]. Opportunity signals: [signals]. Escalation: [escalation status].”
+
+Client follow-up draft format:
+“Hi [contact name], thank you for speaking with Gregg today. Based on the conversation, our next step is [next action]. We are currently waiting on [missing information if any]. We will follow up by [due date if available].”
+
+Task list format:
+Create separate task items from next actions. Each task should have:
+- title
+- owner
+- due date
+- priority
+- source call note
+
+Decision boundaries:
+Add visible internal reminder language somewhere in the app:
+“This cockpit organizes relationship follow-through. It does not approve pricing, refunds, legal advice, compliance opinions, qualifier placements, or final client commitments.”
+
+Also include:
+“RingCentral AI notes are draft source material until reviewed.”
+
+Sample data:
+Create at least 6 current clients.
+Include a mix of:
+- normal current client
+- high-priority client
+- at-risk client
+- client with renewal issue
+- client with qualifier concern
+- client with possible monitoring opportunity
+
+Create at least 8 sample RingCentral-style notes.
+Some should need no escalation.
+Some should create tasks.
+Some should create missing info.
+Some should trigger opportunity signals.
+Some should trigger Rose / leadership review.
+
+UI requirements:
+- Sidebar navigation
+- Search clients
+- Filter by priority, risk, owner, status
+- Clear badges for risk and status
+- No decorative marketing hero
+- No public-facing sales page
+- No fake backend claims
+- No live integrations
+- Responsive enough for laptop and tablet use
+- Use localStorage so prototype data persists after refresh
+
+Acceptance criteria:
+- Gregg can open one screen and see which current clients need attention today.
+- Landon can process a RingCentral note into a clean CRM-ready summary in under five minutes.
+- Every meaningful call can produce at least one of: no action needed, follow-up task, missing information request, escalation, or opportunity signal.
+- The cockpit clearly separates draft RingCentral notes from reviewed summaries.
+- Weekly Review shows overdue items, stalled clients, high-risk accounts, and opportunities.
+- Copy buttons work for CRM note, client follow-up draft, task list, and JSON.
+- The prototype does not write to live Zoho, RingCentral, WorkDrive, or Company Brain.
+- Role boundaries are visible and clear.
