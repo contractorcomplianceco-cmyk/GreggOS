@@ -4,7 +4,7 @@ import { useStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Flag, AlertTriangle, ListChecks, ArrowUpRight } from "lucide-react";
 
 type Filter = "All" | "High priority" | "At risk" | "Due soon" | "Has escalation";
@@ -13,6 +13,7 @@ const FILTERS: Filter[] = ["All", "High priority", "At risk", "Due soon", "Has e
 
 export default function GreggToday() {
   const { clients, tasks, escalations } = useStore();
+  const [, setLocation] = useLocation();
   const [filter, setFilter] = useState<Filter>("All");
 
   const openEscalations = escalations.filter(
@@ -86,6 +87,7 @@ export default function GreggToday() {
       sub: "High & urgent accounts",
       icon: Flag,
       accent: "bg-primary",
+      filter: "High priority" as Filter,
     },
     {
       label: "Open Escalations",
@@ -93,6 +95,7 @@ export default function GreggToday() {
       sub: "Awaiting your decision",
       icon: AlertTriangle,
       accent: openEscalations.length > 0 ? "bg-destructive" : "bg-border",
+      filter: "Has escalation" as Filter,
     },
     {
       label: "My Open Tasks",
@@ -100,6 +103,8 @@ export default function GreggToday() {
       sub: "Assigned to Gregg",
       icon: ListChecks,
       accent: "bg-accent",
+      filter: null,
+      href: "/oversight",
     },
   ];
 
@@ -120,8 +125,27 @@ export default function GreggToday() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {kpis.map((kpi) => {
             const Icon = kpi.icon;
+            const activate = () => {
+              if (kpi.filter) setFilter(kpi.filter);
+              else if (kpi.href) setLocation(kpi.href);
+            };
+            const active = kpi.filter != null && filter === kpi.filter;
             return (
-              <Card key={kpi.label} className="relative overflow-hidden shadow-sm">
+              <Card
+                key={kpi.label}
+                role="button"
+                tabIndex={0}
+                onClick={activate}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    activate();
+                  }
+                }}
+                className={`relative overflow-hidden shadow-sm cursor-pointer transition-all hover:shadow-md hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                  active ? "ring-2 ring-accent" : ""
+                }`}
+              >
                 <div className={`absolute inset-x-0 top-0 h-1 ${kpi.accent}`} />
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -225,10 +249,14 @@ export default function GreggToday() {
               {openEscalations.map((esc) => {
                 const client = clients.find((c) => c.id === esc.clientId);
                 return (
-                  <Card key={esc.id} className="p-5 border-l-4 border-l-destructive">
+                  <Link key={esc.id} href={`/clients/${esc.clientId}`}>
+                  <Card className="group p-5 border-l-4 border-l-destructive cursor-pointer transition-all hover:shadow-md hover:-translate-y-px">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold leading-tight">{esc.reason}</h3>
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="font-semibold leading-tight">{esc.reason}</h3>
+                          <ArrowUpRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground/60 transition-colors" />
+                        </div>
                         <p className="text-sm text-muted-foreground">{client?.clientName}</p>
                       </div>
                       <Badge variant="destructive">{esc.riskLevel} Risk</Badge>
@@ -241,6 +269,7 @@ export default function GreggToday() {
                       </p>
                     </div>
                   </Card>
+                  </Link>
                 );
               })}
               {openEscalations.length === 0 && (

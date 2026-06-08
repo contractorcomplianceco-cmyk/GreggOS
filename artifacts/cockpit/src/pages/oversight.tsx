@@ -1,7 +1,7 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,7 @@ import {
   Pie,
   Legend,
 } from "recharts";
-import { ArrowDown, ArrowUp, ArrowUpDown, AlertTriangle } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, AlertTriangle, X, ChevronRight } from "lucide-react";
 import type {
   CurrentClient,
   ClientStatus,
@@ -98,11 +98,49 @@ type SortKey =
 
 type SortDir = "asc" | "desc";
 
+type Drill =
+  | { type: "all" }
+  | { type: "status"; value: ClientStatus }
+  | { type: "risk"; value: RiskLevel }
+  | { type: "owner"; value: string }
+  | { type: "atRisk" }
+  | { type: "overdue" }
+  | { type: "hasEscalation" }
+  | { type: "hasTasks" }
+  | { type: "hasSignals" };
+
+function drillLabel(d: Drill): string {
+  switch (d.type) {
+    case "status":
+      return `Status: ${d.value}`;
+    case "risk":
+      return `Risk: ${d.value}`;
+    case "owner":
+      return `Owner: ${d.value}`;
+    case "atRisk":
+      return "At-risk accounts";
+    case "overdue":
+      return "Accounts with overdue tasks";
+    case "hasEscalation":
+      return "Accounts with open escalations";
+    case "hasTasks":
+      return "Accounts with open tasks";
+    case "hasSignals":
+      return "Accounts with opportunity signals";
+    case "all":
+    default:
+      return "All accounts";
+  }
+}
+
 export default function Oversight() {
   const { clients, tasks, signals, escalations } = useStore();
+  const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("greggPriority");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [drill, setDrill] = useState<Drill | null>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   const today = useMemo(() => startOfDay(new Date()), []);
 
@@ -117,8 +155,20 @@ export default function Oversight() {
     return d !== null && d < today;
   });
 
+  const overdueClientIds = useMemo(
+    () => new Set(overdueTasks.map((t) => t.clientId)),
+    [overdueTasks]
+  );
+
   const greggOpenTasks = openTasks.filter((t) => t.owner === "Gregg");
   const landonOpenTasks = openTasks.filter((t) => t.owner === "Landon");
+
+  const applyDrill = (d: Drill) => {
+    setDrill(d.type === "all" ? null : d);
+    window.setTimeout(() => {
+      tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  };
 
   const statusData = useMemo(() => {
     const counts = new Map<string, number>();
@@ -134,14 +184,6 @@ export default function Oversight() {
         value: clients.filter((c) => c.riskLevel === level).length,
       }))
       .filter((d) => d.value > 0);
-  }, [clients]);
-
-  const priorityData = useMemo(() => {
-    const order: Priority[] = ["Urgent", "High", "Medium", "Low"];
-    return order.map((p) => ({
-      name: p,
-      value: clients.filter((c) => c.greggPriority === p).length,
-    }));
   }, [clients]);
 
   const ownerData = useMemo(() => {
@@ -183,15 +225,45 @@ export default function Oversight() {
     }
   };
 
+  const matchesDrill = (c: CurrentClient): boolean => {
+    if (!drill) return true;
+    switch (drill.type) {
+      case "status":
+        return c.clientStatus === drill.value;
+      case "risk":
+        return c.riskLevel === drill.value;
+      case "owner":
+        return c.nextOwner === drill.value;
+      case "atRisk":
+        return (
+          c.clientStatus === "At Risk" ||
+          c.riskLevel === "High" ||
+          c.riskLevel === "Critical"
+        );
+      case "overdue":
+        return overdueClientIds.has(c.id);
+      case "hasEscalation":
+        return c.escalations > 0;
+      case "hasTasks":
+        return c.openTasks > 0;
+      case "hasSignals":
+        return c.opportunitySignals > 0;
+      case "all":
+      default:
+        return true;
+    }
+  };
+
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
     const filtered = clients.filter(
       (c) =>
-        !q ||
-        c.clientName.toLowerCase().includes(q) ||
-        c.companyName.toLowerCase().includes(q) ||
-        c.contactName.toLowerCase().includes(q) ||
-        c.nextOwner.toLowerCase().includes(q)
+        (!q ||
+          c.clientName.toLowerCase().includes(q) ||
+          c.companyName.toLowerCase().includes(q) ||
+          c.contactName.toLowerCase().includes(q) ||
+          c.nextOwner.toLowerCase().includes(q)) &&
+        matchesDrill(c)
     );
     const sorted = [...filtered].sort((a, b) => {
       const av = sortValue(a, sortKey);
@@ -202,7 +274,8 @@ export default function Oversight() {
       return sortDir === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [clients, search, sortKey, sortDir]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clients, search, sortKey, sortDir, drill, overdueClientIds]);
 
   const SortHeader = ({ label, k, numeric }: { label: string; k: SortKey; numeric?: boolean }) => (
     <TableHead
@@ -230,14 +303,64 @@ export default function Oversight() {
     </TableHead>
   );
 
-  const kpis = [
-    { label: "Total Accounts", value: clients.length, sub: `${clients.filter((c) => c.clientStatus === "Active").length} active` },
-    { label: "At Risk", value: clients.filter((c) => c.clientStatus === "At Risk" || c.riskLevel === "High" || c.riskLevel === "Critical").length, sub: "status or risk", tone: "warn" as const },
-    { label: "Open Tasks", value: openTasks.length, sub: `${greggOpenTasks.length} Gregg / ${landonOpenTasks.length} Landon` },
-    { label: "Overdue Tasks", value: overdueTasks.length, sub: "past due date", tone: overdueTasks.length > 0 ? ("danger" as const) : undefined },
-    { label: "Open Escalations", value: openEscalations.length, sub: "awaiting decision", tone: openEscalations.length > 0 ? ("danger" as const) : undefined },
-    { label: "Opportunity Signals", value: openSignals.length, sub: "open / unactioned" },
+  const kpis: {
+    label: string;
+    value: number;
+    sub: string;
+    tone?: "warn" | "danger";
+    drill: Drill;
+  }[] = [
+    {
+      label: "Total Accounts",
+      value: clients.length,
+      sub: `${clients.filter((c) => c.clientStatus === "Active").length} active`,
+      drill: { type: "all" },
+    },
+    {
+      label: "At Risk",
+      value: clients.filter(
+        (c) => c.clientStatus === "At Risk" || c.riskLevel === "High" || c.riskLevel === "Critical"
+      ).length,
+      sub: "status or risk",
+      tone: "warn",
+      drill: { type: "atRisk" },
+    },
+    {
+      label: "Open Tasks",
+      value: openTasks.length,
+      sub: `${greggOpenTasks.length} Gregg / ${landonOpenTasks.length} Landon`,
+      drill: { type: "hasTasks" },
+    },
+    {
+      label: "Overdue Tasks",
+      value: overdueTasks.length,
+      sub: "past due date",
+      tone: overdueTasks.length > 0 ? "danger" : undefined,
+      drill: { type: "overdue" },
+    },
+    {
+      label: "Open Escalations",
+      value: openEscalations.length,
+      sub: "awaiting decision",
+      tone: openEscalations.length > 0 ? "danger" : undefined,
+      drill: { type: "hasEscalation" },
+    },
+    {
+      label: "Opportunity Signals",
+      value: openSignals.length,
+      sub: "open / unactioned",
+      drill: { type: "hasSignals" },
+    },
   ];
+
+  const isDrillActive = (d: Drill) => {
+    if (!drill) return d.type === "all";
+    if (drill.type !== d.type) return false;
+    if (d.type === "status" || d.type === "risk" || d.type === "owner") {
+      return (drill as { value: string }).value === d.value;
+    }
+    return true;
+  };
 
   return (
     <SidebarLayout>
@@ -246,7 +369,8 @@ export default function Oversight() {
           <div>
             <h1 className="text-3xl font-bold">Account Oversight</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Portfolio-wide view across all {clients.length} current client accounts.
+              Portfolio-wide view across all {clients.length} current client accounts. Select any
+              metric or chart segment to drill into the matching accounts.
             </p>
           </div>
           <Input
@@ -258,29 +382,47 @@ export default function Oversight() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          {kpis.map((kpi) => (
-            <Card key={kpi.label}>
-              <CardHeader className="pb-1">
-                <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  {kpi.label}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div
-                  className={`text-3xl font-bold ${
-                    kpi.tone === "danger"
-                      ? "text-destructive"
-                      : kpi.tone === "warn"
-                      ? "text-amber-600"
-                      : ""
-                  }`}
-                >
-                  {kpi.value}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{kpi.sub}</p>
-              </CardContent>
-            </Card>
-          ))}
+          {kpis.map((kpi) => {
+            const active = isDrillActive(kpi.drill);
+            return (
+              <Card
+                key={kpi.label}
+                role="button"
+                tabIndex={0}
+                onClick={() => applyDrill(kpi.drill)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    applyDrill(kpi.drill);
+                  }
+                }}
+                aria-label={`Show ${drillLabel(kpi.drill)}`}
+                className={`cursor-pointer transition-all hover:shadow-md hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                  active ? "ring-2 ring-accent" : ""
+                }`}
+              >
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    {kpi.label}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div
+                    className={`text-3xl font-bold ${
+                      kpi.tone === "danger"
+                        ? "text-destructive"
+                        : kpi.tone === "warn"
+                        ? "text-amber-600"
+                        : ""
+                    }`}
+                  >
+                    {kpi.value}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{kpi.sub}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -300,6 +442,10 @@ export default function Oversight() {
                     innerRadius={45}
                     outerRadius={75}
                     paddingAngle={2}
+                    style={{ cursor: "pointer" }}
+                    onClick={(d: { name?: string }) =>
+                      d?.name && applyDrill({ type: "status", value: d.name as ClientStatus })
+                    }
                   >
                     {statusData.map((entry) => (
                       <Cell
@@ -325,7 +471,14 @@ export default function Oversight() {
                   <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                   <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                   <Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  <Bar
+                    dataKey="value"
+                    radius={[4, 4, 0, 0]}
+                    style={{ cursor: "pointer" }}
+                    onClick={(d: { name?: string }) =>
+                      d?.name && applyDrill({ type: "risk", value: d.name as RiskLevel })
+                    }
+                  >
                     {riskData.map((entry) => (
                       <Cell
                         key={entry.name}
@@ -349,8 +502,24 @@ export default function Oversight() {
                   <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                   <Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="Clients" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Tasks" fill="#64748b" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="Clients"
+                    fill="#2563eb"
+                    radius={[4, 4, 0, 0]}
+                    style={{ cursor: "pointer" }}
+                    onClick={(d: { name?: string }) =>
+                      d?.name && applyDrill({ type: "owner", value: d.name })
+                    }
+                  />
+                  <Bar
+                    dataKey="Tasks"
+                    fill="#64748b"
+                    radius={[4, 4, 0, 0]}
+                    style={{ cursor: "pointer" }}
+                    onClick={(d: { name?: string }) =>
+                      d?.name && applyDrill({ type: "owner", value: d.name })
+                    }
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -377,30 +546,33 @@ export default function Oversight() {
                       const d = parseDate(t.dueDate);
                       const overdueBy = d ? Math.abs(daysBetween(d, today)) : 0;
                       return (
-                        <div
-                          key={t.id}
-                          className="flex items-center justify-between text-sm border-b pb-1.5 last:border-0"
-                        >
-                          <div className="min-w-0">
-                            <span className="font-medium">{t.title}</span>
-                            <span className="text-muted-foreground">
-                              {" "}
-                              &middot; {client?.clientName ?? "Unknown"} &middot; {t.owner}
-                            </span>
+                        <Link key={t.id} href={`/clients/${t.clientId}`}>
+                          <div className="flex items-center justify-between text-sm border-b pb-1.5 last:border-0 cursor-pointer hover:text-foreground group">
+                            <div className="min-w-0">
+                              <span className="font-medium">{t.title}</span>
+                              <span className="text-muted-foreground">
+                                {" "}
+                                &middot; {client?.clientName ?? "Unknown"} &middot; {t.owner}
+                              </span>
+                            </div>
+                            <Badge variant="destructive" className="shrink-0">
+                              {overdueBy}d overdue
+                            </Badge>
                           </div>
-                          <Badge variant="destructive" className="shrink-0">
-                            {overdueBy}d overdue
-                          </Badge>
-                        </div>
+                        </Link>
                       );
                     })}
                     {overdueTasks.length === 0 && (
                       <p className="text-sm text-muted-foreground">No overdue tasks.</p>
                     )}
                     {overdueTasks.length > 6 && (
-                      <p className="text-xs text-muted-foreground pt-1">
+                      <button
+                        onClick={() => applyDrill({ type: "overdue" })}
+                        className="inline-flex items-center gap-0.5 text-xs text-accent hover:underline pt-1"
+                      >
                         + {overdueTasks.length - 6} more
-                      </p>
+                        <ChevronRight className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -439,9 +611,13 @@ export default function Oversight() {
                       <p className="text-sm text-muted-foreground">No open escalations.</p>
                     )}
                     {openEscalations.length > 6 && (
-                      <p className="text-xs text-muted-foreground pt-1">
+                      <button
+                        onClick={() => applyDrill({ type: "hasEscalation" })}
+                        className="inline-flex items-center gap-0.5 text-xs text-accent hover:underline pt-1"
+                      >
                         + {openEscalations.length - 6} more
-                      </p>
+                        <ChevronRight className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -450,9 +626,20 @@ export default function Oversight() {
           </Card>
         )}
 
-        <Card>
-          <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="text-base">All Accounts</CardTitle>
+        <Card ref={tableRef}>
+          <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3 flex-wrap">
+              <CardTitle className="text-base">All Accounts</CardTitle>
+              {drill && (
+                <button
+                  onClick={() => setDrill(null)}
+                  className="inline-flex items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors"
+                >
+                  {drillLabel(drill)}
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
             <span className="text-xs text-muted-foreground">
               {rows.length} of {clients.length}
             </span>
@@ -480,16 +667,22 @@ export default function Oversight() {
                     const due = parseDate(c.dueDate);
                     const overdue = due !== null && due < today && c.openTasks > 0;
                     return (
-                      <TableRow key={c.id} className="cursor-pointer">
+                      <TableRow
+                        key={c.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => setLocation(`/clients/${c.id}`)}
+                      >
                         <TableCell className="font-medium">
-                          <Link href={`/clients/${c.id}`}>
-                            <div className="hover:underline">
-                              {c.clientName}
-                              <div className="text-xs text-muted-foreground font-normal">
-                                {c.companyName}
-                              </div>
-                            </div>
+                          <Link
+                            href={`/clients/${c.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="hover:underline focus:outline-none focus-visible:underline"
+                          >
+                            {c.clientName}
                           </Link>
+                          <div className="text-xs text-muted-foreground font-normal">
+                            {c.companyName}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -551,7 +744,7 @@ export default function Oversight() {
                   {rows.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
-                        No accounts match your search.
+                        No accounts match {drill ? "this filter" : "your search"}.
                       </TableCell>
                     </TableRow>
                   )}
