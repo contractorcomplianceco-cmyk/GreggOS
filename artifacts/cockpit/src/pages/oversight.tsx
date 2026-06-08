@@ -43,7 +43,7 @@ const STATUS_COLORS: Record<ClientStatus, string> = {
 
 const RISK_COLORS: Record<RiskLevel, string> = {
   Low: "#16a34a",
-  Medium: "#64748b",
+  Medium: "#d97706",
   High: "#ef4444",
   Critical: "#b91c1c",
 };
@@ -271,7 +271,7 @@ export default function Oversight() {
                     kpi.tone === "danger"
                       ? "text-destructive"
                       : kpi.tone === "warn"
-                      ? "text-destructive"
+                      ? "text-amber-600"
                       : ""
                   }`}
                 >

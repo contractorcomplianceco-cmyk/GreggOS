@@ -214,13 +214,13 @@ export default function Processor() {
             <h1 className="text-3xl font-bold">Call Note Processor</h1>
             <Badge
               variant="outline"
-              className="px-3 py-1 bg-blue-100/60 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200"
+              className="px-3 py-1 bg-yellow-100/50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200"
             >
               Draft Mode
             </Badge>
           </div>
 
-          <p className="text-xs text-muted-foreground border-l-2 border-primary/50 pl-3 py-1">
+          <p className="text-xs text-muted-foreground border-l-2 border-yellow-500/60 pl-3 py-1">
             Drafts only. This tool does not approve pricing, refunds, legal advice, compliance
             opinions, qualifier placements, or final client commitments. Route those to leadership
             review.
