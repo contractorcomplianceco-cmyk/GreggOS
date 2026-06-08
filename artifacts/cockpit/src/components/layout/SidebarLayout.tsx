@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard } from "lucide-react";
+import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
@@ -7,6 +7,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: "Gregg Today", href: "/", icon: LayoutDashboard },
+    { name: "Account Oversight", href: "/oversight", icon: BarChart3 },
     { name: "Landon Work Queue", href: "/work-queue", icon: CheckSquare },
     { name: "Current Clients", href: "/clients", icon: Users },
     { name: "Call Note Processor", href: "/processor", icon: Briefcase },

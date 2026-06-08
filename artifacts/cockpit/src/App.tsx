@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import GreggToday from "@/pages/gregg-today";
+import Oversight from "@/pages/oversight";
 import WorkQueue from "@/pages/work-queue";
 import Clients from "@/pages/clients";
 import ClientDetail from "@/pages/client-detail";
@@ -18,6 +19,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={GreggToday} />
+      <Route path="/oversight" component={Oversight} />
       <Route path="/work-queue" component={WorkQueue} />
       <Route path="/clients" component={Clients} />
       <Route path="/clients/:id" component={ClientDetail} />
