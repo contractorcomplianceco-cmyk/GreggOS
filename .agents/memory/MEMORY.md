@@ -1,1 +1,2 @@
 - [Zustand store self-reference](zustand-store-typing.md) — calling the store singleton inside its own creator collapses all store types to `any`; use the `get` param instead.
+- [CCA brand palette](cca-brand-palette.md) — navy + electric blue + silver/white; red only for alerts; NO gold/amber; theme tokens in cockpit index.css.

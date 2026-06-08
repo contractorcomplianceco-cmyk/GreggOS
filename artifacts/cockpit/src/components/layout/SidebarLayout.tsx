@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -19,9 +19,15 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen w-full bg-background overflow-hidden">
       <div className="w-64 bg-sidebar border-r border-sidebar-border text-sidebar-foreground flex flex-col justify-between hidden md:flex">
         <div>
-          <div className="p-6">
-            <h1 className="text-xl font-bold tracking-tight text-sidebar-primary">Cockpit</h1>
-            <p className="text-xs text-sidebar-foreground/70 mt-1">Contractor Compliance Authority</p>
+          <div className="px-5 pt-6 pb-5">
+            <img
+              src={ccaLogo}
+              alt="Contractor Compliance Authority"
+              className="w-full h-auto"
+            />
+            <p className="text-[11px] uppercase tracking-[0.18em] text-sidebar-foreground/60 mt-3">
+              Current Client Cockpit
+            </p>
           </div>
           <nav className="space-y-1 px-4">
             {navigation.map((item) => {

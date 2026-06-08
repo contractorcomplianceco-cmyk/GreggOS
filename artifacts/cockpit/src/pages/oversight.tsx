@@ -36,16 +36,16 @@ import type {
 const STATUS_COLORS: Record<ClientStatus, string> = {
   Active: "#16a34a",
   "At Risk": "#dc2626",
-  Onboarding: "#2563eb",
-  "Renewal Pending": "#d97706",
-  Stalled: "#6b7280",
+  Onboarding: "#1d6fd6",
+  "Renewal Pending": "#0e9bb8",
+  Stalled: "#64748b",
 };
 
 const RISK_COLORS: Record<RiskLevel, string> = {
   Low: "#16a34a",
-  Medium: "#d97706",
-  High: "#ea580c",
-  Critical: "#dc2626",
+  Medium: "#64748b",
+  High: "#ef4444",
+  Critical: "#b91c1c",
 };
 
 const PRIORITY_ORDER: Record<Priority, number> = {
@@ -271,7 +271,7 @@ export default function Oversight() {
                     kpi.tone === "danger"
                       ? "text-destructive"
                       : kpi.tone === "warn"
-                      ? "text-amber-600"
+                      ? "text-destructive"
                       : ""
                   }`}
                 >
@@ -350,7 +350,7 @@ export default function Oversight() {
                   <Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
                   <Bar dataKey="Clients" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Tasks" fill="#d97706" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Tasks" fill="#64748b" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
