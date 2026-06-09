@@ -12,8 +12,30 @@ import {
   RiskLevel,
   SignalType,
   EscalationReason,
+  ClientProcess,
+  ClientAudit,
+  ClientRiskProfile,
+  ExpansionMilestone,
+  Invoice,
+  SLA,
+  ScheduledEvent,
+  ContactLogEntry,
 } from './types';
-import { seedClients, seedNotes, seedTasks, seedSignals, seedEscalations } from './seed';
+import {
+  seedClients,
+  seedNotes,
+  seedTasks,
+  seedSignals,
+  seedEscalations,
+  seedProcesses,
+  seedAudits,
+  seedRiskProfiles,
+  seedExpansion,
+  seedInvoices,
+  seedSLAs,
+  seedEvents,
+  seedContactLog,
+} from './seed';
 
 export interface ProcessedNotePayload {
   id?: string;
@@ -47,6 +69,14 @@ interface AppState {
   tasks: Task[];
   signals: OpportunitySignal[];
   escalations: Escalation[];
+  processes: ClientProcess[];
+  audits: ClientAudit[];
+  riskProfiles: ClientRiskProfile[];
+  expansion: ExpansionMilestone[];
+  invoices: Invoice[];
+  slas: SLA[];
+  events: ScheduledEvent[];
+  contactLog: ContactLogEntry[];
 
   addClient: (client: CurrentClient) => void;
   updateClient: (id: string, updates: Partial<CurrentClient>) => void;
@@ -76,6 +106,14 @@ export const useStore = create<AppState>()(
       tasks: seedTasks,
       signals: seedSignals,
       escalations: seedEscalations,
+      processes: seedProcesses,
+      audits: seedAudits,
+      riskProfiles: seedRiskProfiles,
+      expansion: seedExpansion,
+      invoices: seedInvoices,
+      slas: seedSLAs,
+      events: seedEvents,
+      contactLog: seedContactLog,
 
       addClient: (client) => set((state) => ({ clients: [...state.clients, client] })),
       updateClient: (id, updates) => set((state) => ({
@@ -227,11 +265,19 @@ export const useStore = create<AppState>()(
         tasks: seedTasks,
         signals: seedSignals,
         escalations: seedEscalations,
+        processes: seedProcesses,
+        audits: seedAudits,
+        riskProfiles: seedRiskProfiles,
+        expansion: seedExpansion,
+        invoices: seedInvoices,
+        slas: seedSLAs,
+        events: seedEvents,
+        contactLog: seedContactLog,
       })
     }),
     {
       name: 'cockpit-storage',
-      version: 2,
+      version: 3,
     }
   )
 );

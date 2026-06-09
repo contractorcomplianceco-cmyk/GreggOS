@@ -85,3 +85,147 @@ export interface Escalation {
   deadline: string;
   status: 'Open' | 'Under Review' | 'Resolved';
 }
+
+export type Trend = 'up' | 'down' | 'flat';
+
+export type ProcessType =
+  | 'Onboarding'
+  | 'Audit'
+  | 'Qualifier'
+  | 'Placement'
+  | 'Renewal'
+  | 'Document Collection'
+  | 'Monitoring'
+  | 'Client-save'
+  | 'Expansion';
+
+export type ProcessStatus =
+  | 'Not Started'
+  | 'In Progress'
+  | 'Blocked'
+  | 'Waiting on Client'
+  | 'Completed';
+
+export interface ClientProcess {
+  id: string;
+  clientId: string;
+  name: string;
+  type: ProcessType;
+  status: ProcessStatus;
+  progress: number; // 0-100
+  owner: string;
+  startedAt: string;
+  dueDate: string;
+  blockedReason: string;
+}
+
+export type AuditStatus =
+  | 'Not Started'
+  | 'Scheduled'
+  | 'In Progress'
+  | 'Under Review'
+  | 'Passed'
+  | 'Remediation'
+  | 'Failed';
+
+export interface AuditScoreItem {
+  category: string;
+  score: number; // 0-100, higher is better
+  weight: number;
+  notes: string;
+}
+
+export interface ClientAudit {
+  clientId: string;
+  status: AuditStatus;
+  auditType: string;
+  auditor: string;
+  lastAuditDate: string;
+  nextAuditDate: string;
+  overallScore: number; // 0-100
+  scoresheet: AuditScoreItem[];
+}
+
+export interface RiskFactor {
+  label: string;
+  score: number; // 0-100 contribution, higher = riskier
+  weight: number;
+  trend: Trend;
+}
+
+export interface ClientRiskProfile {
+  clientId: string;
+  overallScore: number; // 0-100, higher = riskier
+  trend: Trend;
+  updatedAt: string;
+  factors: RiskFactor[];
+}
+
+export type RoadmapStage = 'Identified' | 'Proposed' | 'In Discussion' | 'Committed' | 'Live';
+
+export interface ExpansionMilestone {
+  id: string;
+  clientId: string;
+  title: string;
+  stage: RoadmapStage;
+  potentialValue: number;
+  targetDate: string;
+  description: string;
+}
+
+export type InvoiceStatus = 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Overdue';
+
+export interface Invoice {
+  id: string;
+  clientId: string;
+  invoiceNumber: string;
+  amount: number;
+  amountPaid: number;
+  issueDate: string;
+  dueDate: string;
+  status: InvoiceStatus;
+}
+
+export type SLAStatus = 'On Track' | 'At Risk' | 'Met' | 'Missed' | 'Upcoming';
+
+export interface SLA {
+  id: string;
+  clientId: string;
+  name: string;
+  description: string;
+  dueDate: string;
+  status: SLAStatus;
+  owner: string;
+}
+
+export type EventType =
+  | 'Check-in'
+  | 'Audit'
+  | 'Review'
+  | 'Renewal'
+  | 'Escalation'
+  | 'Onboarding'
+  | 'Placement';
+
+export interface ScheduledEvent {
+  id: string;
+  clientId: string;
+  title: string;
+  type: EventType;
+  date: string;
+  time: string;
+  attendees: string;
+  withClient: boolean;
+}
+
+export type ContactChannel = 'Call' | 'Email' | 'Meeting' | 'Text';
+
+export interface ContactLogEntry {
+  id: string;
+  clientId: string;
+  date: string;
+  channel: ContactChannel;
+  internalPerson: string;
+  direction: 'Inbound' | 'Outbound';
+  summary: string;
+}

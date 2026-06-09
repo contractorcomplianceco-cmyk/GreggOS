@@ -118,13 +118,13 @@ export default function Clients() {
                     <p>
                       <strong>Contact:</strong> {client.contactName}
                     </p>
-                    <p className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <strong>Priority:</strong>{" "}
                       <Badge variant={client.greggPriority === "Urgent" ? "destructive" : "secondary"}>
                         {client.greggPriority}
                       </Badge>
                       <Badge variant="outline">{client.riskLevel} Risk</Badge>
-                    </p>
+                    </div>
                     <p>
                       <strong>Next Action:</strong> {client.nextAction}
                     </p>
