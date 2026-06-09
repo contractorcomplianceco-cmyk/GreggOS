@@ -1,0 +1,51 @@
+Next, scope Phase 3 for Gregg’s Cockpit.
+
+Do not make code changes yet. First provide a build plan.
+
+The app now has Phase 2 completed with Expansion Pipeline, Relationships view, Gregg/Tara overlap controls, Shared Activity Timeline, Hand off action, and relationship monitoring.
+
+I want the next phase to focus on making this more operationally useful for Gregg’s current-client relationship work and expansion opportunities.
+
+Please evaluate and propose the next build scope for:
+
+1. CRM output / sync
+- How expansion opportunities, call notes, tasks, relationship touches, and handoffs should push or sync to CRM
+- What should remain human-approved before pushing
+- What CRM IDs or traceability should be stored
+- What should be draft/export-only first versus real sync later
+
+2. RingCentral or transcript intake
+- How call notes or transcripts should flow into the Call Note Processor
+- Whether this should start as file/upload/paste support before direct integration
+- What data should be extracted into tasks, escalations, relationship touches, and expansion signals
+
+3. Gregg-facing communication support
+- Whether Gregg needs an email/message builder similar to Tara’s
+- What communication types should be supported: client nurture, post-call follow-up, expansion opportunity follow-up, meeting confirmation, visit follow-up, handoff to Tara, handoff to Rose
+- What guardrails should apply: no pricing promises, no approval guarantees, no legal/compliance advice, human review required
+
+4. Relationship and expansion reporting
+- What reports Gregg and leadership need
+- Suggested metrics: touches due, clients going cold, visits/meals completed, expansion opportunities by stage, stalled expansion opportunities, Tara-shared accounts, converted expansion revenue, follow-up completion rate
+- What should appear on Gregg Today versus a dedicated reporting view
+
+5. Tara/Gregg coordination
+- How the app should represent Tara post-sale involvement and Gregg pre-sale involvement
+- Whether there should be shared tasks, shared notes, co-owner status, or handoff workflows
+- How to prevent duplicate outreach or confusion over ownership
+
+For each proposed feature, classify it as:
+- Must build next
+- Should build soon
+- Nice later
+- Defer to CRM/Zoho
+
+Also include:
+- Recommended sequence
+- Data model changes needed
+- API changes needed
+- Risks
+- What should be human-reviewed
+- What should not be automated yet
+
+Do not start implementation until I approve the plan.
