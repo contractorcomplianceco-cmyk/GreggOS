@@ -23,6 +23,7 @@ import {
   Phone,
   ListChecks,
   CircleDollarSign,
+  Activity,
 } from "lucide-react";
 import type {
   RiskLevel,
@@ -120,6 +121,21 @@ function scoreColor(score: number): string {
   return "#dc2626";
 }
 
+// Overall health (higher = healthier). Green -> amber -> red -> dark red.
+function healthColor(score: number): string {
+  if (score >= 80) return "#16a34a";
+  if (score >= 60) return "#d97706";
+  if (score >= 40) return "#ef4444";
+  return "#b91c1c";
+}
+
+function healthBand(score: number): string {
+  if (score >= 80) return "Healthy";
+  if (score >= 60) return "Stable";
+  if (score >= 40) return "At Risk";
+  return "Critical";
+}
+
 const AUDIT_BADGE: Record<AuditStatus, string> = {
   "Not Started": "bg-slate-100 text-slate-700 border-slate-300",
   Scheduled: "bg-blue-50 text-blue-700 border-blue-300",
@@ -176,6 +192,55 @@ function Bar({ value, color, height = 8 }: { value: number; color: string; heigh
   return (
     <div className="w-full rounded-full bg-muted overflow-hidden" style={{ height }}>
       <div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, value))}%`, backgroundColor: color }} />
+    </div>
+  );
+}
+
+// Semicircular dial gauge for the overall health meter. `score` is null when
+// there is not enough signal to compute a meaningful health figure.
+function HealthGauge({ score }: { score: number | null }) {
+  const cx = 110;
+  const cy = 110;
+  const r = 90;
+  const sw = 14;
+  const has = score !== null;
+  const clamped = has ? Math.max(0, Math.min(100, score)) : 0;
+  const polar = (pct: number, radius = r) => {
+    const t = Math.PI * (1 - pct / 100);
+    return { x: cx + radius * Math.cos(t), y: cy - radius * Math.sin(t) };
+  };
+  const arc = (from: number, to: number, radius = r) => {
+    const s = polar(from, radius);
+    const e = polar(to, radius);
+    return `M ${s.x} ${s.y} A ${radius} ${radius} 0 0 1 ${e.x} ${e.y}`;
+  };
+  const color = has ? healthColor(clamped) : "#94a3b8";
+  const dot = polar(clamped);
+  const zero = polar(0);
+  const hundred = polar(100);
+  return (
+    <div className="relative w-full max-w-[240px]">
+      <svg viewBox="0 0 220 128" className="w-full" role="img" aria-label={has ? `Overall health ${clamped} of 100` : "Overall health not available"}>
+        <path d={arc(0, 100)} fill="none" stroke="#e2e8f0" strokeWidth={sw} strokeLinecap="round" />
+        {has && <path d={arc(0, Math.max(0.5, clamped))} fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" />}
+        {has && <circle cx={dot.x} cy={dot.y} r={7} fill="#ffffff" stroke={color} strokeWidth={3} />}
+        <text x={zero.x} y={cy + 18} fontSize="10" fill="#94a3b8" textAnchor="middle">0</text>
+        <text x={hundred.x} y={cy + 18} fontSize="10" fill="#94a3b8" textAnchor="middle">100</text>
+      </svg>
+      <div className="absolute inset-x-0 bottom-1 flex flex-col items-center">
+        {has ? (
+          <>
+            <span className="text-4xl font-bold leading-none tabular-nums" style={{ color }}>{clamped}</span>
+            <span className="mt-1 text-xs font-semibold" style={{ color }}>{healthBand(clamped)}</span>
+            <span className="text-[10px] text-muted-foreground">/ 100 health</span>
+          </>
+        ) : (
+          <>
+            <span className="text-2xl font-bold leading-none text-muted-foreground">N/A</span>
+            <span className="mt-1 text-[10px] text-muted-foreground">Insufficient data</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -331,6 +396,46 @@ export default function ClientDetail() {
 
   const isHighRisk = client.riskLevel === "High" || client.riskLevel === "Critical";
 
+  // Overall client health (0-100, higher = healthier). Weighted blend of the
+  // available signals; weights renormalize when risk/audit/SLA data is absent.
+  const healthParts: { label: string; score: number; weight: number; target: string }[] = [];
+  if (data.risk) healthParts.push({ label: "Risk profile", score: 100 - data.risk.overallScore, weight: 30, target: "section-risk" });
+  if (data.audit && data.audit.overallScore > 0)
+    healthParts.push({ label: "Audit compliance", score: data.audit.overallScore, weight: 25, target: "section-audit" });
+  if (data.clientSlas.length > 0) {
+    const bad = data.missedSlas.length + data.atRiskSlas.length * 0.5;
+    healthParts.push({ label: "SLA adherence", score: Math.max(0, 100 - (bad / data.clientSlas.length) * 100), weight: 15, target: "section-slas" });
+  }
+  healthParts.push({
+    label: "Task timeliness",
+    score: data.openTasks.length === 0 ? 100 : Math.max(0, 100 - (data.overdueTasks.length / data.openTasks.length) * 100),
+    weight: 10,
+    target: "section-tasks",
+  });
+  healthParts.push({
+    label: "Billing / AR",
+    score: data.arOutstanding > 0 ? Math.max(0, 100 - (data.arOverdue / data.arOutstanding) * 100) : 100,
+    weight: 10,
+    target: "section-invoices",
+  });
+  healthParts.push({
+    label: "Escalations",
+    score: data.openEscalations.length === 0 ? 100 : Math.max(0, 100 - data.openEscalations.length * 34),
+    weight: 10,
+    target: data.clientEscalations.length > 0 ? "section-escalations" : "",
+  });
+  // Clamp each component to [0,100] so an out-of-range upstream value can't skew the blend.
+  healthParts.forEach((p) => (p.score = Math.max(0, Math.min(100, p.score))));
+  // Require at least one substantive signal (risk, audit, or SLAs). The
+  // operational factors (tasks/AR/escalations) default to 100 when empty, so on
+  // their own they would inflate a data-less client to a misleading perfect score.
+  const healthHasSignal = !!data.risk || !!(data.audit && data.audit.overallScore > 0) || data.clientSlas.length > 0;
+  const healthWeight = healthParts.reduce((s, p) => s + p.weight, 0);
+  const healthScore =
+    !healthHasSignal || healthWeight === 0
+      ? null
+      : Math.round(healthParts.reduce((s, p) => s + p.score * p.weight, 0) / healthWeight);
+
   const norm = (s: string) => s.toLowerCase().replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
   const liveAudit = liveAudits?.find(
     (a) => norm(a.clientName) === norm(client.clientName) || norm(a.clientName) === norm(client.companyName),
@@ -425,6 +530,50 @@ export default function ClientDetail() {
             </CardContent>
           </Card>
         )}
+
+        {/* Overall client health */}
+        <Card id="section-health" className="scroll-mt-6 transition-all">
+          <CardHeader className="pb-3">
+            <SectionTitle icon={<Activity className="h-4 w-4" />}>Overall Client Health</SectionTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 sm:grid-cols-[240px_1fr] sm:items-center">
+              <div className="flex justify-center">
+                <HealthGauge score={healthScore} />
+              </div>
+              <div className="space-y-1">
+                {healthParts.map((p) => {
+                  const clickable = !!p.target;
+                  const row = (
+                    <>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="flex items-center gap-1.5">
+                          {p.label} <span className="text-muted-foreground">· {p.weight}%</span>
+                        </span>
+                        <span className="font-medium tabular-nums" style={{ color: healthColor(p.score) }}>
+                          {Math.round(p.score)}
+                        </span>
+                      </div>
+                      <Bar value={p.score} color={healthColor(p.score)} />
+                    </>
+                  );
+                  return clickable ? (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => scrollToSection(p.target)}
+                      className="block w-full rounded-md p-1.5 text-left transition-colors hover:bg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      {row}
+                    </button>
+                  ) : (
+                    <div key={p.label} className="p-1.5">{row}</div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* KPI strip */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">

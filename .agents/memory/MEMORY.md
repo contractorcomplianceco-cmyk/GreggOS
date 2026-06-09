@@ -1,3 +1,4 @@
 - [Zustand store self-reference](zustand-store-typing.md) — calling the store singleton inside its own creator collapses all store types to `any`; use the `get` param instead.
 - [CCA brand palette](cca-brand-palette.md) — navy + electric blue + silver/white; red only for alerts; NO gold/amber; theme tokens in cockpit index.css.
 - [Cockpit live audit portal integration](audit-portal-integration.md) — cockpit reads live audits from external open-CORS portal via direct browser fetch; name-match linkage; portal endpoints are public/unauth.
+- [Cockpit data conventions](cockpit-data-conventions.md) — audit.overallScore 0 = "not audited" sentinel; overall health gauge blend/N-A rules
