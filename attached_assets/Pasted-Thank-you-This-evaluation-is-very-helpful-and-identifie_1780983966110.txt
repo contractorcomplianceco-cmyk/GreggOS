@@ -1,0 +1,40 @@
+Thank you. This evaluation is very helpful and identifies the correct core issue.
+
+I agree that the strongest part of the Gregg + Landon Cockpit is the Call Note Processor. That feature directly supports the business need: turning messy call notes into structured, decision-safe, CRM-ready follow-up without losing important client signals.
+
+The biggest issue is also clear: if Gregg and Landon are both supposed to work from this cockpit, the app cannot rely on localStorage or browser-only data. The purpose of the tool is coordination, so the data needs to live in one shared place.
+
+For now, please treat this app as a prototype / pilot until we confirm the product role.
+
+Priority direction:
+
+1. Decide the app’s role
+Before building more, confirm whether this is:
+- A staging layer that prepares information for the CRM
+- A true operational cockpit
+- A prototype only
+- Or a future production tool
+
+2. Add shared persistent data if this will be used operationally
+Gregg and Landon need to see the same clients, notes, tasks, escalations, and changes across devices.
+
+3. Reduce double entry
+The Call Note Processor is valuable, but the workflow should eventually reduce manual copy/paste:
+- RingCentral or transcript input into the processor
+- Reviewed CRM-ready output into the CRM
+
+4. Protect the audit-risk connection
+The client-to-audit link should not depend only on name matching. It needs a stable mapping or confirm/override step.
+
+5. Add change-awareness
+Gregg should be able to see what is new, what changed, what Landon processed, and what needs his attention since the last review.
+
+6. Add audit trail and accountability
+For a compliance business, we need to know who processed or edited notes, tasks, escalations, and client signals.
+
+Please turn the priority recommendations into a concrete next-step build plan, but do not make code changes yet. First identify:
+- Whether this should stay prototype-only or become operational
+- What backend/shared data option is recommended
+- How CRM output should work
+- Whether RingCentral integration is possible
+- What should be built first versus postponed
