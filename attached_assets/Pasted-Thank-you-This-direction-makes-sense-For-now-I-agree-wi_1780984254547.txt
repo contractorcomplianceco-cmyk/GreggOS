@@ -1,0 +1,44 @@
+Thank you. This direction makes sense.
+
+For now, I agree with treating the Gregg + Landon Cockpit as a focused operational cockpit, not a CRM replacement and not just a throwaway prototype.
+
+The system boundary should be:
+
+- The Cockpit owns the follow-through workflow: call notes, reviewed summaries, tasks, escalations, opportunity signals, client ops status, and audit-risk linkage.
+- The CRM remains the system of record for client master data, official client history, and long-term account records.
+
+I also agree that Phase 1 should focus on shared data and login before anything else. Gregg and Landon need to see the same live information before the app can be trusted as an operational coordination tool.
+
+Approved direction for planning:
+
+1. Start with shared backend/data foundation
+Use the existing api-server structure if it is already present and appropriate. Move away from browser-only/localStorage data.
+
+2. Add login/user identity
+We need known users before we can support audit trail, change-awareness, or accountability.
+
+3. Add audit trail and change-awareness after shared data
+Once Gregg and Landon are working from the same data, add:
+- Who processed what
+- What changed
+- What is new since last review
+- What needs Gregg’s attention
+
+4. Make audit-risk linkage durable
+Client-to-audit matching should be confirmed and stored, not dependent only on name matching.
+
+5. Keep CRM output human-approved
+Do not auto-push to CRM. Use an “Approve & push” model so reviewed notes and tasks only leave the Cockpit after human approval.
+
+6. Postpone RingCentral integration until later
+Direct transcript/call intake can wait until the shared data and CRM output foundation is in place, and until we confirm where the raw notes actually originate.
+
+Before starting implementation, please provide the proposed Phase 1 database/schema plan for review, including:
+- Main tables
+- User/account structure
+- Notes/tasks/escalations/signals structure
+- Activity log structure
+- How existing local/demo data would migrate
+- Any auth choice recommendation and tradeoffs
+
+Do not begin code changes until the Phase 1 schema and implementation plan are reviewed.
