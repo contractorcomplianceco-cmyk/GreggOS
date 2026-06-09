@@ -873,3 +873,37 @@ export const ImportDataResponse = zod.object({
 })
 
 
+/**
+ * @summary List all users (admin only)
+ */
+export const ListUsersResponseItem = zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string(),
+  "active": zod.boolean()
+})
+export const ListUsersResponse = zod.array(ListUsersResponseItem)
+
+
+/**
+ * @summary Update a user's role or active status (admin only)
+ */
+export const UpdateUserParams = zod.object({
+  "userId": zod.coerce.string()
+})
+
+export const UpdateUserBody = zod.object({
+  "role": zod.enum(['admin', 'coordinator']).optional(),
+  "active": zod.boolean().optional()
+})
+
+export const UpdateUserResponse = zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string(),
+  "active": zod.boolean()
+})
+
+

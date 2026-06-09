@@ -1,16 +1,62 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { useStore } from "@/lib/store";
-import { exportData, useGetCurrentUser } from "@workspace/api-client-react";
+import {
+  exportData,
+  useGetCurrentUser,
+  useListUsers,
+  useUpdateUser,
+  getListUsersQueryKey,
+} from "@workspace/api-client-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ApiError } from "@workspace/api-client-react";
 
 export default function Admin() {
   const { resetData } = useStore();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { data: me, isLoading: meLoading } = useGetCurrentUser();
   const isAdmin = me?.role === "admin";
+
+  const { data: users } = useListUsers({
+    query: { enabled: isAdmin, queryKey: getListUsersQueryKey() },
+  });
+  const updateUserM = useUpdateUser({
+    mutation: {
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: getListUsersQueryKey() }),
+    },
+  });
+
+  const handleRoleChange = async (
+    userId: string,
+    email: string,
+    nextRole: "admin" | "coordinator"
+  ) => {
+    try {
+      await updateUserM.mutateAsync({ userId, data: { role: nextRole } });
+      toast({
+        title: "Role updated",
+        description:
+          nextRole === "admin"
+            ? `${email} is now an admin.`
+            : `${email} is now a coordinator.`,
+      });
+    } catch (err) {
+      const isLastAdmin = err instanceof ApiError && err.status === 409;
+      toast({
+        title: "Update failed",
+        description: isLastAdmin
+          ? "You can't remove the last active admin. Promote someone else first."
+          : "Could not change this user's role. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleReset = async () => {
     if (confirm("Are you sure you want to reset all data to default seed values? This cannot be undone.")) {
@@ -70,6 +116,90 @@ export default function Admin() {
         <h1 className="text-3xl font-bold mb-6">Admin / Setup</h1>
         
         <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>User Management</CardTitle>
+              <CardDescription>
+                Choose who has admin access. Admins can manage data and user roles; coordinators have the standard cockpit without admin tools.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="border rounded-lg divide-y">
+                {(users ?? []).map((u) => {
+                  const isSelf = u.id === me?.id;
+                  const userIsAdmin = u.role === "admin";
+                  return (
+                    <div
+                      key={u.id}
+                      className="flex items-center justify-between gap-4 p-3"
+                      data-testid={`row-user-${u.id}`}
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm truncate">
+                            {u.displayName || u.email}
+                          </span>
+                          <Badge
+                            variant={userIsAdmin ? "default" : "secondary"}
+                            className="shrink-0"
+                          >
+                            {userIsAdmin ? (
+                              <ShieldCheck className="h-3 w-3 mr-1" />
+                            ) : null}
+                            {u.role}
+                          </Badge>
+                          {isSelf ? (
+                            <span className="text-[11px] text-muted-foreground">
+                              (you)
+                            </span>
+                          ) : null}
+                          {!u.active ? (
+                            <span className="text-[11px] text-destructive">
+                              inactive
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {u.email}
+                        </p>
+                      </div>
+                      {userIsAdmin ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={updateUserM.isPending}
+                          onClick={() =>
+                            handleRoleChange(u.id, u.email, "coordinator")
+                          }
+                          data-testid={`button-demote-${u.id}`}
+                        >
+                          Remove admin
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          disabled={updateUserM.isPending}
+                          onClick={() =>
+                            handleRoleChange(u.id, u.email, "admin")
+                          }
+                          data-testid={`button-promote-${u.id}`}
+                        >
+                          Make admin
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+                {(users ?? []).length === 0 ? (
+                  <div className="p-4 text-sm text-muted-foreground">
+                    No users found.
+                  </div>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Data Management</CardTitle>

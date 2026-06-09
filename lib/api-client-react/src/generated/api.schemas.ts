@@ -22,6 +22,19 @@ export interface User {
   active: boolean;
 }
 
+export type UserUpdateRole = typeof UserUpdateRole[keyof typeof UserUpdateRole];
+
+
+export const UserUpdateRole = {
+  admin: 'admin',
+  coordinator: 'coordinator',
+} as const;
+
+export interface UserUpdate {
+  role?: UserUpdateRole;
+  active?: boolean;
+}
+
 export interface RiskFactor {
   label: string;
   score: number;

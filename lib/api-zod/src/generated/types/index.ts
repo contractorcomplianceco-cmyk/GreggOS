@@ -47,4 +47,6 @@ export * from './task';
 export * from './taskInput';
 export * from './taskUpdate';
 export * from './user';
+export * from './userUpdate';
+export * from './userUpdateRole';
 export * from './viewState';
