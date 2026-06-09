@@ -779,6 +779,129 @@ paths:
               schema:
                 $ref: "#/components/schemas/Client"
 
+  /crm-links:
+    get:
+      operationId: listCrmLinks
+      tags: [crm]
+      summary: List CRM links (the export/approve/push queue)
+      parameters:
+        - { name: entityType, in: query, required: false, schema: { type: string } }
+        - { name: clientId, in: query, required: false, schema: { type: string } }
+        - { name: syncStatus, in: query, required: false, schema: { type: string } }
+        - { name: crmModule, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: CRM links
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CrmLink"
+    post:
+      operationId: upsertCrmLink
+      tags: [crm]
+      summary: Approve an entity for CRM (idempotent on entityType+entityId)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrmLinkInput"
+      responses:
+        "200":
+          description: Approved or updated CRM link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmLink"
+
+  /crm-links/{linkId}:
+    parameters:
+      - name: linkId
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateCrmLink
+      tags: [crm]
+      summary: Mark pushed to CRM (capture record id) or record a sync failure
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrmLinkUpdate"
+      responses:
+        "200":
+          description: Updated CRM link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrmLink"
+
+  /crm-export:
+    get:
+      operationId: listCrmExport
+      tags: [crm]
+      summary: CRM-ready export payloads (export-only; no live push)
+      parameters:
+        - { name: entityType, in: query, required: false, schema: { type: string } }
+        - { name: entityId, in: query, required: false, schema: { type: string } }
+        - { name: syncStatus, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: CRM-ready payloads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CrmExportPayload"
+
+  /reports/relationships:
+    get:
+      operationId: getRelationshipReport
+      tags: [reports]
+      summary: Relationship activity report (operational + leadership)
+      parameters:
+        - { name: windowDays, in: query, required: false, schema: { type: integer } }
+      responses:
+        "200":
+          description: Relationship report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationshipReport"
+
+  /reports/expansion:
+    get:
+      operationId: getExpansionReport
+      tags: [reports]
+      summary: Expansion pipeline + revenue report with owner attribution
+      responses:
+        "200":
+          description: Expansion report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExpansionReport"
+
+  /reports/activity:
+    get:
+      operationId: getActivityReport
+      tags: [reports]
+      summary: Follow-up + activity report
+      parameters:
+        - { name: windowDays, in: query, required: false, schema: { type: integer } }
+      responses:
+        "200":
+          description: Activity report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityReport"
+
 components:
   schemas:
     HealthStatus:
@@ -1258,6 +1381,9 @@ components:
         pinned: { type: boolean }
         priorityBoost: { type: integer }
         lastMovementAt: { type: string }
+        actualValue: { type: number }
+        closedAt:
+          type: [string, "null"]
       required:
         - id
         - clientId
@@ -1271,6 +1397,7 @@ components:
         - pinned
         - priorityBoost
         - lastMovementAt
+        - actualValue
 
     ExpansionInput:
       type: object
@@ -1299,6 +1426,7 @@ components:
         owner: { type: string }
         pinned: { type: boolean }
         priorityBoost: { type: integer }
+        actualValue: { type: number }
 
     ExpansionOpportunity:
       type: object
@@ -1321,6 +1449,186 @@ components:
         - stalled
         - daysSinceMovement
         - sharedWithTara
+
+    CrmLink:
+      type: object
+      properties:
+        id: { type: string }
+        entityType: { type: string }
+        entityId: { type: string }
+        clientId:
+          type: [string, "null"]
+        crmModule: { type: string }
+        crmRecordId:
+          type: [string, "null"]
+        syncStatus: { type: string }
+        syncDirection: { type: string }
+        lastSyncedAt:
+          type: [string, "null"]
+        errorMessage: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - entityType
+        - entityId
+        - crmModule
+        - syncStatus
+        - syncDirection
+        - errorMessage
+        - createdAt
+        - updatedAt
+
+    CrmLinkInput:
+      type: object
+      properties:
+        entityType: { type: string }
+        entityId: { type: string }
+        clientId: { type: string }
+        crmModule: { type: string }
+      required: [entityType, entityId, crmModule]
+
+    CrmLinkUpdate:
+      type: object
+      properties:
+        crmRecordId: { type: string }
+        syncStatus: { type: string }
+        errorMessage: { type: string }
+
+    CrmExportPayload:
+      type: object
+      properties:
+        entityType: { type: string }
+        entityId: { type: string }
+        clientId:
+          type: [string, "null"]
+        crmModule: { type: string }
+        recordTitle: { type: string }
+        syncStatus: { type: string }
+        crmRecordId:
+          type: [string, "null"]
+        fields:
+          type: object
+          additionalProperties: true
+      required:
+        - entityType
+        - entityId
+        - crmModule
+        - recordTitle
+        - syncStatus
+        - fields
+
+    RelationshipReport:
+      type: object
+      properties:
+        windowDays: { type: integer }
+        totalClients: { type: integer }
+        touchesDue: { type: integer }
+        goingCold: { type: integer }
+        visitsCompleted: { type: integer }
+        mealsCompleted: { type: integer }
+        cadenceAdherencePct: { type: number }
+        taraSharedAccounts: { type: integer }
+        byWarmth:
+          type: array
+          items:
+            type: object
+            properties:
+              warmth: { type: string }
+              count: { type: integer }
+            required: [warmth, count]
+        byOwner:
+          type: array
+          items:
+            type: object
+            properties:
+              owner: { type: string }
+              clients: { type: integer }
+              touchesDue: { type: integer }
+              goingCold: { type: integer }
+            required: [owner, clients, touchesDue, goingCold]
+      required:
+        - windowDays
+        - totalClients
+        - touchesDue
+        - goingCold
+        - visitsCompleted
+        - mealsCompleted
+        - cadenceAdherencePct
+        - taraSharedAccounts
+        - byWarmth
+        - byOwner
+
+    ExpansionReport:
+      type: object
+      properties:
+        openCount: { type: integer }
+        wonCount: { type: integer }
+        lostCount: { type: integer }
+        stalledCount: { type: integer }
+        pipelineValue: { type: number }
+        convertedRevenue: { type: number }
+        winRatePct: { type: number }
+        taraSharedOpenCount: { type: integer }
+        taraSharedPipelineValue: { type: number }
+        taraSharedConvertedRevenue: { type: number }
+        byStage:
+          type: array
+          items:
+            type: object
+            properties:
+              stage: { type: string }
+              count: { type: integer }
+              value: { type: number }
+            required: [stage, count, value]
+        byOwner:
+          type: array
+          items:
+            type: object
+            properties:
+              owner: { type: string }
+              openCount: { type: integer }
+              pipelineValue: { type: number }
+              wonCount: { type: integer }
+              convertedRevenue: { type: number }
+            required:
+              - owner
+              - openCount
+              - pipelineValue
+              - wonCount
+              - convertedRevenue
+      required:
+        - openCount
+        - wonCount
+        - lostCount
+        - stalledCount
+        - pipelineValue
+        - convertedRevenue
+        - winRatePct
+        - taraSharedOpenCount
+        - taraSharedPipelineValue
+        - taraSharedConvertedRevenue
+        - byStage
+        - byOwner
+
+    ActivityReport:
+      type: object
+      properties:
+        windowDays: { type: integer }
+        openTasks: { type: integer }
+        completedTasks: { type: integer }
+        overdueTasks: { type: integer }
+        followUpCompletionPct: { type: number }
+        touchesLogged: { type: integer }
+        handoffs: { type: integer }
+      required:
+        - windowDays
+        - openTasks
+        - completedTasks
+        - overdueTasks
+        - followUpCompletionPct
+        - touchesLogged
+        - handoffs
 
     Invoice:
       type: object

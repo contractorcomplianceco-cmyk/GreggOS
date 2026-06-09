@@ -127,6 +127,10 @@ export const expansionMilestonesTable = pgTable("expansion_milestones", {
   lastMovementAt: timestamp("last_movement_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  // Closed-revenue lifecycle: actualValue is the realized amount on Won;
+  // closedAt is stamped when status moves to Won/Lost.
+  actualValue: integer("actual_value").notNull().default(0),
+  closedAt: timestamp("closed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

@@ -10,6 +10,7 @@ import {
   getListExpansionPipelineQueryKey,
 } from "@workspace/api-client-react";
 import type { ExpansionOpportunity } from "@workspace/api-client-react";
+import { useStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,9 @@ import {
   AlertTriangle,
   TrendingUp,
   Plus,
+  CheckCircle2,
+  Flag,
+  Upload,
 } from "lucide-react";
 
 const STAGES = ["Identified", "Qualifying", "Proposed", "Negotiation", "Closing"];
@@ -58,9 +62,12 @@ function riskBadgeVariant(level: string): "default" | "secondary" | "destructive
 
 export default function Expansion() {
   const qc = useQueryClient();
+  const { toast } = useToast();
+  const { approveForCrm } = useStore();
   const [ownerFilter, setOwnerFilter] = useState<string>("All");
   const [stageFilter, setStageFilter] = useState<string>("All");
   const [sharedOnly, setSharedOnly] = useState(false);
+  const [closing, setClosing] = useState<ExpansionOpportunity | null>(null);
 
   const params = {
     ...(ownerFilter !== "All" ? { owner: ownerFilter } : {}),
@@ -104,6 +111,27 @@ export default function Expansion() {
   const adjustBoost = (o: ExpansionOpportunity, delta: number) => {
     const next = Math.max(0, Math.min(20, o.milestone.priorityBoost + delta));
     updateM.mutate({ milestoneId: o.milestone.id, data: { priorityBoost: next } });
+  };
+
+  const approve = async (o: ExpansionOpportunity) => {
+    try {
+      await approveForCrm({
+        entityType: "expansion_milestone",
+        entityId: o.milestone.id,
+        clientId: o.milestone.clientId,
+        crmModule: "Deals",
+      });
+      toast({
+        title: "Approved for CRM",
+        description: `${o.milestone.title} queued for Zoho Deals export.`,
+      });
+    } catch {
+      toast({
+        title: "Could not approve",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -313,6 +341,28 @@ export default function Expansion() {
                           </button>
                         </div>
                       </div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 flex-1 text-[11px]"
+                          onClick={() => approve(o)}
+                          data-testid={`crm-approve-${o.milestone.id}`}
+                        >
+                          <Upload className="h-3 w-3 mr-1" />
+                          Approve for CRM
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 flex-1 text-[11px]"
+                          onClick={() => setClosing(o)}
+                          data-testid={`close-deal-${o.milestone.id}`}
+                        >
+                          <Flag className="h-3 w-3 mr-1" />
+                          Close
+                        </Button>
+                      </div>
                     </Card>
                   ))}
                   {col.items.length === 0 ? (
@@ -326,7 +376,150 @@ export default function Expansion() {
           </div>
         )}
       </div>
+      <CloseDealDialog
+        opp={closing}
+        onClose={() => setClosing(null)}
+        onDone={() => {
+          invalidate();
+          setClosing(null);
+        }}
+      />
     </SidebarLayout>
+  );
+}
+
+function CloseDealDialog({
+  opp,
+  onClose,
+  onDone,
+}: {
+  opp: ExpansionOpportunity | null;
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const { toast } = useToast();
+  const { approveForCrm } = useStore();
+  const updateM = useUpdateExpansionMilestone();
+  const [outcome, setOutcome] = useState<"Won" | "Lost">("Won");
+  const [actualValue, setActualValue] = useState("");
+  const [approveCrm, setApproveCrm] = useState(true);
+
+  const open = opp !== null;
+
+  const submit = async () => {
+    if (!opp) return;
+    try {
+      const value =
+        outcome === "Won"
+          ? actualValue
+            ? Number(actualValue)
+            : opp.milestone.potentialValue
+          : 0;
+      await updateM.mutateAsync({
+        milestoneId: opp.milestone.id,
+        data: { status: outcome, actualValue: value },
+      });
+      if (outcome === "Won" && approveCrm) {
+        await approveForCrm({
+          entityType: "expansion_milestone",
+          entityId: opp.milestone.id,
+          clientId: opp.milestone.clientId,
+          crmModule: "Deals",
+        });
+      }
+      toast({
+        title: outcome === "Won" ? "Marked Won" : "Marked Lost",
+        description:
+          outcome === "Won"
+            ? `${opp.milestone.title} closed at ${money(value)}.`
+            : `${opp.milestone.title} closed as lost.`,
+      });
+      setActualValue("");
+      setOutcome("Won");
+      onDone();
+    } catch {
+      toast({
+        title: "Could not close deal",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => (!o ? onClose() : undefined)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Close expansion opportunity</DialogTitle>
+        </DialogHeader>
+        {opp ? (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {opp.clientName} — {opp.milestone.title}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant={outcome === "Won" ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setOutcome("Won")}
+                data-testid="outcome-won"
+              >
+                <CheckCircle2 className="h-4 w-4 mr-1" />
+                Won
+              </Button>
+              <Button
+                variant={outcome === "Lost" ? "destructive" : "outline"}
+                className="flex-1"
+                onClick={() => setOutcome("Lost")}
+                data-testid="outcome-lost"
+              >
+                <Flag className="h-4 w-4 mr-1" />
+                Lost
+              </Button>
+            </div>
+            {outcome === "Won" ? (
+              <>
+                <div className="space-y-1.5">
+                  <Label>Actual value ($)</Label>
+                  <Input
+                    type="number"
+                    value={actualValue}
+                    onChange={(e) => setActualValue(e.target.value)}
+                    placeholder={String(opp.milestone.potentialValue)}
+                    data-testid="input-actual-value"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Defaults to the potential value (
+                    {money(opp.milestone.potentialValue)}) if left blank.
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={approveCrm}
+                    onChange={(e) => setApproveCrm(e.target.checked)}
+                    data-testid="checkbox-approve-crm"
+                  />
+                  Approve for CRM export (Zoho Deals)
+                </label>
+              </>
+            ) : null}
+          </div>
+        ) : null}
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={submit}
+            disabled={updateM.isPending}
+            data-testid="button-confirm-close"
+          >
+            {updateM.isPending ? "Saving…" : "Confirm"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

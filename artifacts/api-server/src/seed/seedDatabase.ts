@@ -16,6 +16,7 @@ import {
   scheduledEventsTable,
   contactLogTable,
   activityLogTable,
+  crmLinksTable,
   type RiskFactor,
   type AuditScoreItem,
 } from "@workspace/db";
@@ -180,6 +181,9 @@ const expansion = [
   { clientKey: "c4", title: "Second qualifier placement", stage: "Identified", status: "Open", potentialValue: 8000, targetDate: iso(60), description: "Client may add a second qualifier.", owner: "Landon", pinned: false, priorityBoost: 0, movedDaysAgo: 11 },
   { clientKey: "c5", title: "Referral lead — partner company", stage: "Qualifying", status: "Open", potentialValue: 11000, targetDate: iso(75), description: "Charlie referred a colleague at another company.", owner: "Landon", pinned: false, priorityBoost: 0, movedDaysAgo: 16 },
   { clientKey: "c6", title: "Qualifier placement for bid", stage: "Closing", status: "Open", potentialValue: 14000, targetDate: iso(10), description: "Placement tied to an upcoming bid.", owner: "Gregg", pinned: false, priorityBoost: 0, movedDaysAgo: 1 },
+  { clientKey: "c1", title: "Additional state registration", stage: "Live", status: "Won", potentialValue: 10000, actualValue: 11500, targetDate: iso(-5), closedDaysAgo: 5, description: "Closed expansion into a second state.", owner: "Gregg", pinned: false, priorityBoost: 0, movedDaysAgo: 5 },
+  { clientKey: "c3", title: "Premium monitoring bundle", stage: "Live", status: "Won", potentialValue: 7000, actualValue: 7000, targetDate: iso(-12), closedDaysAgo: 12, description: "Monitoring add-on closed with renewal.", owner: "Tara", pinned: false, priorityBoost: 0, movedDaysAgo: 12 },
+  { clientKey: "c2", title: "Compliance retainer upsell", stage: "Negotiation", status: "Lost", potentialValue: 13000, actualValue: 0, targetDate: iso(-8), closedDaysAgo: 8, description: "Client declined the retainer upsell.", owner: "Gregg", pinned: false, priorityBoost: 0, movedDaysAgo: 8 },
 ];
 
 const invoices = [
@@ -332,8 +336,12 @@ export async function seedDatabase(): Promise<void> {
       });
     }
 
+    const taskIds = new Map<string, string>();
     for (const t of tasks) {
+      const id = randomUUID();
+      taskIds.set(t.title, id);
       await tx.insert(tasksTable).values({
+        id,
         clientId: clientIds.get(t.clientKey)!,
         sourceCallNoteId: noteIds.get(t.noteKey) ?? null,
         title: t.title,
@@ -415,8 +423,12 @@ export async function seedDatabase(): Promise<void> {
       });
     }
 
+    const expansionIds = new Map<string, string>();
     for (const x of expansion) {
+      const id = randomUUID();
+      expansionIds.set(x.title, id);
       await tx.insert(expansionMilestonesTable).values({
+        id,
         clientId: clientIds.get(x.clientKey)!,
         title: x.title,
         stage: x.stage,
@@ -428,7 +440,94 @@ export async function seedDatabase(): Promise<void> {
         ownerUserId: ownerId(x.owner),
         pinned: x.pinned,
         priorityBoost: x.priorityBoost,
+        actualValue: "actualValue" in x ? (x.actualValue ?? 0) : 0,
+        closedAt:
+          "closedDaysAgo" in x && x.closedDaysAgo != null
+            ? new Date(Date.now() - x.closedDaysAgo * 86_400_000)
+            : null,
         lastMovementAt: new Date(Date.now() - x.movedDaysAgo * 86_400_000),
+      });
+    }
+
+    const wonStateId = expansionIds.get("Additional state registration");
+    const wonMonitorId = expansionIds.get("Premium monitoring bundle");
+    const openDealId = expansionIds.get("Monitoring add-on");
+    const crmNoteId = noteIds.get("n1");
+    const crmTaskId = taskIds.get("Review compliance docs");
+
+    const crmSeed: Array<{
+      entityType: string;
+      entityId: string | undefined;
+      clientKey: string;
+      crmModule: string;
+      crmRecordId: string | null;
+      syncStatus: string;
+      pushedDaysAgo: number | null;
+      summary: string;
+    }> = [
+      { entityType: "expansion_milestone", entityId: wonStateId, clientKey: "c1", crmModule: "Deals", crmRecordId: "ZD-100245", syncStatus: "pushed", pushedDaysAgo: 4, summary: "Won deal exported to Zoho Deals." },
+      { entityType: "expansion_milestone", entityId: wonMonitorId, clientKey: "c3", crmModule: "Deals", crmRecordId: null, syncStatus: "approved", pushedDaysAgo: null, summary: "Won deal approved for Zoho Deals export." },
+      { entityType: "expansion_milestone", entityId: openDealId, clientKey: "c3", crmModule: "Deals", crmRecordId: null, syncStatus: "approved", pushedDaysAgo: null, summary: "Open deal approved for Zoho Deals export." },
+      { entityType: "call_note", entityId: crmNoteId, clientKey: "c1", crmModule: "Notes", crmRecordId: "ZN-50871", syncStatus: "pushed", pushedDaysAgo: 2, summary: "Call note exported to Zoho Notes." },
+      { entityType: "task", entityId: crmTaskId, clientKey: "c1", crmModule: "Tasks", crmRecordId: null, syncStatus: "approved", pushedDaysAgo: null, summary: "Task approved for Zoho Tasks export." },
+    ];
+
+    for (const link of crmSeed) {
+      if (!link.entityId) continue;
+      await tx.insert(crmLinksTable).values({
+        entityType: link.entityType,
+        entityId: link.entityId,
+        clientId: clientIds.get(link.clientKey) ?? null,
+        crmModule: link.crmModule,
+        crmRecordId: link.crmRecordId,
+        syncStatus: link.syncStatus,
+        lastSyncedAt:
+          link.pushedDaysAgo != null
+            ? new Date(Date.now() - link.pushedDaysAgo * 86_400_000)
+            : null,
+        lastPushedByUserId: link.syncStatus === "pushed" ? greggId : null,
+      });
+      await tx.insert(activityLogTable).values({
+        actorUserId: greggId,
+        actorLabel: "Gregg",
+        action: link.syncStatus === "pushed" ? "crm_push_status" : "crm_approved",
+        entityType: link.entityType,
+        entityId: link.entityId,
+        clientId: clientIds.get(link.clientKey) ?? null,
+        summary: link.summary,
+        createdAt:
+          link.pushedDaysAgo != null
+            ? new Date(Date.now() - link.pushedDaysAgo * 86_400_000)
+            : new Date(),
+      });
+    }
+
+    const wonActivity: Array<{
+      title: string;
+      clientKey: string;
+      value: number;
+      closedDaysAgo: number;
+      action: string;
+      summary: string;
+    }> = [
+      { title: "Additional state registration", clientKey: "c1", value: 11500, closedDaysAgo: 5, action: "expansion_won", summary: "Expansion won: Additional state registration ($11,500)." },
+      { title: "Premium monitoring bundle", clientKey: "c3", value: 7000, closedDaysAgo: 12, action: "expansion_won", summary: "Expansion won: Premium monitoring bundle ($7,000)." },
+      { title: "Compliance retainer upsell", clientKey: "c2", value: 0, closedDaysAgo: 8, action: "expansion_lost", summary: "Expansion lost: Compliance retainer upsell." },
+    ];
+
+    for (const w of wonActivity) {
+      const eid = expansionIds.get(w.title);
+      if (!eid) continue;
+      await tx.insert(activityLogTable).values({
+        actorUserId: greggId,
+        actorLabel: "Gregg",
+        action: w.action,
+        entityType: "expansion_milestone",
+        entityId: eid,
+        clientId: clientIds.get(w.clientKey) ?? null,
+        summary: w.summary,
+        changes: { actualValue: w.value },
+        createdAt: new Date(Date.now() - w.closedDaysAgo * 86_400_000),
       });
     }
 

@@ -14,6 +14,7 @@ import type {
   ScheduledEvent as DbEvent,
   ContactLogEntry as DbContactLog,
   ActivityLogEntry as DbActivity,
+  CrmLink as DbCrmLink,
 } from "@workspace/db";
 import type {
   Client,
@@ -31,6 +32,7 @@ import type {
   ScheduledEvent,
   ContactLogEntry,
   ActivityLogEntry,
+  CrmLink,
 } from "@workspace/api-zod";
 
 const s = (v: string | null | undefined): string => v ?? "";
@@ -208,6 +210,25 @@ export function toExpansion(row: DbExpansion): ExpansionMilestone {
     pinned: row.pinned,
     priorityBoost: row.priorityBoost,
     lastMovementAt: iso(row.lastMovementAt),
+    actualValue: row.actualValue,
+    closedAt: row.closedAt ? row.closedAt.toISOString() : null,
+  };
+}
+
+export function toCrmLink(row: DbCrmLink): CrmLink {
+  return {
+    id: row.id,
+    entityType: row.entityType,
+    entityId: row.entityId,
+    clientId: row.clientId ?? null,
+    crmModule: row.crmModule,
+    crmRecordId: row.crmRecordId ?? null,
+    syncStatus: row.syncStatus,
+    syncDirection: row.syncDirection,
+    lastSyncedAt: row.lastSyncedAt ? row.lastSyncedAt.toISOString() : null,
+    errorMessage: row.errorMessage,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
   };
 }
 

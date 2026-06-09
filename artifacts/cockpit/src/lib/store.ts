@@ -15,6 +15,8 @@ import {
   useUpdateEscalation,
   useProcessCallNote,
   useResetToSeed,
+  useUpsertCrmLink,
+  useUpdateCrmLink,
 } from "@workspace/api-client-react";
 import type {
   ClientInput,
@@ -26,6 +28,8 @@ import type {
   SignalUpdate,
   EscalationUpdate,
   ProcessNoteInput,
+  CrmLinkInput,
+  CrmLinkUpdate,
 } from "@workspace/api-client-react";
 import {
   CurrentClient,
@@ -96,6 +100,8 @@ export function useStore() {
   const updateEscalationM = useUpdateEscalation(mOpts);
   const processNoteM = useProcessCallNote(mOpts);
   const resetM = useResetToSeed(mOpts);
+  const upsertCrmLinkM = useUpsertCrmLink(mOpts);
+  const updateCrmLinkM = useUpdateCrmLink(mOpts);
 
   return {
     clients: (clientsQ.data ?? []) as unknown as CurrentClient[],
@@ -175,6 +181,11 @@ export function useStore() {
       };
       return processNoteM.mutateAsync({ data });
     },
+
+    approveForCrm: (input: CrmLinkInput) =>
+      upsertCrmLinkM.mutateAsync({ data: input }),
+    updateCrmLink: (linkId: string, updates: CrmLinkUpdate) =>
+      updateCrmLinkM.mutateAsync({ linkId, data: updates }),
 
     resetData: () => resetM.mutateAsync(),
   };

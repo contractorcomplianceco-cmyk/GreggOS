@@ -16,4 +16,5 @@ export interface ExpansionUpdate {
   owner?: string;
   pinned?: boolean;
   priorityBoost?: number;
+  actualValue?: number;
 }

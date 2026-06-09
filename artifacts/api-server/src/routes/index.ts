@@ -14,6 +14,8 @@ import relationshipsRouter from "./relationships";
 import expansionRouter from "./expansion";
 import scheduledEventsRouter from "./scheduledEvents";
 import contactLogRouter from "./contactLog";
+import crmRouter from "./crm";
+import reportsRouter from "./reports";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -36,5 +38,7 @@ router.use(relationshipsRouter);
 router.use(expansionRouter);
 router.use(scheduledEventsRouter);
 router.use(contactLogRouter);
+router.use(crmRouter);
+router.use(reportsRouter);
 
 export default router;

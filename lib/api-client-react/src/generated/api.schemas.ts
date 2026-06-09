@@ -344,6 +344,9 @@ export interface ExpansionMilestone {
   pinned: boolean;
   priorityBoost: number;
   lastMovementAt: string;
+  actualValue: number;
+  /** @nullable */
+  closedAt?: string | null;
 }
 
 export interface ExpansionInput {
@@ -369,6 +372,7 @@ export interface ExpansionUpdate {
   owner?: string;
   pinned?: boolean;
   priorityBoost?: number;
+  actualValue?: number;
 }
 
 export interface ExpansionOpportunity {
@@ -380,6 +384,116 @@ export interface ExpansionOpportunity {
   stalled: boolean;
   daysSinceMovement: number;
   sharedWithTara: boolean;
+}
+
+export interface CrmLink {
+  id: string;
+  entityType: string;
+  entityId: string;
+  /** @nullable */
+  clientId?: string | null;
+  crmModule: string;
+  /** @nullable */
+  crmRecordId?: string | null;
+  syncStatus: string;
+  syncDirection: string;
+  /** @nullable */
+  lastSyncedAt?: string | null;
+  errorMessage: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CrmLinkInput {
+  entityType: string;
+  entityId: string;
+  clientId?: string;
+  crmModule: string;
+}
+
+export interface CrmLinkUpdate {
+  crmRecordId?: string;
+  syncStatus?: string;
+  errorMessage?: string;
+}
+
+export type CrmExportPayloadFields = { [key: string]: unknown };
+
+export interface CrmExportPayload {
+  entityType: string;
+  entityId: string;
+  /** @nullable */
+  clientId?: string | null;
+  crmModule: string;
+  recordTitle: string;
+  syncStatus: string;
+  /** @nullable */
+  crmRecordId?: string | null;
+  fields: CrmExportPayloadFields;
+}
+
+export type RelationshipReportByWarmthItem = {
+  warmth: string;
+  count: number;
+};
+
+export type RelationshipReportByOwnerItem = {
+  owner: string;
+  clients: number;
+  touchesDue: number;
+  goingCold: number;
+};
+
+export interface RelationshipReport {
+  windowDays: number;
+  totalClients: number;
+  touchesDue: number;
+  goingCold: number;
+  visitsCompleted: number;
+  mealsCompleted: number;
+  cadenceAdherencePct: number;
+  taraSharedAccounts: number;
+  byWarmth: RelationshipReportByWarmthItem[];
+  byOwner: RelationshipReportByOwnerItem[];
+}
+
+export type ExpansionReportByStageItem = {
+  stage: string;
+  count: number;
+  value: number;
+};
+
+export type ExpansionReportByOwnerItem = {
+  owner: string;
+  openCount: number;
+  pipelineValue: number;
+  wonCount: number;
+  convertedRevenue: number;
+};
+
+export interface ExpansionReport {
+  openCount: number;
+  wonCount: number;
+  lostCount: number;
+  stalledCount: number;
+  pipelineValue: number;
+  convertedRevenue: number;
+  winRatePct: number;
+  taraSharedOpenCount: number;
+  taraSharedPipelineValue: number;
+  taraSharedConvertedRevenue: number;
+  byStage: ExpansionReportByStageItem[];
+  byOwner: ExpansionReportByOwnerItem[];
+}
+
+export interface ActivityReport {
+  windowDays: number;
+  openTasks: number;
+  completedTasks: number;
+  overdueTasks: number;
+  followUpCompletionPct: number;
+  touchesLogged: number;
+  handoffs: number;
 }
 
 export interface Invoice {
@@ -581,5 +695,26 @@ sharedWithTara?: boolean;
 export type ListScheduledEventsParams = {
 clientId?: string;
 owner?: string;
+};
+
+export type ListCrmLinksParams = {
+entityType?: string;
+clientId?: string;
+syncStatus?: string;
+crmModule?: string;
+};
+
+export type ListCrmExportParams = {
+entityType?: string;
+entityId?: string;
+syncStatus?: string;
+};
+
+export type GetRelationshipReportParams = {
+windowDays?: number;
+};
+
+export type GetActivityReportParams = {
+windowDays?: number;
 };
 

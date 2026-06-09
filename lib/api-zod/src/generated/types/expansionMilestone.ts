@@ -21,4 +21,7 @@ export interface ExpansionMilestone {
   pinned: boolean;
   priorityBoost: number;
   lastMovementAt: string;
+  actualValue: number;
+  /** @nullable */
+  closedAt?: string | null;
 }

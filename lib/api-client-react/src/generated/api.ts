@@ -21,6 +21,7 @@ import type {
 
 import type {
   ActivityLogEntry,
+  ActivityReport,
   AuditLink,
   AuditLinkInput,
   AuditLinkOrNull,
@@ -31,6 +32,10 @@ import type {
   ClientUpdate,
   ContactLogEntry,
   ContactLogInput,
+  CrmExportPayload,
+  CrmLink,
+  CrmLinkInput,
+  CrmLinkUpdate,
   Escalation,
   EscalationUpdate,
   EventInput,
@@ -38,14 +43,19 @@ import type {
   ExpansionInput,
   ExpansionMilestone,
   ExpansionOpportunity,
+  ExpansionReport,
   ExpansionUpdate,
   ExportData,
+  GetActivityReportParams,
+  GetRelationshipReportParams,
   HandoffInput,
   HealthStatus,
   ImportData,
   ListActivityParams,
   ListCallNotesParams,
   ListClientsParams,
+  ListCrmExportParams,
+  ListCrmLinksParams,
   ListEscalationsParams,
   ListExpansionPipelineParams,
   ListRelationshipsParams,
@@ -58,6 +68,7 @@ import type {
   OpportunitySignal,
   ProcessNoteInput,
   ProcessNoteResult,
+  RelationshipReport,
   RelationshipSummary,
   ScheduledEvent,
   SignalUpdate,
@@ -2950,4 +2961,560 @@ export const useHandoffClient = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getHandoffClientMutationOptions(options));
     }
+
+export const getListCrmLinksUrl = (params?: ListCrmLinksParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/crm-links?${stringifiedParams}` : `/api/crm-links`
+}
+
+/**
+ * @summary List CRM links (the export/approve/push queue)
+ */
+export const listCrmLinks = async (params?: ListCrmLinksParams, options?: RequestInit): Promise<CrmLink[]> => {
+
+  return customFetch<CrmLink[]>(getListCrmLinksUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCrmLinksQueryKey = (params?: ListCrmLinksParams,) => {
+    return [
+    `/api/crm-links`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCrmLinksQueryOptions = <TData = Awaited<ReturnType<typeof listCrmLinks>>, TError = ErrorType<unknown>>(params?: ListCrmLinksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCrmLinks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCrmLinksQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCrmLinks>>> = ({ signal }) => listCrmLinks(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCrmLinks>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCrmLinksQueryResult = NonNullable<Awaited<ReturnType<typeof listCrmLinks>>>
+export type ListCrmLinksQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List CRM links (the export/approve/push queue)
+ */
+
+export function useListCrmLinks<TData = Awaited<ReturnType<typeof listCrmLinks>>, TError = ErrorType<unknown>>(
+ params?: ListCrmLinksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCrmLinks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCrmLinksQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpsertCrmLinkUrl = () => {
+
+
+
+
+  return `/api/crm-links`
+}
+
+/**
+ * @summary Approve an entity for CRM (idempotent on entityType+entityId)
+ */
+export const upsertCrmLink = async (crmLinkInput: CrmLinkInput, options?: RequestInit): Promise<CrmLink> => {
+
+  return customFetch<CrmLink>(getUpsertCrmLinkUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      crmLinkInput,)
+  }
+);}
+
+
+
+
+export const getUpsertCrmLinkMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertCrmLink>>, TError,{data: BodyType<CrmLinkInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertCrmLink>>, TError,{data: BodyType<CrmLinkInput>}, TContext> => {
+
+const mutationKey = ['upsertCrmLink'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertCrmLink>>, {data: BodyType<CrmLinkInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  upsertCrmLink(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpsertCrmLinkMutationResult = NonNullable<Awaited<ReturnType<typeof upsertCrmLink>>>
+    export type UpsertCrmLinkMutationBody = BodyType<CrmLinkInput>
+    export type UpsertCrmLinkMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Approve an entity for CRM (idempotent on entityType+entityId)
+ */
+export const useUpsertCrmLink = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertCrmLink>>, TError,{data: BodyType<CrmLinkInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof upsertCrmLink>>,
+        TError,
+        {data: BodyType<CrmLinkInput>},
+        TContext
+      > => {
+      return useMutation(getUpsertCrmLinkMutationOptions(options));
+    }
+
+export const getUpdateCrmLinkUrl = (linkId: string,) => {
+
+
+
+
+  return `/api/crm-links/${linkId}`
+}
+
+/**
+ * @summary Mark pushed to CRM (capture record id) or record a sync failure
+ */
+export const updateCrmLink = async (linkId: string,
+    crmLinkUpdate: CrmLinkUpdate, options?: RequestInit): Promise<CrmLink> => {
+
+  return customFetch<CrmLink>(getUpdateCrmLinkUrl(linkId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      crmLinkUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateCrmLinkMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCrmLink>>, TError,{linkId: string;data: BodyType<CrmLinkUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCrmLink>>, TError,{linkId: string;data: BodyType<CrmLinkUpdate>}, TContext> => {
+
+const mutationKey = ['updateCrmLink'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCrmLink>>, {linkId: string;data: BodyType<CrmLinkUpdate>}> = (props) => {
+          const {linkId,data} = props ?? {};
+
+          return  updateCrmLink(linkId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCrmLinkMutationResult = NonNullable<Awaited<ReturnType<typeof updateCrmLink>>>
+    export type UpdateCrmLinkMutationBody = BodyType<CrmLinkUpdate>
+    export type UpdateCrmLinkMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Mark pushed to CRM (capture record id) or record a sync failure
+ */
+export const useUpdateCrmLink = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCrmLink>>, TError,{linkId: string;data: BodyType<CrmLinkUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateCrmLink>>,
+        TError,
+        {linkId: string;data: BodyType<CrmLinkUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateCrmLinkMutationOptions(options));
+    }
+
+export const getListCrmExportUrl = (params?: ListCrmExportParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/crm-export?${stringifiedParams}` : `/api/crm-export`
+}
+
+/**
+ * @summary CRM-ready export payloads (export-only; no live push)
+ */
+export const listCrmExport = async (params?: ListCrmExportParams, options?: RequestInit): Promise<CrmExportPayload[]> => {
+
+  return customFetch<CrmExportPayload[]>(getListCrmExportUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCrmExportQueryKey = (params?: ListCrmExportParams,) => {
+    return [
+    `/api/crm-export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCrmExportQueryOptions = <TData = Awaited<ReturnType<typeof listCrmExport>>, TError = ErrorType<unknown>>(params?: ListCrmExportParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCrmExport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCrmExportQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCrmExport>>> = ({ signal }) => listCrmExport(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCrmExport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCrmExportQueryResult = NonNullable<Awaited<ReturnType<typeof listCrmExport>>>
+export type ListCrmExportQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary CRM-ready export payloads (export-only; no live push)
+ */
+
+export function useListCrmExport<TData = Awaited<ReturnType<typeof listCrmExport>>, TError = ErrorType<unknown>>(
+ params?: ListCrmExportParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCrmExport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCrmExportQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetRelationshipReportUrl = (params?: GetRelationshipReportParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/reports/relationships?${stringifiedParams}` : `/api/reports/relationships`
+}
+
+/**
+ * @summary Relationship activity report (operational + leadership)
+ */
+export const getRelationshipReport = async (params?: GetRelationshipReportParams, options?: RequestInit): Promise<RelationshipReport> => {
+
+  return customFetch<RelationshipReport>(getGetRelationshipReportUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRelationshipReportQueryKey = (params?: GetRelationshipReportParams,) => {
+    return [
+    `/api/reports/relationships`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetRelationshipReportQueryOptions = <TData = Awaited<ReturnType<typeof getRelationshipReport>>, TError = ErrorType<unknown>>(params?: GetRelationshipReportParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRelationshipReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRelationshipReportQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRelationshipReport>>> = ({ signal }) => getRelationshipReport(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRelationshipReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRelationshipReportQueryResult = NonNullable<Awaited<ReturnType<typeof getRelationshipReport>>>
+export type GetRelationshipReportQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Relationship activity report (operational + leadership)
+ */
+
+export function useGetRelationshipReport<TData = Awaited<ReturnType<typeof getRelationshipReport>>, TError = ErrorType<unknown>>(
+ params?: GetRelationshipReportParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRelationshipReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRelationshipReportQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetExpansionReportUrl = () => {
+
+
+
+
+  return `/api/reports/expansion`
+}
+
+/**
+ * @summary Expansion pipeline + revenue report with owner attribution
+ */
+export const getExpansionReport = async ( options?: RequestInit): Promise<ExpansionReport> => {
+
+  return customFetch<ExpansionReport>(getGetExpansionReportUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExpansionReportQueryKey = () => {
+    return [
+    `/api/reports/expansion`
+    ] as const;
+    }
+
+
+export const getGetExpansionReportQueryOptions = <TData = Awaited<ReturnType<typeof getExpansionReport>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExpansionReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExpansionReportQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExpansionReport>>> = ({ signal }) => getExpansionReport({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExpansionReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExpansionReportQueryResult = NonNullable<Awaited<ReturnType<typeof getExpansionReport>>>
+export type GetExpansionReportQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Expansion pipeline + revenue report with owner attribution
+ */
+
+export function useGetExpansionReport<TData = Awaited<ReturnType<typeof getExpansionReport>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExpansionReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExpansionReportQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetActivityReportUrl = (params?: GetActivityReportParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/reports/activity?${stringifiedParams}` : `/api/reports/activity`
+}
+
+/**
+ * @summary Follow-up + activity report
+ */
+export const getActivityReport = async (params?: GetActivityReportParams, options?: RequestInit): Promise<ActivityReport> => {
+
+  return customFetch<ActivityReport>(getGetActivityReportUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetActivityReportQueryKey = (params?: GetActivityReportParams,) => {
+    return [
+    `/api/reports/activity`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetActivityReportQueryOptions = <TData = Awaited<ReturnType<typeof getActivityReport>>, TError = ErrorType<unknown>>(params?: GetActivityReportParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActivityReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActivityReportQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActivityReport>>> = ({ signal }) => getActivityReport(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getActivityReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetActivityReportQueryResult = NonNullable<Awaited<ReturnType<typeof getActivityReport>>>
+export type GetActivityReportQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Follow-up + activity report
+ */
+
+export function useGetActivityReport<TData = Awaited<ReturnType<typeof getActivityReport>>, TError = ErrorType<unknown>>(
+ params?: GetActivityReportParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActivityReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetActivityReportQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 

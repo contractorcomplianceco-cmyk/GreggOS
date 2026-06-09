@@ -181,6 +181,83 @@ export interface ExpansionMilestone {
   pinned: boolean;
   priorityBoost: number;
   lastMovementAt: string;
+  actualValue: number;
+  closedAt?: string | null;
+}
+
+export interface CrmLink {
+  id: string;
+  entityType: string;
+  entityId: string;
+  clientId?: string | null;
+  crmModule: string;
+  crmRecordId?: string | null;
+  syncStatus: string;
+  syncDirection: string;
+  lastSyncedAt?: string | null;
+  errorMessage: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CrmExportPayload {
+  entityType: string;
+  entityId: string;
+  clientId?: string | null;
+  crmModule: string;
+  recordTitle: string;
+  syncStatus: string;
+  crmRecordId?: string | null;
+  fields: Record<string, unknown>;
+}
+
+export interface RelationshipReport {
+  windowDays: number;
+  totalClients: number;
+  touchesDue: number;
+  goingCold: number;
+  visitsCompleted: number;
+  mealsCompleted: number;
+  cadenceAdherencePct: number;
+  taraSharedAccounts: number;
+  byWarmth: Array<{ warmth: string; count: number }>;
+  byOwner: Array<{
+    owner: string;
+    clients: number;
+    touchesDue: number;
+    goingCold: number;
+  }>;
+}
+
+export interface ExpansionReport {
+  openCount: number;
+  wonCount: number;
+  lostCount: number;
+  stalledCount: number;
+  pipelineValue: number;
+  convertedRevenue: number;
+  winRatePct: number;
+  taraSharedOpenCount: number;
+  taraSharedPipelineValue: number;
+  taraSharedConvertedRevenue: number;
+  byStage: Array<{ stage: string; count: number; value: number }>;
+  byOwner: Array<{
+    owner: string;
+    openCount: number;
+    pipelineValue: number;
+    wonCount: number;
+    convertedRevenue: number;
+  }>;
+}
+
+export interface ActivityReport {
+  windowDays: number;
+  openTasks: number;
+  completedTasks: number;
+  overdueTasks: number;
+  followUpCompletionPct: number;
+  touchesLogged: number;
+  handoffs: number;
 }
 
 export type InvoiceStatus = 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Overdue';

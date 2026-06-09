@@ -170,6 +170,8 @@ router.patch(
     if (body.status !== undefined) updates["status"] = body.status;
     if (body.potentialValue !== undefined)
       updates["potentialValue"] = body.potentialValue;
+    if (body.actualValue !== undefined)
+      updates["actualValue"] = body.actualValue;
     if (body.targetDate !== undefined)
       updates["targetDate"] = dateOrNull(body.targetDate);
     if (body.description !== undefined)
@@ -182,12 +184,28 @@ router.patch(
     if (body.priorityBoost !== undefined)
       updates["priorityBoost"] = body.priorityBoost;
 
+    const statusChanged =
+      body.status !== undefined && body.status !== existing.status;
+    const normalizedNewStatus = body.status?.trim().toLowerCase();
+    const isClosing =
+      statusChanged &&
+      (normalizedNewStatus === "won" || normalizedNewStatus === "lost");
+    const isReopening =
+      statusChanged && normalizedNewStatus === "open";
+
     // Stage or status movement resets the "stalled" clock.
     if (
       (body.stage !== undefined && body.stage !== existing.stage) ||
-      (body.status !== undefined && body.status !== existing.status)
+      statusChanged
     ) {
       updates["lastMovementAt"] = new Date();
+    }
+
+    // Stamp/clear the close timestamp as the deal enters/leaves a closed state.
+    if (isClosing) {
+      updates["closedAt"] = new Date();
+    } else if (isReopening) {
+      updates["closedAt"] = null;
     }
 
     const updated = await db
@@ -197,16 +215,73 @@ router.patch(
       .returning();
     const row = updated[0]!;
     const actor = actorOf(req);
-    await logActivity(db, {
-      actorUserId: actor.id,
-      actorLabel: actor.label,
-      action: "updated",
-      entityType: "expansion",
-      entityId: row.id,
-      clientId: row.clientId,
-      summary: `Updated expansion opportunity ${row.title}`,
-      changes: updates,
-    });
+
+    // Won/Lost transitions are logged distinctly from generic edits so the
+    // activity timeline reads as a revenue lifecycle, not just "updated".
+    if (isClosing) {
+      const won = normalizedNewStatus === "won";
+      await logActivity(db, {
+        actorUserId: actor.id,
+        actorLabel: actor.label,
+        action: won ? "expansion_won" : "expansion_lost",
+        entityType: "expansion",
+        entityId: row.id,
+        clientId: row.clientId,
+        summary: won
+          ? `Won expansion opportunity ${row.title} (${row.actualValue})`
+          : `Lost expansion opportunity ${row.title}`,
+        changes: {
+          status: row.status,
+          actualValue: row.actualValue,
+          closedAt: row.closedAt?.toISOString() ?? null,
+        },
+      });
+    } else {
+      await logActivity(db, {
+        actorUserId: actor.id,
+        actorLabel: actor.label,
+        action: "updated",
+        entityType: "expansion",
+        entityId: row.id,
+        clientId: row.clientId,
+        summary: `Updated expansion opportunity ${row.title}`,
+        changes: updates,
+      });
+    }
+
+    // Value changes are logged separately so revenue movement is auditable.
+    const valueChanges: Record<string, unknown> = {};
+    if (
+      body.potentialValue !== undefined &&
+      body.potentialValue !== existing.potentialValue
+    ) {
+      valueChanges["potentialValue"] = {
+        from: existing.potentialValue,
+        to: row.potentialValue,
+      };
+    }
+    if (
+      body.actualValue !== undefined &&
+      body.actualValue !== existing.actualValue
+    ) {
+      valueChanges["actualValue"] = {
+        from: existing.actualValue,
+        to: row.actualValue,
+      };
+    }
+    if (Object.keys(valueChanges).length > 0) {
+      await logActivity(db, {
+        actorUserId: actor.id,
+        actorLabel: actor.label,
+        action: "expansion_value_changed",
+        entityType: "expansion",
+        entityId: row.id,
+        clientId: row.clientId,
+        summary: `Adjusted expansion value for ${row.title}`,
+        changes: valueChanges,
+      });
+    }
+
     res.json(toExpansion(row));
   },
 );

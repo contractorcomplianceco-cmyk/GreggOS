@@ -4,3 +4,4 @@ export * from "./callNotes";
 export * from "./workItems";
 export * from "./clientContext";
 export * from "./activity";
+export * from "./crm";

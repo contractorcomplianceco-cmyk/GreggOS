@@ -231,7 +231,9 @@ export const GetClientDetailResponse = zod.object({
   "ownerUserId": zod.string().nullish(),
   "pinned": zod.boolean(),
   "priorityBoost": zod.number(),
-  "lastMovementAt": zod.string()
+  "lastMovementAt": zod.string(),
+  "actualValue": zod.number(),
+  "closedAt": zod.string().nullish()
 })),
   "invoices": zod.array(zod.object({
   "id": zod.string(),
@@ -989,7 +991,9 @@ export const ListExpansionPipelineResponseItem = zod.object({
   "ownerUserId": zod.string().nullish(),
   "pinned": zod.boolean(),
   "priorityBoost": zod.number(),
-  "lastMovementAt": zod.string()
+  "lastMovementAt": zod.string(),
+  "actualValue": zod.number(),
+  "closedAt": zod.string().nullish()
 }),
   "clientName": zod.string(),
   "companyName": zod.string(),
@@ -1035,7 +1039,8 @@ export const UpdateExpansionMilestoneBody = zod.object({
   "description": zod.string().optional(),
   "owner": zod.string().optional(),
   "pinned": zod.boolean().optional(),
-  "priorityBoost": zod.number().optional()
+  "priorityBoost": zod.number().optional(),
+  "actualValue": zod.number().optional()
 })
 
 export const UpdateExpansionMilestoneResponse = zod.object({
@@ -1051,7 +1056,9 @@ export const UpdateExpansionMilestoneResponse = zod.object({
   "ownerUserId": zod.string().nullish(),
   "pinned": zod.boolean(),
   "priorityBoost": zod.number(),
-  "lastMovementAt": zod.string()
+  "lastMovementAt": zod.string(),
+  "actualValue": zod.number(),
+  "closedAt": zod.string().nullish()
 })
 
 
@@ -1176,6 +1183,186 @@ export const HandoffClientResponse = zod.object({
   "opportunitySignals": zod.number(),
   "escalations": zod.number(),
   "callNotes": zod.number()
+})
+
+
+/**
+ * @summary List CRM links (the export/approve/push queue)
+ */
+export const ListCrmLinksQueryParams = zod.object({
+  "entityType": zod.coerce.string().optional(),
+  "clientId": zod.coerce.string().optional(),
+  "syncStatus": zod.coerce.string().optional(),
+  "crmModule": zod.coerce.string().optional()
+})
+
+export const ListCrmLinksResponseItem = zod.object({
+  "id": zod.string(),
+  "entityType": zod.string(),
+  "entityId": zod.string(),
+  "clientId": zod.string().nullish(),
+  "crmModule": zod.string(),
+  "crmRecordId": zod.string().nullish(),
+  "syncStatus": zod.string(),
+  "syncDirection": zod.string(),
+  "lastSyncedAt": zod.string().nullish(),
+  "errorMessage": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListCrmLinksResponse = zod.array(ListCrmLinksResponseItem)
+
+
+/**
+ * @summary Approve an entity for CRM (idempotent on entityType+entityId)
+ */
+export const UpsertCrmLinkBody = zod.object({
+  "entityType": zod.string(),
+  "entityId": zod.string(),
+  "clientId": zod.string().optional(),
+  "crmModule": zod.string()
+})
+
+export const UpsertCrmLinkResponse = zod.object({
+  "id": zod.string(),
+  "entityType": zod.string(),
+  "entityId": zod.string(),
+  "clientId": zod.string().nullish(),
+  "crmModule": zod.string(),
+  "crmRecordId": zod.string().nullish(),
+  "syncStatus": zod.string(),
+  "syncDirection": zod.string(),
+  "lastSyncedAt": zod.string().nullish(),
+  "errorMessage": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Mark pushed to CRM (capture record id) or record a sync failure
+ */
+export const UpdateCrmLinkParams = zod.object({
+  "linkId": zod.coerce.string()
+})
+
+export const UpdateCrmLinkBody = zod.object({
+  "crmRecordId": zod.string().optional(),
+  "syncStatus": zod.string().optional(),
+  "errorMessage": zod.string().optional()
+})
+
+export const UpdateCrmLinkResponse = zod.object({
+  "id": zod.string(),
+  "entityType": zod.string(),
+  "entityId": zod.string(),
+  "clientId": zod.string().nullish(),
+  "crmModule": zod.string(),
+  "crmRecordId": zod.string().nullish(),
+  "syncStatus": zod.string(),
+  "syncDirection": zod.string(),
+  "lastSyncedAt": zod.string().nullish(),
+  "errorMessage": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary CRM-ready export payloads (export-only; no live push)
+ */
+export const ListCrmExportQueryParams = zod.object({
+  "entityType": zod.coerce.string().optional(),
+  "entityId": zod.coerce.string().optional(),
+  "syncStatus": zod.coerce.string().optional()
+})
+
+export const ListCrmExportResponseItem = zod.object({
+  "entityType": zod.string(),
+  "entityId": zod.string(),
+  "clientId": zod.string().nullish(),
+  "crmModule": zod.string(),
+  "recordTitle": zod.string(),
+  "syncStatus": zod.string(),
+  "crmRecordId": zod.string().nullish(),
+  "fields": zod.record(zod.string(), zod.unknown())
+})
+export const ListCrmExportResponse = zod.array(ListCrmExportResponseItem)
+
+
+/**
+ * @summary Relationship activity report (operational + leadership)
+ */
+export const GetRelationshipReportQueryParams = zod.object({
+  "windowDays": zod.coerce.number().optional()
+})
+
+export const GetRelationshipReportResponse = zod.object({
+  "windowDays": zod.number(),
+  "totalClients": zod.number(),
+  "touchesDue": zod.number(),
+  "goingCold": zod.number(),
+  "visitsCompleted": zod.number(),
+  "mealsCompleted": zod.number(),
+  "cadenceAdherencePct": zod.number(),
+  "taraSharedAccounts": zod.number(),
+  "byWarmth": zod.array(zod.object({
+  "warmth": zod.string(),
+  "count": zod.number()
+})),
+  "byOwner": zod.array(zod.object({
+  "owner": zod.string(),
+  "clients": zod.number(),
+  "touchesDue": zod.number(),
+  "goingCold": zod.number()
+}))
+})
+
+
+/**
+ * @summary Expansion pipeline + revenue report with owner attribution
+ */
+export const GetExpansionReportResponse = zod.object({
+  "openCount": zod.number(),
+  "wonCount": zod.number(),
+  "lostCount": zod.number(),
+  "stalledCount": zod.number(),
+  "pipelineValue": zod.number(),
+  "convertedRevenue": zod.number(),
+  "winRatePct": zod.number(),
+  "taraSharedOpenCount": zod.number(),
+  "taraSharedPipelineValue": zod.number(),
+  "taraSharedConvertedRevenue": zod.number(),
+  "byStage": zod.array(zod.object({
+  "stage": zod.string(),
+  "count": zod.number(),
+  "value": zod.number()
+})),
+  "byOwner": zod.array(zod.object({
+  "owner": zod.string(),
+  "openCount": zod.number(),
+  "pipelineValue": zod.number(),
+  "wonCount": zod.number(),
+  "convertedRevenue": zod.number()
+}))
+})
+
+
+/**
+ * @summary Follow-up + activity report
+ */
+export const GetActivityReportQueryParams = zod.object({
+  "windowDays": zod.coerce.number().optional()
+})
+
+export const GetActivityReportResponse = zod.object({
+  "windowDays": zod.number(),
+  "openTasks": zod.number(),
+  "completedTasks": zod.number(),
+  "overdueTasks": zod.number(),
+  "followUpCompletionPct": zod.number(),
+  "touchesLogged": zod.number(),
+  "handoffs": zod.number()
 })
 
 
