@@ -25,11 +25,11 @@ function iso(offsetDays: number): string {
 export const seedClients: CurrentClient[] = [
   {
     id: 'c1',
-    clientName: 'Acme Contracting',
-    companyName: 'Acme Contracting LLC',
+    clientName: 'ABC Construction',
+    companyName: 'ABC Construction LLC',
     contactName: 'John Doe',
     phone: '555-0101',
-    email: 'john@acme.com',
+    email: 'john@abcconstruction.com',
     clientStatus: 'Active',
     greggPriority: 'High',
     riskLevel: 'Low',

@@ -2,7 +2,7 @@ import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { useStore } from "@/lib/store";
 import { useParams, Link } from "wouter";
 import { useMemo } from "react";
-import { useAudits, levelColor } from "@/lib/auditPortal";
+import { useAudits, useAuditDetail, levelColor, layerAFactors, getPortalBaseUrl } from "@/lib/auditPortal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ import {
   ListChecks,
   CircleDollarSign,
   Activity,
+  ChevronRight,
+  ExternalLink,
 } from "lucide-react";
 import type {
   RiskLevel,
@@ -312,6 +314,17 @@ export default function ClientDetail() {
   const client = clients.find((c) => c.id === id);
   const { data: liveAudits } = useAudits();
 
+  // Best-effort name match against the live CCA Audit Risk Portal (the two
+  // systems share no common ID), then pull the full audit detail when matched.
+  const liveAudit = useMemo(() => {
+    if (!client || !liveAudits) return undefined;
+    const norm = (s: string) => s.toLowerCase().replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
+    return liveAudits.find(
+      (a) => norm(a.clientName) === norm(client.clientName) || norm(a.clientName) === norm(client.companyName),
+    );
+  }, [client, liveAudits]);
+  const { data: liveAuditDetail, isLoading: liveAuditDetailLoading, isError: liveAuditDetailError } = useAuditDetail(liveAudit?.id ?? null);
+
   const data = useMemo(() => {
     if (!client) return null;
     const cid = client.id;
@@ -400,7 +413,9 @@ export default function ClientDetail() {
   // available signals; weights renormalize when risk/audit/SLA data is absent.
   const healthParts: { label: string; score: number; weight: number; target: string }[] = [];
   if (data.risk) healthParts.push({ label: "Risk profile", score: 100 - data.risk.overallScore, weight: 30, target: "section-risk" });
-  if (data.audit && data.audit.overallScore > 0)
+  if (liveAudit)
+    healthParts.push({ label: "Audit compliance", score: Math.max(0, 100 - liveAudit.layerANormalized), weight: 25, target: "section-audit" });
+  else if (data.audit && data.audit.overallScore > 0)
     healthParts.push({ label: "Audit compliance", score: data.audit.overallScore, weight: 25, target: "section-audit" });
   if (data.clientSlas.length > 0) {
     const bad = data.missedSlas.length + data.atRiskSlas.length * 0.5;
@@ -429,17 +444,12 @@ export default function ClientDetail() {
   // Require at least one substantive signal (risk, audit, or SLAs). The
   // operational factors (tasks/AR/escalations) default to 100 when empty, so on
   // their own they would inflate a data-less client to a misleading perfect score.
-  const healthHasSignal = !!data.risk || !!(data.audit && data.audit.overallScore > 0) || data.clientSlas.length > 0;
+  const healthHasSignal = !!data.risk || !!liveAudit || !!(data.audit && data.audit.overallScore > 0) || data.clientSlas.length > 0;
   const healthWeight = healthParts.reduce((s, p) => s + p.weight, 0);
   const healthScore =
     !healthHasSignal || healthWeight === 0
       ? null
       : Math.round(healthParts.reduce((s, p) => s + p.score * p.weight, 0) / healthWeight);
-
-  const norm = (s: string) => s.toLowerCase().replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
-  const liveAudit = liveAudits?.find(
-    (a) => norm(a.clientName) === norm(client.clientName) || norm(a.clientName) === norm(client.companyName),
-  );
 
   // Build critical alerts.
   const alerts: { label: string; detail: string; target: string }[] = [];
@@ -588,10 +598,11 @@ export default function ClientDetail() {
           />
           <Kpi
             icon={<ClipboardCheck className="h-4 w-4" />}
-            label="Audit Score"
-            value={data.audit && data.audit.overallScore > 0 ? `${data.audit.overallScore}%` : "—"}
-            sub={data.audit?.status}
-            accent={data.audit && data.audit.overallScore > 0 ? scoreColor(data.audit.overallScore) : "#64748b"}
+            label="Audit Risk"
+            value={liveAudit ? String(liveAudit.layerANormalized) : data.audit && data.audit.overallScore > 0 ? `${data.audit.overallScore}%` : "—"}
+            sub={liveAudit ? `Live · ${liveAudit.layerABand}` : data.audit?.status}
+            accent={liveAudit ? levelColor(liveAudit.finalLevel) : data.audit && data.audit.overallScore > 0 ? scoreColor(data.audit.overallScore) : "#64748b"}
+            alert={!!liveAudit && liveAudit.finalLevel === "critical"}
             targetId="section-audit"
           />
           <Kpi
@@ -714,7 +725,7 @@ export default function ClientDetail() {
                         </span>
                       </Link>
                     )}
-                    {data.audit && (
+                    {!liveAudit && data.audit && (
                       <Badge variant="outline" className={AUDIT_BADGE[data.audit.status]}>
                         {data.audit.status}
                       </Badge>
@@ -723,7 +734,74 @@ export default function ClientDetail() {
                 </div>
               </CardHeader>
               <CardContent>
-                {data.audit ? (
+                {liveAudit ? (
+                  <>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-sm">
+                      <div>
+                        <div className="text-xs text-muted-foreground">Layer A (normalized)</div>
+                        <div className="text-xl font-bold tabular-nums" style={{ color: levelColor(liveAudit.finalLevel) }}>
+                          {liveAudit.layerANormalized}
+                        </div>
+                        <div className="text-xs text-muted-foreground">{liveAudit.layerABand}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Overall Score</div>
+                        <div className="text-xl font-bold tabular-nums">{liveAudit.overallScore}</div>
+                        <div className="text-xs text-muted-foreground">Layer B: {liveAudit.layerBBand}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Active Triggers</div>
+                        <div className="text-xl font-bold tabular-nums" style={{ color: liveAudit.activeTriggerCount > 0 ? "#b91c1c" : "#16a34a" }}>
+                          {liveAudit.activeTriggerCount}
+                        </div>
+                        <div className="text-xs text-muted-foreground">{liveAudit.findingsCount} findings · {liveAudit.documentsCount} docs</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Audited</div>
+                        <div className="font-medium">{fmtDate(liveAudit.auditDate)}</div>
+                        <div className="text-xs text-muted-foreground">{liveAudit.reviewer}</div>
+                      </div>
+                    </div>
+                    {liveAuditDetail ? (
+                      (() => {
+                        const factors = layerAFactors(liveAuditDetail.layerAScores);
+                        const max = Math.max(1, ...factors.map((x) => x.value));
+                        return (
+                          <div className="space-y-2.5">
+                            {factors.map((f) => (
+                              <div key={f.key}>
+                                <div className="flex items-center justify-between text-xs mb-1">
+                                  <span>{f.label}</span>
+                                  <span className="font-medium tabular-nums">{f.value}</span>
+                                </div>
+                                <Bar value={(f.value / max) * 100} color={levelColor(liveAudit.finalLevel)} />
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()
+                    ) : liveAuditDetailLoading ? (
+                      <p className="text-sm text-muted-foreground">Loading live Layer A scoresheet…</p>
+                    ) : liveAuditDetailError ? (
+                      <p className="text-sm text-red-600">Could not load the live Layer A scoresheet from the portal.</p>
+                    ) : null}
+                    <div className="mt-4 flex items-center gap-4 text-xs">
+                      <Link href="/audit-risk">
+                        <span className="inline-flex cursor-pointer items-center gap-1 font-medium text-primary hover:underline">
+                          View full audit detail <ChevronRight className="h-3 w-3" />
+                        </span>
+                      </Link>
+                      <a
+                        href={getPortalBaseUrl()}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                      >
+                        Open portal <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  </>
+                ) : data.audit ? (
                   <>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-sm">
                       <div>

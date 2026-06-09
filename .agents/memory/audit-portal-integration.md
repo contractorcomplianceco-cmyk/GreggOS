@@ -1,16 +1,16 @@
 ---
-name: Cockpit live audit portal integration
-description: How/why the cockpit reads live audit data from the external CCA Audit Risk Portal, and the constraints around it.
+name: Live audit portal integration (cockpit)
+description: How client-detail consumes the external CCA Audit Risk Portal and its risk-vs-compliance gotcha
 ---
 
-The cockpit (artifacts/cockpit) is otherwise a deliberate no-backend/localStorage app, but it reads LIVE audit data from an external app, the CCA Audit Risk Portal (`https://audit-risk-model.replit.app`).
+# Live audit portal integration
 
-**Why direct browser fetch (no proxy):** the portal serves an OPEN, public CORS API — it reflects any request Origin and sets `access-control-allow-credentials: true`. So the browser can fetch it directly with React Query; adding a cockpit-side backend proxy would contradict the no-backend design AND would not improve security, because the portal endpoints are themselves public/unauthenticated.
+The cockpit links clients to the external CCA Audit Risk Portal by **best-effort name match only** (no shared ID): normalized `clientName`/`companyName` vs the portal audit's `clientName`. The portal often holds very few audits (at times only one, "ABC Construction LLC"), so a cockpit client must be named to match or no live data shows.
 
-**Endpoints used:** `/api/healthz` (`{status:"ok"}`), `/api/audits` (summary list — has `layerANormalized`, `layerABand`, `overallScore`, `finalStatus`, `finalLevel`, `activeTriggerCount` etc.), `/api/audits/:id` (deep detail — `layerAScores`, `findings[]`, `documents[]`, entity profile; but NOT the band/score summary fields, so the detail page merges list-summary + detail). There is no OpenAPI spec; `/api`/`/api/risk` 404.
+**Risk vs compliance inversion (critical):** the portal is risk-oriented — higher `layerANormalized` = WORSE. Any "health"/"compliance" surface (higher = better) must use `100 - layerANormalized`, never the score directly. Mixing the two scales silently inverts meaning.
 
-**Security caveat to remember:** anyone who can open the cockpit (and anyone who hits the portal) can read full audit payloads including EIN/financials. Real lock-down must happen on the portal (auth), not in the cockpit.
+`overallScore` from the portal is a decimal risk figure (e.g. 36.8), NOT a 0-100 compliance %; don't render it with the seed's green-good `scoreColor`.
 
-**Client linkage is best-effort name matching:** the two systems share no common ID. client-detail matches a live audit by normalized clientName/companyName (lowercase, strip `.`/`,`, collapse spaces). Portal demo clients (ABC Construction LLC, Northgate Mechanical, Summit Builders LLC) do NOT match the cockpit seed clients, so the "Live: <status>" badge is invisible until names line up.
+When matched, the client-detail Audit card / Audit KPI / overall-health "Audit compliance" factor all render live data via `useAudits` + `useAuditDetail`; unmatched falls back to seed audit. `useAuditDetail(id)` is gated on `id != null`.
 
-**Base URL override:** `getPortalBaseUrl()`/`setPortalBaseUrl()` in `auditPortal.ts` allow a localStorage override (key `cockpit-audit-portal-url`); default is the portal URL above. Query keys include the base URL so switching it refetches.
+**Why:** the user asked to "link audit information to real audit information" and the only way to make the linkage visible was aligning a seed client's name to the portal's sample entity; the inversion bug is easy to reintroduce because seed audits use a higher-is-better compliance %.

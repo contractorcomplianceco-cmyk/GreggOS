@@ -277,7 +277,7 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'cockpit-storage',
-      version: 3,
+      version: 4,
     }
   )
 );
