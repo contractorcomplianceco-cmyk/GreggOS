@@ -1,41 +1,45 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useListClients,
+  useListCallNotes,
+  useListTasks,
+  useListSignals,
+  useListEscalations,
+  useCreateClient,
+  useUpdateClient,
+  useCreateCallNote,
+  useUpdateCallNote,
+  useCreateTask,
+  useUpdateTask,
+  useUpdateSignal,
+  useUpdateEscalation,
+  useProcessCallNote,
+  useResetToSeed,
+} from "@workspace/api-client-react";
+import type {
+  ClientInput,
+  ClientUpdate,
+  NoteInput,
+  NoteUpdate,
+  TaskInput,
+  TaskUpdate,
+  SignalUpdate,
+  EscalationUpdate,
+  ProcessNoteInput,
+} from "@workspace/api-client-react";
 import {
   CurrentClient,
   CallNote,
   Task,
   OpportunitySignal,
   Escalation,
-  CallNoteStatus,
   CallType,
+  CallNoteStatus,
   Priority,
   RiskLevel,
   SignalType,
   EscalationReason,
-  ClientProcess,
-  ClientAudit,
-  ClientRiskProfile,
-  ExpansionMilestone,
-  Invoice,
-  SLA,
-  ScheduledEvent,
-  ContactLogEntry,
-} from './types';
-import {
-  seedClients,
-  seedNotes,
-  seedTasks,
-  seedSignals,
-  seedEscalations,
-  seedProcesses,
-  seedAudits,
-  seedRiskProfiles,
-  seedExpansion,
-  seedInvoices,
-  seedSLAs,
-  seedEvents,
-  seedContactLog,
-} from './seed';
+} from "./types";
 
 export interface ProcessedNotePayload {
   id?: string;
@@ -63,221 +67,115 @@ export interface ProcessedNotePayload {
   riskLevel: RiskLevel;
 }
 
-interface AppState {
-  clients: CurrentClient[];
-  callNotes: CallNote[];
-  tasks: Task[];
-  signals: OpportunitySignal[];
-  escalations: Escalation[];
-  processes: ClientProcess[];
-  audits: ClientAudit[];
-  riskProfiles: ClientRiskProfile[];
-  expansion: ExpansionMilestone[];
-  invoices: Invoice[];
-  slas: SLA[];
-  events: ScheduledEvent[];
-  contactLog: ContactLogEntry[];
+/**
+ * Drop-in replacement for the former Zustand store. Data now lives server-side
+ * (Postgres via the api-server); reads use generated React Query list hooks and
+ * writes use generated mutation hooks. Every mutation invalidates the cache so
+ * derived data (client counters, etc.) refreshes from the server.
+ */
+export function useStore() {
+  const qc = useQueryClient();
+  const invalidate = () => {
+    void qc.invalidateQueries();
+  };
+  const mOpts = { mutation: { onSuccess: invalidate } };
 
-  addClient: (client: CurrentClient) => void;
-  updateClient: (id: string, updates: Partial<CurrentClient>) => void;
-  
-  addCallNote: (note: CallNote) => void;
-  updateCallNote: (id: string, updates: Partial<CallNote>) => void;
+  const clientsQ = useListClients();
+  const notesQ = useListCallNotes();
+  const tasksQ = useListTasks();
+  const signalsQ = useListSignals();
+  const escalationsQ = useListEscalations();
 
-  addTask: (task: Task) => void;
-  updateTask: (id: string, updates: Partial<Task>) => void;
+  const createClientM = useCreateClient(mOpts);
+  const updateClientM = useUpdateClient(mOpts);
+  const createNoteM = useCreateCallNote(mOpts);
+  const updateNoteM = useUpdateCallNote(mOpts);
+  const createTaskM = useCreateTask(mOpts);
+  const updateTaskM = useUpdateTask(mOpts);
+  const updateSignalM = useUpdateSignal(mOpts);
+  const updateEscalationM = useUpdateEscalation(mOpts);
+  const processNoteM = useProcessCallNote(mOpts);
+  const resetM = useResetToSeed(mOpts);
 
-  addSignal: (signal: OpportunitySignal) => void;
-  updateSignal: (id: string, updates: Partial<OpportunitySignal>) => void;
+  return {
+    clients: (clientsQ.data ?? []) as unknown as CurrentClient[],
+    callNotes: (notesQ.data ?? []) as unknown as CallNote[],
+    tasks: (tasksQ.data ?? []) as unknown as Task[],
+    signals: (signalsQ.data ?? []) as unknown as OpportunitySignal[],
+    escalations: (escalationsQ.data ?? []) as unknown as Escalation[],
 
-  addEscalation: (escalation: Escalation) => void;
-  updateEscalation: (id: string, updates: Partial<Escalation>) => void;
+    isLoading:
+      clientsQ.isLoading ||
+      notesQ.isLoading ||
+      tasksQ.isLoading ||
+      signalsQ.isLoading ||
+      escalationsQ.isLoading,
 
-  saveProcessedNote: (payload: ProcessedNotePayload) => string;
+    addClient: (client: Partial<CurrentClient> & { clientName: string }) =>
+      createClientM.mutateAsync({ data: client as unknown as ClientInput }),
+    updateClient: (id: string, updates: Partial<CurrentClient>) =>
+      updateClientM.mutateAsync({
+        clientId: id,
+        data: updates as unknown as ClientUpdate,
+      }),
 
-  resetData: () => void;
+    addCallNote: (note: Partial<CallNote> & { clientId: string }) =>
+      createNoteM.mutateAsync({ data: note as unknown as NoteInput }),
+    updateCallNote: (id: string, updates: Partial<CallNote>) =>
+      updateNoteM.mutateAsync({
+        noteId: id,
+        data: updates as unknown as NoteUpdate,
+      }),
+
+    addTask: (task: Partial<Task> & { clientId: string; title: string }) =>
+      createTaskM.mutateAsync({ data: task as unknown as TaskInput }),
+    updateTask: (id: string, updates: Partial<Task>) =>
+      updateTaskM.mutateAsync({
+        taskId: id,
+        data: updates as unknown as TaskUpdate,
+      }),
+
+    updateSignal: (id: string, updates: Partial<OpportunitySignal>) =>
+      updateSignalM.mutateAsync({
+        signalId: id,
+        data: updates as unknown as SignalUpdate,
+      }),
+
+    updateEscalation: (id: string, updates: Partial<Escalation>) =>
+      updateEscalationM.mutateAsync({
+        escalationId: id,
+        data: updates as unknown as EscalationUpdate,
+      }),
+
+    saveProcessedNote: (payload: ProcessedNotePayload) => {
+      const data: ProcessNoteInput = {
+        id: payload.id ?? null,
+        clientId: payload.clientId,
+        callDate: payload.callDate,
+        caller: payload.caller,
+        callType: payload.callType,
+        rawRingCentralNote: payload.rawRingCentralNote,
+        cleanSummary: payload.cleanSummary,
+        clientConcern: payload.clientConcern,
+        commitmentsMade: payload.commitmentsMade,
+        missingInformation: payload.missingInformation,
+        nextActions: payload.nextActions,
+        opportunitySignals: payload.opportunitySignals,
+        escalationFlags: payload.escalationFlags,
+        routingStatus: payload.routingStatus,
+        crmReadyNote: payload.crmReadyNote,
+        clientFollowUpDraft: payload.clientFollowUpDraft,
+        taskList: payload.taskList,
+        owner: payload.nextOwner,
+        dueDate: payload.dueDate,
+        priority: payload.priority,
+        signalType: payload.signalType,
+        escalationReason: payload.escalationReason,
+        riskLevel: payload.riskLevel,
+      };
+      return processNoteM.mutateAsync({ data });
+    },
+
+    resetData: () => resetM.mutateAsync(),
+  };
 }
-
-export const useStore = create<AppState>()(
-  persist(
-    (set, get) => ({
-      clients: seedClients,
-      callNotes: seedNotes,
-      tasks: seedTasks,
-      signals: seedSignals,
-      escalations: seedEscalations,
-      processes: seedProcesses,
-      audits: seedAudits,
-      riskProfiles: seedRiskProfiles,
-      expansion: seedExpansion,
-      invoices: seedInvoices,
-      slas: seedSLAs,
-      events: seedEvents,
-      contactLog: seedContactLog,
-
-      addClient: (client) => set((state) => ({ clients: [...state.clients, client] })),
-      updateClient: (id, updates) => set((state) => ({
-        clients: state.clients.map((c) => (c.id === id ? { ...c, ...updates } : c)),
-      })),
-
-      addCallNote: (note) => set((state) => ({ callNotes: [...state.callNotes, note] })),
-      updateCallNote: (id, updates) => set((state) => ({
-        callNotes: state.callNotes.map((n) => (n.id === id ? { ...n, ...updates } : n)),
-      })),
-
-      addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
-      updateTask: (id, updates) => set((state) => ({
-        tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-      })),
-
-      addSignal: (signal) => set((state) => ({ signals: [...state.signals, signal] })),
-      updateSignal: (id, updates) => set((state) => ({
-        signals: state.signals.map((s) => (s.id === id ? { ...s, ...updates } : s)),
-      })),
-
-      addEscalation: (escalation) => set((state) => ({ escalations: [...state.escalations, escalation] })),
-      updateEscalation: (id, updates) => set((state) => ({
-        escalations: state.escalations.map((e) => (e.id === id ? { ...e, ...updates } : e)),
-      })),
-
-      saveProcessedNote: (payload) => {
-        const now = new Date().toISOString();
-        const stamp = Date.now();
-        const existing = payload.id
-          ? get().callNotes.find((n) => n.id === payload.id)
-          : undefined;
-        const noteId = existing ? existing.id : `n_${stamp}`;
-
-        set((state) => {
-          const note: CallNote = {
-            id: noteId,
-            clientId: payload.clientId,
-            callDate: payload.callDate,
-            caller: payload.caller,
-            callType: payload.callType,
-            rawRingCentralNote: payload.rawRingCentralNote,
-            cleanSummary: payload.cleanSummary,
-            clientConcern: payload.clientConcern,
-            commitmentsMade: payload.commitmentsMade,
-            missingInformation: payload.missingInformation,
-            nextActions: payload.nextActions,
-            opportunitySignals: payload.opportunitySignals,
-            escalationFlags: payload.escalationFlags,
-            routingStatus: payload.routingStatus,
-            crmReadyNote: payload.crmReadyNote,
-            clientFollowUpDraft: payload.clientFollowUpDraft,
-            taskList: payload.taskList,
-            createdAt: existing ? existing.createdAt : now,
-            updatedAt: now,
-          };
-
-          const callNotes = existing
-            ? state.callNotes.map((n) => (n.id === noteId ? note : n))
-            : [...state.callNotes, note];
-
-          // Regenerate downstream artifacts derived from this note.
-          const tasks = state.tasks.filter((t) => t.sourceCallNoteId !== noteId);
-          const signals = state.signals.filter((s) => s.sourceCallNoteId !== noteId);
-          const escalations = state.escalations.filter((e) => e.sourceCallNoteId !== noteId);
-
-          const owner = payload.nextOwner || 'Gregg';
-          const hasOpportunity =
-            !!payload.opportunitySignals.trim() && payload.opportunitySignals.trim() !== 'None';
-          const hasEscalation =
-            !!payload.escalationFlags.trim() && payload.escalationFlags.trim() !== 'None';
-
-          const actionItems = payload.nextActions
-            .split('\n')
-            .map((s) => s.trim())
-            .filter(Boolean);
-
-          actionItems.forEach((title, i) => {
-            tasks.push({
-              id: `t_${stamp}_${i}`,
-              clientId: payload.clientId,
-              sourceCallNoteId: noteId,
-              title,
-              owner,
-              dueDate: payload.dueDate,
-              priority: payload.priority,
-              status: 'Open',
-              escalationFlag: hasEscalation,
-              notes: '',
-            });
-          });
-
-          if (hasOpportunity) {
-            signals.push({
-              id: `s_${stamp}`,
-              clientId: payload.clientId,
-              sourceCallNoteId: noteId,
-              type: payload.signalType,
-              description: payload.opportunitySignals,
-              status: 'Open',
-              routedTo: owner,
-              createdAt: now,
-            });
-          }
-
-          if (hasEscalation) {
-            escalations.push({
-              id: `e_${stamp}`,
-              clientId: payload.clientId,
-              sourceCallNoteId: noteId,
-              reason: payload.escalationReason,
-              riskLevel: payload.riskLevel,
-              routedTo: 'Gregg',
-              decisionNeeded: payload.escalationFlags,
-              deadline: payload.dueDate,
-              status: 'Open',
-            });
-          }
-
-          const clients = state.clients.map((c) => {
-            if (c.id !== payload.clientId) return c;
-            return {
-              ...c,
-              nextAction: actionItems[0] || c.nextAction,
-              nextOwner: owner,
-              dueDate: payload.dueDate || c.dueDate,
-              missingInformation: payload.missingInformation || 'None',
-              lastMeaningfulContact: payload.callDate,
-              openTasks: tasks.filter(
-                (t) => t.clientId === c.id && t.status !== 'Completed' && t.status !== 'Canceled'
-              ).length,
-              opportunitySignals: signals.filter((s) => s.clientId === c.id && s.status === 'Open')
-                .length,
-              escalations: escalations.filter((e) => e.clientId === c.id && e.status !== 'Resolved')
-                .length,
-              callNotes: callNotes.filter((n) => n.clientId === c.id).length,
-            };
-          });
-
-          return { callNotes, tasks, signals, escalations, clients };
-        });
-
-        return noteId;
-      },
-
-      resetData: () => set({
-        clients: seedClients,
-        callNotes: seedNotes,
-        tasks: seedTasks,
-        signals: seedSignals,
-        escalations: seedEscalations,
-        processes: seedProcesses,
-        audits: seedAudits,
-        riskProfiles: seedRiskProfiles,
-        expansion: seedExpansion,
-        invoices: seedInvoices,
-        slas: seedSLAs,
-        events: seedEvents,
-        contactLog: seedContactLog,
-      })
-    }),
-    {
-      name: 'cockpit-storage',
-      version: 4,
-    }
-  )
-);

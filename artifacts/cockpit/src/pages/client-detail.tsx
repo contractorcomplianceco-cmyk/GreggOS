@@ -1,5 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
-import { useStore } from "@/lib/store";
+import { useGetClientDetail } from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
 import { useMemo } from "react";
 import { useAudits, useAuditDetail, levelColor, layerAFactors, getPortalBaseUrl } from "@/lib/auditPortal";
@@ -36,6 +36,19 @@ import type {
   RoadmapStage,
   Trend,
   InvoiceStatus,
+  CurrentClient,
+  CallNote,
+  Task,
+  Escalation,
+  OpportunitySignal,
+  ClientProcess,
+  ClientAudit,
+  ClientRiskProfile,
+  ExpansionMilestone,
+  Invoice,
+  SLA,
+  ScheduledEvent,
+  ContactLogEntry,
 } from "@/lib/types";
 
 const BASE_URL = import.meta.env.BASE_URL;
@@ -308,8 +321,21 @@ function SectionTitle({ icon, children }: { icon: React.ReactNode; children: Rea
 
 export default function ClientDetail() {
   const { id } = useParams<{ id: string }>();
-  const store = useStore();
-  const { clients, callNotes, tasks, escalations, signals, processes, audits, riskProfiles, expansion, invoices, slas, events, contactLog } = store;
+  const { data: detail } = useGetClientDetail(id);
+
+  const clients = (detail?.client ? [detail.client] : []) as unknown as CurrentClient[];
+  const callNotes = (detail?.callNotes ?? []) as unknown as CallNote[];
+  const tasks = (detail?.tasks ?? []) as unknown as Task[];
+  const escalations = (detail?.escalations ?? []) as unknown as Escalation[];
+  const signals = (detail?.signals ?? []) as unknown as OpportunitySignal[];
+  const processes = (detail?.processes ?? []) as unknown as ClientProcess[];
+  const audits = (detail?.audit ? [detail.audit] : []) as unknown as ClientAudit[];
+  const riskProfiles = (detail?.riskProfile ? [detail.riskProfile] : []) as unknown as ClientRiskProfile[];
+  const expansion = (detail?.expansion ?? []) as unknown as ExpansionMilestone[];
+  const invoices = (detail?.invoices ?? []) as unknown as Invoice[];
+  const slas = (detail?.slas ?? []) as unknown as SLA[];
+  const events = (detail?.events ?? []) as unknown as ScheduledEvent[];
+  const contactLog = (detail?.contactLog ?? []) as unknown as ContactLogEntry[];
 
   const client = clients.find((c) => c.id === id);
   const { data: liveAudits } = useAudits();

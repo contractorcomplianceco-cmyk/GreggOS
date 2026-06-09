@@ -33,9 +33,17 @@ export default function WorkQueue() {
     toast({ title: "Queue refreshed", description: "Showing the latest call notes." });
   };
 
-  const handleArchive = (id: string) => {
-    updateCallNote(id, { routingStatus: "Archived", updatedAt: new Date().toISOString() });
-    toast({ title: "Archived", description: "Call note moved to the archive." });
+  const handleArchive = async (id: string) => {
+    try {
+      await updateCallNote(id, { routingStatus: "Archived", updatedAt: new Date().toISOString() });
+      toast({ title: "Archived", description: "Call note moved to the archive." });
+    } catch {
+      toast({
+        title: "Archive failed",
+        description: "The call note could not be archived. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

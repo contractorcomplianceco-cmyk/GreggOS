@@ -1,5 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -101,6 +101,37 @@ export default function Processor() {
     existingNote?.routingStatus || "New"
   );
 
+  // Call notes load asynchronously now (React Query). When editing via ?noteId=,
+  // the note may not be present on first render, so re-hydrate the form once the
+  // matching note arrives. A ref guards against clobbering user edits.
+  const hydratedRef = useRef(false);
+  useEffect(() => {
+    if (!noteId || hydratedRef.current || !existingNote) return;
+    hydratedRef.current = true;
+    setClientId(existingNote.clientId || "");
+    setCallDate(existingNote.callDate || new Date().toISOString().split("T")[0]);
+    setCaller(existingNote.caller || "");
+    setCallType(existingNote.callType || "Inbound");
+    setRawNote(existingNote.rawRingCentralNote || "");
+    setCleanSummary(existingNote.cleanSummary || "");
+    setClientConcern(existingNote.clientConcern || "");
+    setCommitmentsMade(existingNote.commitmentsMade || "");
+    setMissingInformation(existingNote.missingInformation || "");
+    setNextActions(existingNote.nextActions || "");
+    setOpportunitySignals(
+      existingNote.opportunitySignals && existingNote.opportunitySignals !== "None"
+        ? existingNote.opportunitySignals
+        : ""
+    );
+    setEscalationFlags(
+      existingNote.escalationFlags && existingNote.escalationFlags !== "None"
+        ? existingNote.escalationFlags
+        : ""
+    );
+    setRoutingStatus(existingNote.routingStatus || "New");
+    setDueDate(existingNote.callDate || callDate);
+  }, [noteId, existingNote, callDate]);
+
   const selectedClient = clients.find((c) => c.id === clientId);
   const contactLabel = caller || selectedClient?.contactName || "[contact]";
   const dueText = dueDate || "TBD";
@@ -166,44 +197,52 @@ export default function Processor() {
     toast({ title: "Copied to clipboard", description: `${label} copied.` });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!clientId) {
       toast({ title: "Error", description: "Please select a client.", variant: "destructive" });
       return;
     }
 
-    saveProcessedNote({
-      id: existingNote?.id,
-      clientId,
-      callDate,
-      caller,
-      callType,
-      rawRingCentralNote: rawNote,
-      cleanSummary,
-      clientConcern,
-      commitmentsMade,
-      missingInformation,
-      nextActions,
-      opportunitySignals: oppText,
-      escalationFlags: escText,
-      routingStatus,
-      crmReadyNote: generatedCrmNote,
-      clientFollowUpDraft: generatedFollowUp,
-      taskList: generatedTaskList,
-      nextOwner,
-      dueDate,
-      priority,
-      signalType,
-      escalationReason,
-      riskLevel,
-    });
+    try {
+      await saveProcessedNote({
+        id: existingNote?.id,
+        clientId,
+        callDate,
+        caller,
+        callType,
+        rawRingCentralNote: rawNote,
+        cleanSummary,
+        clientConcern,
+        commitmentsMade,
+        missingInformation,
+        nextActions,
+        opportunitySignals: oppText,
+        escalationFlags: escText,
+        routingStatus,
+        crmReadyNote: generatedCrmNote,
+        clientFollowUpDraft: generatedFollowUp,
+        taskList: generatedTaskList,
+        nextOwner,
+        dueDate,
+        priority,
+        signalType,
+        escalationReason,
+        riskLevel,
+      });
 
-    toast({
-      title: existingNote ? "Updated" : "Saved",
-      description: existingNote
-        ? "Call note updated. Tasks, signals, escalations, and the client profile were refreshed."
-        : "New call note saved. Tasks, signals, escalations, and the client profile were updated.",
-    });
+      toast({
+        title: existingNote ? "Updated" : "Saved",
+        description: existingNote
+          ? "Call note updated. Tasks, signals, escalations, and the client profile were refreshed."
+          : "New call note saved. Tasks, signals, escalations, and the client profile were updated.",
+      });
+    } catch {
+      toast({
+        title: "Save failed",
+        description: "The call note could not be saved. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

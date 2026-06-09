@@ -3,20 +3,28 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Gregg + Landon Current Client Cockpit API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: clients
+  - name: call-notes
+  - name: tasks
+  - name: signals
+  - name: escalations
+  - name: audit-links
+  - name: activity
+  - name: view-state
+  - name: admin
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,507 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      summary: List clients with derived counters
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string }
+        - name: owner
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+    post:
+      operationId: createClient
+      tags: [clients]
+      summary: Create a client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+
+  /clients/{clientId}:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getClientDetail
+      tags: [clients]
+      summary: Aggregate client detail
+      responses:
+        "200":
+          description: Client detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientDetail"
+    patch:
+      operationId: updateClient
+      tags: [clients]
+      summary: Update a client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+
+  /clients/{clientId}/audit-link:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getAuditLink
+      tags: [audit-links]
+      summary: Get the audit link for a client
+      responses:
+        "200":
+          description: Audit link or null
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLinkOrNull"
+    put:
+      operationId: setAuditLink
+      tags: [audit-links]
+      summary: Confirm an audit link for a client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuditLinkInput"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLink"
+    delete:
+      operationId: unsetAuditLink
+      tags: [audit-links]
+      summary: Remove the audit link for a client
+      responses:
+        "204":
+          description: Removed
+
+  /call-notes:
+    get:
+      operationId: listCallNotes
+      tags: [call-notes]
+      summary: List call notes
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: routingStatus
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Call notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CallNote"
+    post:
+      operationId: createCallNote
+      tags: [call-notes]
+      summary: Create a call note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CallNote"
+
+  /call-notes/process:
+    post:
+      operationId: processCallNote
+      tags: [call-notes]
+      summary: Transactionally save a processed call note and regenerate children
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessNoteInput"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessNoteResult"
+
+  /call-notes/{noteId}:
+    parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getCallNote
+      tags: [call-notes]
+      summary: Get a call note
+      responses:
+        "200":
+          description: Call note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CallNote"
+    patch:
+      operationId: updateCallNote
+      tags: [call-notes]
+      summary: Update a call note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CallNote"
+
+  /tasks:
+    get:
+      operationId: listTasks
+      tags: [tasks]
+      summary: List tasks
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: owner
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /tasks/{taskId}:
+    parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /opportunity-signals:
+    get:
+      operationId: listSignals
+      tags: [signals]
+      summary: List opportunity signals
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Signals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpportunitySignal"
+
+  /opportunity-signals/{signalId}:
+    parameters:
+      - name: signalId
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateSignal
+      tags: [signals]
+      summary: Update an opportunity signal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignalUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpportunitySignal"
+
+  /escalations:
+    get:
+      operationId: listEscalations
+      tags: [escalations]
+      summary: List escalations
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Escalations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Escalation"
+
+  /escalations/{escalationId}:
+    parameters:
+      - name: escalationId
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateEscalation
+      tags: [escalations]
+      summary: Update an escalation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EscalationUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Escalation"
+
+  /activity:
+    get:
+      operationId: listActivity
+      tags: [activity]
+      summary: List activity log entries
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityLogEntry"
+
+  /view-state/{scope}:
+    parameters:
+      - name: scope
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getViewState
+      tags: [view-state]
+      summary: Get last-seen view state for a scope
+      responses:
+        "200":
+          description: View state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ViewState"
+
+  /view-state/{scope}/seen:
+    parameters:
+      - name: scope
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: markSeen
+      tags: [view-state]
+      summary: Mark a scope as seen now
+      responses:
+        "200":
+          description: View state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ViewState"
+
+  /admin/export:
+    get:
+      operationId: exportData
+      tags: [admin]
+      summary: Export the full dataset (admin only)
+      responses:
+        "200":
+          description: Full dump
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportData"
+
+  /admin/reset:
+    post:
+      operationId: resetToSeed
+      tags: [admin]
+      summary: Reset the dataset to seed (admin only)
+      responses:
+        "200":
+          description: Reset result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
+  /admin/import:
+    post:
+      operationId: importData
+      tags: [admin]
+      summary: Import a full dataset (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportData"
+      responses:
+        "200":
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +540,670 @@ components:
       properties:
         status:
           type: string
+      required: [status]
+
+    MutationResult:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        message:
+          type: string
+      required: [ok]
+
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string }
+        displayName: { type: string }
+        role: { type: string }
+        active: { type: boolean }
+      required: [id, email, displayName, role, active]
+
+    RiskFactor:
+      type: object
+      properties:
+        label: { type: string }
+        score: { type: number }
+        weight: { type: number }
+        trend: { type: string }
+      required: [label, score, weight, trend]
+
+    AuditScoreItem:
+      type: object
+      properties:
+        category: { type: string }
+        score: { type: number }
+        weight: { type: number }
+        notes: { type: string }
+      required: [category, score, weight, notes]
+
+    Client:
+      type: object
+      properties:
+        id: { type: string }
+        clientName: { type: string }
+        companyName: { type: string }
+        contactName: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        clientStatus: { type: string }
+        greggPriority: { type: string }
+        riskLevel: { type: string }
+        lastMeaningfulContact: { type: string }
+        nextAction: { type: string }
+        nextOwner: { type: string }
+        nextOwnerUserId:
+          type: [string, "null"]
+        dueDate: { type: string }
+        missingInformation: { type: string }
+        openTasks: { type: integer }
+        opportunitySignals: { type: integer }
+        escalations: { type: integer }
+        callNotes: { type: integer }
       required:
+        - id
+        - clientName
+        - companyName
+        - contactName
+        - phone
+        - email
+        - clientStatus
+        - greggPriority
+        - riskLevel
+        - lastMeaningfulContact
+        - nextAction
+        - nextOwner
+        - dueDate
+        - missingInformation
+        - openTasks
+        - opportunitySignals
+        - escalations
+        - callNotes
+
+    ClientInput:
+      type: object
+      properties:
+        clientName: { type: string }
+        companyName: { type: string }
+        contactName: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        clientStatus: { type: string }
+        greggPriority: { type: string }
+        riskLevel: { type: string }
+        lastMeaningfulContact: { type: string }
+        nextAction: { type: string }
+        nextOwner: { type: string }
+        dueDate: { type: string }
+        missingInformation: { type: string }
+      required: [clientName]
+
+    ClientUpdate:
+      type: object
+      properties:
+        clientName: { type: string }
+        companyName: { type: string }
+        contactName: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        clientStatus: { type: string }
+        greggPriority: { type: string }
+        riskLevel: { type: string }
+        lastMeaningfulContact: { type: string }
+        nextAction: { type: string }
+        nextOwner: { type: string }
+        dueDate: { type: string }
+        missingInformation: { type: string }
+
+    CallNote:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        callDate: { type: string }
+        caller: { type: string }
+        callType: { type: string }
+        rawRingCentralNote: { type: string }
+        cleanSummary: { type: string }
+        clientConcern: { type: string }
+        commitmentsMade: { type: string }
+        missingInformation: { type: string }
+        nextActions: { type: string }
+        opportunitySignals: { type: string }
+        escalationFlags: { type: string }
+        routingStatus: { type: string }
+        crmReadyNote: { type: string }
+        clientFollowUpDraft: { type: string }
+        taskList: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - clientId
+        - callDate
+        - caller
+        - callType
+        - rawRingCentralNote
+        - cleanSummary
+        - clientConcern
+        - commitmentsMade
+        - missingInformation
+        - nextActions
+        - opportunitySignals
+        - escalationFlags
+        - routingStatus
+        - crmReadyNote
+        - clientFollowUpDraft
+        - taskList
+        - createdAt
+        - updatedAt
+
+    NoteInput:
+      type: object
+      properties:
+        clientId: { type: string }
+        callDate: { type: string }
+        caller: { type: string }
+        callType: { type: string }
+        rawRingCentralNote: { type: string }
+        cleanSummary: { type: string }
+        clientConcern: { type: string }
+        commitmentsMade: { type: string }
+        missingInformation: { type: string }
+        nextActions: { type: string }
+        opportunitySignals: { type: string }
+        escalationFlags: { type: string }
+        routingStatus: { type: string }
+        crmReadyNote: { type: string }
+        clientFollowUpDraft: { type: string }
+        taskList: { type: string }
+      required: [clientId, callDate, callType, routingStatus]
+
+    NoteUpdate:
+      type: object
+      properties:
+        callDate: { type: string }
+        caller: { type: string }
+        callType: { type: string }
+        rawRingCentralNote: { type: string }
+        cleanSummary: { type: string }
+        clientConcern: { type: string }
+        commitmentsMade: { type: string }
+        missingInformation: { type: string }
+        nextActions: { type: string }
+        opportunitySignals: { type: string }
+        escalationFlags: { type: string }
+        routingStatus: { type: string }
+        crmReadyNote: { type: string }
+        clientFollowUpDraft: { type: string }
+        taskList: { type: string }
+
+    ProcessNoteInput:
+      type: object
+      properties:
+        id:
+          type: [string, "null"]
+        clientId: { type: string }
+        callDate: { type: string }
+        caller: { type: string }
+        callType: { type: string }
+        rawRingCentralNote: { type: string }
+        cleanSummary: { type: string }
+        clientConcern: { type: string }
+        commitmentsMade: { type: string }
+        missingInformation: { type: string }
+        nextActions: { type: string }
+        opportunitySignals: { type: string }
+        escalationFlags: { type: string }
+        routingStatus: { type: string }
+        crmReadyNote: { type: string }
+        clientFollowUpDraft: { type: string }
+        taskList: { type: string }
+        owner: { type: string }
+        dueDate: { type: string }
+        priority: { type: string }
+        signalType: { type: string }
+        escalationReason: { type: string }
+        riskLevel: { type: string }
+      required: [clientId, callDate, callType, routingStatus]
+
+    ProcessNoteResult:
+      type: object
+      properties:
+        note:
+          $ref: "#/components/schemas/CallNote"
+        clientId: { type: string }
+      required: [note, clientId]
+
+    Task:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        sourceCallNoteId:
+          type: [string, "null"]
+        title: { type: string }
+        owner: { type: string }
+        dueDate: { type: string }
+        priority: { type: string }
+        status: { type: string }
+        escalationFlag: { type: boolean }
+        notes: { type: string }
+      required:
+        - id
+        - clientId
+        - sourceCallNoteId
+        - title
+        - owner
+        - dueDate
+        - priority
+        - status
+        - escalationFlag
+        - notes
+
+    TaskInput:
+      type: object
+      properties:
+        clientId: { type: string }
+        title: { type: string }
+        owner: { type: string }
+        dueDate: { type: string }
+        priority: { type: string }
+        status: { type: string }
+        escalationFlag: { type: boolean }
+        notes: { type: string }
+      required: [clientId, title]
+
+    TaskUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        owner: { type: string }
+        dueDate: { type: string }
+        priority: { type: string }
+        status: { type: string }
+        escalationFlag: { type: boolean }
+        notes: { type: string }
+
+    OpportunitySignal:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        sourceCallNoteId:
+          type: [string, "null"]
+        type: { type: string }
+        description: { type: string }
+        status: { type: string }
+        routedTo: { type: string }
+        createdAt: { type: string }
+      required:
+        - id
+        - clientId
+        - sourceCallNoteId
+        - type
+        - description
+        - status
+        - routedTo
+        - createdAt
+
+    SignalUpdate:
+      type: object
+      properties:
+        type: { type: string }
+        description: { type: string }
+        status: { type: string }
+        routedTo: { type: string }
+
+    Escalation:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        sourceCallNoteId:
+          type: [string, "null"]
+        reason: { type: string }
+        riskLevel: { type: string }
+        routedTo: { type: string }
+        decisionNeeded: { type: string }
+        deadline: { type: string }
+        status: { type: string }
+      required:
+        - id
+        - clientId
+        - sourceCallNoteId
+        - reason
+        - riskLevel
+        - routedTo
+        - decisionNeeded
+        - deadline
         - status
 
+    EscalationUpdate:
+      type: object
+      properties:
+        reason: { type: string }
+        riskLevel: { type: string }
+        routedTo: { type: string }
+        decisionNeeded: { type: string }
+        deadline: { type: string }
+        status: { type: string }
+
+    ClientProcess:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        name: { type: string }
+        type: { type: string }
+        status: { type: string }
+        progress: { type: integer }
+        owner: { type: string }
+        startedAt: { type: string }
+        dueDate: { type: string }
+        blockedReason: { type: string }
+      required:
+        - id
+        - clientId
+        - name
+        - type
+        - status
+        - progress
+        - owner
+        - startedAt
+        - dueDate
+        - blockedReason
+
+    ClientRiskProfile:
+      type: object
+      properties:
+        clientId: { type: string }
+        overallScore: { type: number }
+        trend: { type: string }
+        updatedAt: { type: string }
+        factors:
+          type: array
+          items:
+            $ref: "#/components/schemas/RiskFactor"
+      required: [clientId, overallScore, trend, updatedAt, factors]
+
+    ClientAudit:
+      type: object
+      properties:
+        clientId: { type: string }
+        status: { type: string }
+        auditType: { type: string }
+        auditor: { type: string }
+        lastAuditDate: { type: string }
+        nextAuditDate: { type: string }
+        overallScore: { type: number }
+        scoresheet:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditScoreItem"
+      required:
+        - clientId
+        - status
+        - auditType
+        - auditor
+        - lastAuditDate
+        - nextAuditDate
+        - overallScore
+        - scoresheet
+
+    AuditLink:
+      type: object
+      properties:
+        clientId: { type: string }
+        portalAuditId:
+          type: [integer, "null"]
+        portalClientName: { type: string }
+        matchMethod: { type: string }
+        confirmedAt:
+          type: [string, "null"]
+      required: [clientId, portalAuditId, portalClientName, matchMethod]
+
+    AuditLinkOrNull:
+      oneOf:
+        - $ref: "#/components/schemas/AuditLink"
+        - type: "null"
+
+    AuditLinkInput:
+      type: object
+      properties:
+        portalAuditId: { type: integer }
+        portalClientName: { type: string }
+        matchMethod: { type: string }
+      required: [portalAuditId]
+
+    ExpansionMilestone:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        title: { type: string }
+        stage: { type: string }
+        potentialValue: { type: number }
+        targetDate: { type: string }
+        description: { type: string }
+      required:
+        - id
+        - clientId
+        - title
+        - stage
+        - potentialValue
+        - targetDate
+        - description
+
+    Invoice:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        invoiceNumber: { type: string }
+        amount: { type: number }
+        amountPaid: { type: number }
+        issueDate: { type: string }
+        dueDate: { type: string }
+        status: { type: string }
+      required:
+        - id
+        - clientId
+        - invoiceNumber
+        - amount
+        - amountPaid
+        - issueDate
+        - dueDate
+        - status
+
+    SLA:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        name: { type: string }
+        description: { type: string }
+        dueDate: { type: string }
+        status: { type: string }
+        owner: { type: string }
+      required:
+        - id
+        - clientId
+        - name
+        - description
+        - dueDate
+        - status
+        - owner
+
+    ScheduledEvent:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        title: { type: string }
+        type: { type: string }
+        date: { type: string }
+        time: { type: string }
+        attendees: { type: string }
+        withClient: { type: boolean }
+      required:
+        - id
+        - clientId
+        - title
+        - type
+        - date
+        - time
+        - attendees
+        - withClient
+
+    ContactLogEntry:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        date: { type: string }
+        channel: { type: string }
+        internalPerson: { type: string }
+        direction: { type: string }
+        summary: { type: string }
+      required:
+        - id
+        - clientId
+        - date
+        - channel
+        - internalPerson
+        - direction
+        - summary
+
+    ActivityLogEntry:
+      type: object
+      properties:
+        id: { type: string }
+        actorLabel: { type: string }
+        action: { type: string }
+        entityType: { type: string }
+        entityId:
+          type: [string, "null"]
+        clientId:
+          type: [string, "null"]
+        summary: { type: string }
+        createdAt: { type: string }
+      required:
+        - id
+        - actorLabel
+        - action
+        - entityType
+        - summary
+        - createdAt
+
+    ViewState:
+      type: object
+      properties:
+        scope: { type: string }
+        lastSeenAt:
+          type: [string, "null"]
+      required: [scope]
+
+    ClientDetail:
+      type: object
+      properties:
+        client:
+          $ref: "#/components/schemas/Client"
+        callNotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CallNote"
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+        signals:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpportunitySignal"
+        escalations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Escalation"
+        processes:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClientProcess"
+        riskProfile:
+          oneOf:
+            - $ref: "#/components/schemas/ClientRiskProfile"
+            - type: "null"
+        audit:
+          oneOf:
+            - $ref: "#/components/schemas/ClientAudit"
+            - type: "null"
+        auditLink:
+          $ref: "#/components/schemas/AuditLinkOrNull"
+        expansion:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExpansionMilestone"
+        invoices:
+          type: array
+          items:
+            $ref: "#/components/schemas/Invoice"
+        slas:
+          type: array
+          items:
+            $ref: "#/components/schemas/SLA"
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScheduledEvent"
+        contactLog:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContactLogEntry"
+      required:
+        - client
+        - callNotes
+        - tasks
+        - signals
+        - escalations
+        - processes
+        - expansion
+        - invoices
+        - slas
+        - events
+        - contactLog
+
+    ExportData:
+      type: object
+      properties:
+        clients:
+          type: array
+          items:
+            $ref: "#/components/schemas/Client"
+        callNotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CallNote"
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+        signals:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpportunitySignal"
+        escalations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Escalation"
+      required: [clients, callNotes, tasks, signals, escalations]
+
+    ImportData:
+      type: object
+      properties:
+        clients:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClientInput"
+      required: [clients]

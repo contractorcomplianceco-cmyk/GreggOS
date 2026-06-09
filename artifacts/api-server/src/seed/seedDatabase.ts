@@ -1,0 +1,479 @@
+import {
+  db,
+  usersTable,
+  clientsTable,
+  callNotesTable,
+  tasksTable,
+  opportunitySignalsTable,
+  escalationsTable,
+  clientProcessesTable,
+  clientRiskProfilesTable,
+  clientAuditsTable,
+  auditLinksTable,
+  expansionMilestonesTable,
+  invoicesTable,
+  slasTable,
+  scheduledEventsTable,
+  contactLogTable,
+  activityLogTable,
+  type RiskFactor,
+  type AuditScoreItem,
+} from "@workspace/db";
+import { eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
+
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+const now = new Date();
+function iso(offsetDays: number): string {
+  const d = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + offsetDays,
+  );
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+const dateOrNull = (v: string): string | null => (v && v.trim() ? v : null);
+
+interface SeedClient {
+  key: string;
+  clientName: string;
+  companyName: string;
+  contactName: string;
+  phone: string;
+  email: string;
+  clientStatus: string;
+  greggPriority: string;
+  riskLevel: string;
+  lastMeaningfulContact: string;
+  nextAction: string;
+  nextOwner: string;
+  dueDate: string;
+  missingInformation: string;
+}
+
+const clients: SeedClient[] = [
+  { key: "c1", clientName: "ABC Construction", companyName: "ABC Construction LLC", contactName: "John Doe", phone: "555-0101", email: "john@abcconstruction.com", clientStatus: "Active", greggPriority: "High", riskLevel: "Low", lastMeaningfulContact: iso(-2), nextAction: "Review compliance docs", nextOwner: "Gregg", dueDate: iso(5), missingInformation: "None" },
+  { key: "c2", clientName: "BuildCorp", companyName: "BuildCorp Inc", contactName: "Jane Smith", phone: "555-0102", email: "jane@buildcorp.com", clientStatus: "At Risk", greggPriority: "Urgent", riskLevel: "High", lastMeaningfulContact: iso(-1), nextAction: "Address pricing exception", nextOwner: "Gregg", dueDate: iso(2), missingInformation: "Pricing history" },
+  { key: "c3", clientName: "CityBuilders", companyName: "CityBuilders Group", contactName: "Bob Johnson", phone: "555-0103", email: "bob@citybuilders.com", clientStatus: "Renewal Pending", greggPriority: "Medium", riskLevel: "Medium", lastMeaningfulContact: iso(-4), nextAction: "Send renewal agreement", nextOwner: "Landon", dueDate: iso(6), missingInformation: "None" },
+  { key: "c4", clientName: "Delta Construction", companyName: "Delta Construction Ltd", contactName: "Alice Williams", phone: "555-0104", email: "alice@deltaconstruction.com", clientStatus: "Active", greggPriority: "Low", riskLevel: "Low", lastMeaningfulContact: iso(-11), nextAction: "Check in on qualifier status", nextOwner: "Landon", dueDate: iso(9), missingInformation: "Qualifier ID" },
+  { key: "c5", clientName: "Echo Builders", companyName: "Echo Builders LLC", contactName: "Charlie Brown", phone: "555-0105", email: "charlie@echobuilders.com", clientStatus: "Active", greggPriority: "Medium", riskLevel: "Low", lastMeaningfulContact: iso(-16), nextAction: "Schedule monitoring call", nextOwner: "Landon", dueDate: iso(12), missingInformation: "None" },
+  { key: "c6", clientName: "Foxtrot Developments", companyName: "Foxtrot Developments Inc", contactName: "David Lee", phone: "555-0106", email: "david@foxtrot.com", clientStatus: "Onboarding", greggPriority: "High", riskLevel: "Low", lastMeaningfulContact: iso(-1), nextAction: "Complete onboarding", nextOwner: "Gregg", dueDate: iso(3), missingInformation: "Company docs" },
+];
+
+const noteDates = {
+  n1: { call: iso(-2), due: iso(5) },
+  n2: { call: iso(-1), due: iso(2) },
+  n3: { call: iso(-4), due: iso(6) },
+  n4: { call: iso(-11), due: iso(9) },
+  n5: { call: iso(-16), due: iso(12) },
+  n6: { call: iso(-1), due: iso(3) },
+  n7: { call: iso(-7), due: iso(-3) },
+  n8: { call: iso(-12), due: iso(-6) },
+};
+
+interface SeedNote {
+  key: string;
+  clientKey: string;
+  callDate: string;
+  caller: string;
+  callType: string;
+  rawRingCentralNote: string;
+  cleanSummary: string;
+  clientConcern: string;
+  commitmentsMade: string;
+  missingInformation: string;
+  nextActions: string;
+  opportunitySignals: string;
+  escalationFlags: string;
+  routingStatus: string;
+  crmReadyNote: string;
+  clientFollowUpDraft: string;
+  taskList: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const notes: SeedNote[] = [
+  { key: "n1", clientKey: "c1", callDate: noteDates.n1.call, caller: "John Doe", callType: "Inbound", rawRingCentralNote: "John called to ask about the compliance docs. He said he will send them by tomorrow. Also mentioned he might need help with a new project next month.", cleanSummary: "Discussed compliance documentation status and potential new project expansion.", clientConcern: "None", commitmentsMade: "John to send compliance docs by tomorrow.", missingInformation: "Compliance docs", nextActions: "Review compliance docs once received.", opportunitySignals: "Expansion", escalationFlags: "None", routingStatus: "CRM-ready", crmReadyNote: `Call with John Doe on ${noteDates.n1.call}. Discussed compliance documentation status and potential new project expansion. Client concern/request: None. Missing information: Compliance docs. Next steps: Review compliance docs once received. Owner: Gregg. Due date: ${noteDates.n1.due}. Opportunity signals: Expansion. Escalation: None.`, clientFollowUpDraft: `Hi John Doe, thank you for speaking with Gregg today. Based on the conversation, our next step is Review compliance docs once received. We are currently waiting on Compliance docs. We will follow up by ${noteDates.n1.due}.`, taskList: `Task: Review compliance docs | Owner: Gregg | Due: ${noteDates.n1.due} | Priority: High`, createdAt: `${noteDates.n1.call}T10:00:00Z`, updatedAt: `${noteDates.n1.call}T10:30:00Z` },
+  { key: "n2", clientKey: "c2", callDate: noteDates.n2.call, caller: "Jane Smith", callType: "Escalation", rawRingCentralNote: "Jane was very upset about the pricing exception we discussed last week. She says she will cancel if we don't honor the original quote.", cleanSummary: "Client escalated regarding pricing exception and threatened cancellation.", clientConcern: "Pricing exception not honored.", commitmentsMade: "Gregg will review and provide a final decision by end of week.", missingInformation: "Pricing history", nextActions: "Review pricing exception and contact client.", opportunitySignals: "Client-save", escalationFlags: "Pricing exception", routingStatus: "Gregg review", crmReadyNote: `Call with Jane Smith on ${noteDates.n2.call}. Discussed client escalated regarding pricing exception and threatened cancellation. Client concern/request: Pricing exception not honored. Missing information: Pricing history. Next steps: Review pricing exception and contact client. Owner: Gregg. Due date: ${noteDates.n2.due}. Opportunity signals: Client-save. Escalation: Pricing exception.`, clientFollowUpDraft: `Hi Jane Smith, thank you for speaking with Gregg today. Based on the conversation, our next step is Review pricing exception and contact client. We are currently waiting on Pricing history. We will follow up by ${noteDates.n2.due}.`, taskList: `Task: Address pricing exception | Owner: Gregg | Due: ${noteDates.n2.due} | Priority: Urgent`, createdAt: `${noteDates.n2.call}T14:00:00Z`, updatedAt: `${noteDates.n2.call}T14:45:00Z` },
+  { key: "n3", clientKey: "c3", callDate: noteDates.n3.call, caller: "Bob Johnson", callType: "Renewal", rawRingCentralNote: "Bob wants to renew but asked if we can add monitoring to the package. Needs the renewal agreement sent over for signature.", cleanSummary: "Client confirmed renewal intent and asked about adding monitoring services.", clientConcern: "Wants monitoring added to renewal.", commitmentsMade: "Landon to send renewal agreement.", missingInformation: "None", nextActions: "Send renewal agreement\nPrepare monitoring add-on quote", opportunitySignals: "Expansion - monitoring add-on", escalationFlags: "None", routingStatus: "Summary drafted", crmReadyNote: `Call with Bob Johnson on ${noteDates.n3.call}. Discussed client confirmed renewal intent and asked about adding monitoring services. Client concern/request: Wants monitoring added to renewal. Missing information: None. Next steps: Send renewal agreement; Prepare monitoring add-on quote. Owner: Landon. Due date: ${noteDates.n3.due}. Opportunity signals: Expansion - monitoring add-on. Escalation: None.`, clientFollowUpDraft: `Hi Bob Johnson, thank you for speaking with Gregg today. Based on the conversation, our next step is Send renewal agreement. We are currently waiting on nothing at this time. We will follow up by ${noteDates.n3.due}.`, taskList: `Task: Send renewal agreement | Owner: Landon | Due: ${noteDates.n3.due} | Priority: Medium\nTask: Prepare monitoring add-on quote | Owner: Landon | Due: ${noteDates.n3.due} | Priority: Medium`, createdAt: `${noteDates.n3.call}T09:00:00Z`, updatedAt: `${noteDates.n3.call}T09:20:00Z` },
+  { key: "n4", clientKey: "c4", callDate: noteDates.n4.call, caller: "Alice Williams", callType: "Qualifier Discussion", rawRingCentralNote: "Alice asked about qualifier requirements for a new state license. Could not confirm her current qualifier ID on file. Said she may want to add a second qualifier later.", cleanSummary: "Discussed qualifier requirements for a new state license expansion.", clientConcern: "Unsure of qualifier requirements for new state.", commitmentsMade: "Landon to confirm qualifier ID and requirements.", missingInformation: "Qualifier ID", nextActions: "Confirm qualifier ID on file\nResearch new state qualifier requirements", opportunitySignals: "Qualifier - potential second qualifier", escalationFlags: "None", routingStatus: "In review", crmReadyNote: `Call with Alice Williams on ${noteDates.n4.call}. Discussed qualifier requirements for a new state license expansion. Client concern/request: Unsure of qualifier requirements for new state. Missing information: Qualifier ID. Next steps: Confirm qualifier ID on file; Research new state qualifier requirements. Owner: Landon. Due date: ${noteDates.n4.due}. Opportunity signals: Qualifier - potential second qualifier. Escalation: None.`, clientFollowUpDraft: `Hi Alice Williams, thank you for speaking with Gregg today. Based on the conversation, our next step is Confirm qualifier ID on file. We are currently waiting on Qualifier ID. We will follow up by ${noteDates.n4.due}.`, taskList: `Task: Confirm qualifier ID on file | Owner: Landon | Due: ${noteDates.n4.due} | Priority: Medium\nTask: Research new state qualifier requirements | Owner: Landon | Due: ${noteDates.n4.due} | Priority: Medium`, createdAt: `${noteDates.n4.call}T11:00:00Z`, updatedAt: `${noteDates.n4.call}T11:25:00Z` },
+  { key: "n5", clientKey: "c5", callDate: noteDates.n5.call, caller: "Charlie Brown", callType: "Monitoring", rawRingCentralNote: "Routine monitoring check-in. Everything looks fine. Charlie mentioned a colleague at another company might be interested in our services.", cleanSummary: "Routine monitoring check-in with a potential referral lead.", clientConcern: "None", commitmentsMade: "Landon to schedule next monitoring call.", missingInformation: "None", nextActions: "Schedule next monitoring call", opportunitySignals: "Placement - referral lead at another company", escalationFlags: "None", routingStatus: "CRM-ready", crmReadyNote: `Call with Charlie Brown on ${noteDates.n5.call}. Discussed routine monitoring check-in with a potential referral lead. Client concern/request: None. Missing information: None. Next steps: Schedule next monitoring call. Owner: Landon. Due date: ${noteDates.n5.due}. Opportunity signals: Placement - referral lead at another company. Escalation: None.`, clientFollowUpDraft: `Hi Charlie Brown, thank you for speaking with Gregg today. Based on the conversation, our next step is Schedule next monitoring call. We are currently waiting on nothing at this time. We will follow up by ${noteDates.n5.due}.`, taskList: `Task: Schedule next monitoring call | Owner: Landon | Due: ${noteDates.n5.due} | Priority: Low`, createdAt: `${noteDates.n5.call}T13:00:00Z`, updatedAt: `${noteDates.n5.call}T13:15:00Z` },
+  { key: "n6", clientKey: "c6", callDate: noteDates.n6.call, caller: "David Lee", callType: "Scheduled Check-in", rawRingCentralNote: "Onboarding call. David still needs to send company formation docs and insurance certificate. Asked a question about legal liability that we should not answer directly.", cleanSummary: "Onboarding check-in; outstanding documents and a legal-sensitive question raised.", clientConcern: "Asked about legal liability exposure (decision boundary).", commitmentsMade: "Gregg to follow up after collecting onboarding docs.", missingInformation: "Company formation docs, insurance certificate", nextActions: "Collect company formation docs\nRoute legal-liability question to leadership", opportunitySignals: "None", escalationFlags: "Legal-sensitive question raised - route to leadership review", routingStatus: "Gregg review", crmReadyNote: `Call with David Lee on ${noteDates.n6.call}. Discussed onboarding check-in; outstanding documents and a legal-sensitive question raised. Client concern/request: Asked about legal liability exposure (decision boundary). Missing information: Company formation docs, insurance certificate. Next steps: Collect company formation docs; Route legal-liability question to leadership. Owner: Gregg. Due date: ${noteDates.n6.due}. Opportunity signals: None. Escalation: Legal-sensitive question raised - route to leadership review.`, clientFollowUpDraft: `Hi David Lee, thank you for speaking with Gregg today. Based on the conversation, our next step is Collect company formation docs. We are currently waiting on Company formation docs, insurance certificate. We will follow up by ${noteDates.n6.due}.`, taskList: `Task: Collect company formation docs | Owner: Gregg | Due: ${noteDates.n6.due} | Priority: High\nTask: Route legal-liability question to leadership | Owner: Gregg | Due: ${noteDates.n6.due} | Priority: High`, createdAt: `${noteDates.n6.call}T15:00:00Z`, updatedAt: `${noteDates.n6.call}T15:30:00Z` },
+  { key: "n7", clientKey: "c2", callDate: noteDates.n7.call, caller: "Jane Smith", callType: "Inbound", rawRingCentralNote: "Jane called about a refund request for a duplicate charge. Wants money back this week. Did not have the invoice number handy.", cleanSummary: "Client requested a refund for a reported duplicate charge.", clientConcern: "Refund for duplicate charge.", commitmentsMade: "Gregg to review billing and respond.", missingInformation: "Invoice number", nextActions: "Review billing records for duplicate charge", opportunitySignals: "None", escalationFlags: "Refund request - requires leadership approval", routingStatus: "New", crmReadyNote: `Call with Jane Smith on ${noteDates.n7.call}. Discussed client requested a refund for a reported duplicate charge. Client concern/request: Refund for duplicate charge. Missing information: Invoice number. Next steps: Review billing records for duplicate charge. Owner: Gregg. Due date: ${noteDates.n7.due}. Opportunity signals: None. Escalation: Refund request - requires leadership approval.`, clientFollowUpDraft: `Hi Jane Smith, thank you for speaking with Gregg today. Based on the conversation, our next step is Review billing records for duplicate charge. We are currently waiting on Invoice number. We will follow up by ${noteDates.n7.due}.`, taskList: `Task: Review billing records for duplicate charge | Owner: Gregg | Due: ${noteDates.n7.due} | Priority: High`, createdAt: `${noteDates.n7.call}T10:00:00Z`, updatedAt: `${noteDates.n7.call}T10:20:00Z` },
+  { key: "n8", clientKey: "c6", callDate: noteDates.n8.call, caller: "David Lee", callType: "Placement Discussion", rawRingCentralNote: "David wants to place a new qualifier for an upcoming bid. Needs approval on the placement and asked when it can be finalized.", cleanSummary: "Client requested a qualifier placement for an upcoming bid.", clientConcern: "Timeline for placement approval.", commitmentsMade: "Gregg to review placement and confirm timeline.", missingInformation: "Bid deadline", nextActions: "Review placement request\nConfirm placement timeline with client", opportunitySignals: "Placement - new qualifier placement", escalationFlags: "Placement approval needed", routingStatus: "New", crmReadyNote: `Call with David Lee on ${noteDates.n8.call}. Discussed client requested a qualifier placement for an upcoming bid. Client concern/request: Timeline for placement approval. Missing information: Bid deadline. Next steps: Review placement request; Confirm placement timeline with client. Owner: Gregg. Due date: ${noteDates.n8.due}. Opportunity signals: Placement - new qualifier placement. Escalation: Placement approval needed.`, clientFollowUpDraft: `Hi David Lee, thank you for speaking with Gregg today. Based on the conversation, our next step is Review placement request. We are currently waiting on Bid deadline. We will follow up by ${noteDates.n8.due}.`, taskList: `Task: Review placement request | Owner: Gregg | Due: ${noteDates.n8.due} | Priority: High\nTask: Confirm placement timeline with client | Owner: Gregg | Due: ${noteDates.n8.due} | Priority: High`, createdAt: `${noteDates.n8.call}T16:00:00Z`, updatedAt: `${noteDates.n8.call}T16:25:00Z` },
+];
+
+const tasks = [
+  { clientKey: "c1", noteKey: "n1", title: "Review compliance docs", owner: "Gregg", dueDate: iso(5), priority: "High", status: "Open", escalationFlag: false, notes: "Review the docs John is sending." },
+  { clientKey: "c2", noteKey: "n2", title: "Address pricing exception", owner: "Gregg", dueDate: iso(2), priority: "Urgent", status: "Open", escalationFlag: true, notes: "Client threatened cancellation." },
+];
+
+const signals = [
+  { clientKey: "c1", noteKey: "n1", type: "Expansion", description: "Potential new project next month.", status: "Open", routedTo: "Gregg", createdAt: `${noteDates.n1.call}T10:30:00Z` },
+  { clientKey: "c2", noteKey: "n2", type: "Client-save", description: "Client escalated pricing exception.", status: "Open", routedTo: "Gregg", createdAt: `${noteDates.n2.call}T14:45:00Z` },
+];
+
+const escalations = [
+  { clientKey: "c2", noteKey: "n2", reason: "Pricing exception", riskLevel: "High", routedTo: "Gregg", decisionNeeded: "Approve or deny pricing exception.", deadline: iso(2), status: "Open" },
+];
+
+const processes = [
+  { clientKey: "c1", name: "Annual compliance documentation refresh", type: "Document Collection", status: "In Progress", progress: 65, owner: "Gregg", startedAt: iso(-18), dueDate: iso(7), blockedReason: "" },
+  { clientKey: "c1", name: "Q3 compliance audit", type: "Audit", status: "Completed", progress: 100, owner: "Landon", startedAt: iso(-60), dueDate: iso(-12), blockedReason: "" },
+  { clientKey: "c1", name: "New-project expansion scoping", type: "Expansion", status: "In Progress", progress: 30, owner: "Gregg", startedAt: iso(-6), dueDate: iso(21), blockedReason: "" },
+  { clientKey: "c2", name: "Pricing exception resolution", type: "Client-save", status: "Blocked", progress: 40, owner: "Gregg", startedAt: iso(-10), dueDate: iso(2), blockedReason: "Awaiting leadership decision on pricing." },
+  { clientKey: "c2", name: "Duplicate-charge refund review", type: "Client-save", status: "Waiting on Client", progress: 20, owner: "Gregg", startedAt: iso(-26), dueDate: iso(-4), blockedReason: "Client has not provided invoice number." },
+  { clientKey: "c2", name: "Compliance monitoring", type: "Monitoring", status: "In Progress", progress: 55, owner: "Landon", startedAt: iso(-40), dueDate: iso(14), blockedReason: "" },
+  { clientKey: "c3", name: "Renewal agreement processing", type: "Renewal", status: "In Progress", progress: 70, owner: "Landon", startedAt: iso(-9), dueDate: iso(6), blockedReason: "" },
+  { clientKey: "c3", name: "Monitoring add-on setup", type: "Expansion", status: "Not Started", progress: 0, owner: "Landon", startedAt: iso(0), dueDate: iso(18), blockedReason: "" },
+  { clientKey: "c4", name: "Qualifier verification", type: "Qualifier", status: "Waiting on Client", progress: 35, owner: "Landon", startedAt: iso(-14), dueDate: iso(9), blockedReason: "Qualifier ID not yet provided." },
+  { clientKey: "c5", name: "Routine monitoring cycle", type: "Monitoring", status: "In Progress", progress: 50, owner: "Landon", startedAt: iso(-30), dueDate: iso(25), blockedReason: "" },
+  { clientKey: "c6", name: "New client onboarding", type: "Onboarding", status: "In Progress", progress: 45, owner: "Gregg", startedAt: iso(-7), dueDate: iso(7), blockedReason: "" },
+  { clientKey: "c6", name: "Qualifier placement for upcoming bid", type: "Placement", status: "Blocked", progress: 25, owner: "Gregg", startedAt: iso(-20), dueDate: iso(-2), blockedReason: "Placement approval pending leadership review." },
+];
+
+const audits: {
+  clientKey: string;
+  status: string;
+  auditType: string;
+  auditor: string;
+  lastAuditDate: string;
+  nextAuditDate: string;
+  overallScore: number;
+  scoresheet: AuditScoreItem[];
+}[] = [
+  { clientKey: "c1", status: "Passed", auditType: "Annual Compliance Audit", auditor: "Landon", lastAuditDate: iso(-12), nextAuditDate: iso(180), overallScore: 92, scoresheet: [ { category: "Licensing & Registration", score: 96, weight: 25, notes: "All licenses current." }, { category: "Document Completeness", score: 88, weight: 20, notes: "Two minor items pending refresh." }, { category: "Qualifier Standing", score: 94, weight: 20, notes: "Qualifier in good standing." }, { category: "Insurance & Bonding", score: 90, weight: 20, notes: "Certificates on file." }, { category: "Reporting Timeliness", score: 90, weight: 15, notes: "Filed on time." } ] },
+  { clientKey: "c2", status: "Remediation", auditType: "Compliance Review", auditor: "Landon", lastAuditDate: iso(-22), nextAuditDate: iso(15), overallScore: 58, scoresheet: [ { category: "Licensing & Registration", score: 70, weight: 25, notes: "One license expiring soon." }, { category: "Document Completeness", score: 45, weight: 20, notes: "Pricing history missing." }, { category: "Qualifier Standing", score: 65, weight: 20, notes: "Verification pending." }, { category: "Insurance & Bonding", score: 55, weight: 20, notes: "Certificate needs update." }, { category: "Reporting Timeliness", score: 50, weight: 15, notes: "Late filings noted." } ] },
+  { clientKey: "c3", status: "Under Review", auditType: "Renewal Audit", auditor: "Landon", lastAuditDate: iso(-30), nextAuditDate: iso(6), overallScore: 79, scoresheet: [ { category: "Licensing & Registration", score: 85, weight: 25, notes: "Current." }, { category: "Document Completeness", score: 78, weight: 20, notes: "Renewal docs in progress." }, { category: "Qualifier Standing", score: 80, weight: 20, notes: "Good standing." }, { category: "Insurance & Bonding", score: 75, weight: 20, notes: "On file." }, { category: "Reporting Timeliness", score: 74, weight: 15, notes: "Acceptable." } ] },
+  { clientKey: "c4", status: "Scheduled", auditType: "Qualifier Audit", auditor: "Landon", lastAuditDate: iso(-120), nextAuditDate: iso(20), overallScore: 84, scoresheet: [ { category: "Licensing & Registration", score: 88, weight: 30, notes: "Current." }, { category: "Qualifier Standing", score: 80, weight: 40, notes: "Awaiting qualifier ID confirmation." }, { category: "Insurance & Bonding", score: 85, weight: 30, notes: "On file." } ] },
+  { clientKey: "c5", status: "Passed", auditType: "Monitoring Audit", auditor: "Landon", lastAuditDate: iso(-35), nextAuditDate: iso(150), overallScore: 89, scoresheet: [ { category: "Licensing & Registration", score: 92, weight: 30, notes: "Current." }, { category: "Document Completeness", score: 86, weight: 35, notes: "Complete." }, { category: "Reporting Timeliness", score: 89, weight: 35, notes: "On time." } ] },
+  { clientKey: "c6", status: "Not Started", auditType: "Onboarding Baseline Audit", auditor: "Gregg", lastAuditDate: "", nextAuditDate: iso(12), overallScore: 0, scoresheet: [ { category: "Licensing & Registration", score: 0, weight: 34, notes: "Pending onboarding docs." }, { category: "Document Completeness", score: 0, weight: 33, notes: "Formation docs outstanding." }, { category: "Insurance & Bonding", score: 0, weight: 33, notes: "Certificate outstanding." } ] },
+];
+
+const riskProfiles: {
+  clientKey: string;
+  overallScore: number;
+  trend: string;
+  updatedAt: string;
+  factors: RiskFactor[];
+}[] = [
+  { clientKey: "c1", overallScore: 22, trend: "down", updatedAt: iso(-1), factors: [ { label: "Payment / AR health", score: 12, weight: 25, trend: "flat" }, { label: "Compliance standing", score: 18, weight: 30, trend: "down" }, { label: "Engagement / responsiveness", score: 20, weight: 20, trend: "down" }, { label: "Escalation pressure", score: 10, weight: 15, trend: "flat" }, { label: "SLA performance", score: 25, weight: 10, trend: "flat" } ] },
+  { clientKey: "c2", overallScore: 78, trend: "up", updatedAt: iso(0), factors: [ { label: "Payment / AR health", score: 85, weight: 25, trend: "up" }, { label: "Compliance standing", score: 72, weight: 30, trend: "up" }, { label: "Engagement / responsiveness", score: 80, weight: 20, trend: "up" }, { label: "Escalation pressure", score: 90, weight: 15, trend: "up" }, { label: "SLA performance", score: 65, weight: 10, trend: "up" } ] },
+  { clientKey: "c3", overallScore: 48, trend: "flat", updatedAt: iso(-2), factors: [ { label: "Payment / AR health", score: 40, weight: 25, trend: "flat" }, { label: "Compliance standing", score: 50, weight: 30, trend: "down" }, { label: "Engagement / responsiveness", score: 45, weight: 20, trend: "flat" }, { label: "Escalation pressure", score: 30, weight: 15, trend: "flat" }, { label: "SLA performance", score: 60, weight: 10, trend: "up" } ] },
+  { clientKey: "c4", overallScore: 34, trend: "down", updatedAt: iso(-3), factors: [ { label: "Payment / AR health", score: 20, weight: 25, trend: "flat" }, { label: "Compliance standing", score: 38, weight: 30, trend: "down" }, { label: "Engagement / responsiveness", score: 50, weight: 20, trend: "down" }, { label: "Escalation pressure", score: 25, weight: 15, trend: "flat" }, { label: "SLA performance", score: 40, weight: 10, trend: "flat" } ] },
+  { clientKey: "c5", overallScore: 19, trend: "flat", updatedAt: iso(-4), factors: [ { label: "Payment / AR health", score: 10, weight: 25, trend: "flat" }, { label: "Compliance standing", score: 18, weight: 30, trend: "flat" }, { label: "Engagement / responsiveness", score: 22, weight: 20, trend: "flat" }, { label: "Escalation pressure", score: 15, weight: 15, trend: "flat" }, { label: "SLA performance", score: 30, weight: 10, trend: "down" } ] },
+  { clientKey: "c6", overallScore: 41, trend: "up", updatedAt: iso(0), factors: [ { label: "Payment / AR health", score: 30, weight: 25, trend: "flat" }, { label: "Compliance standing", score: 55, weight: 30, trend: "up" }, { label: "Engagement / responsiveness", score: 35, weight: 20, trend: "flat" }, { label: "Escalation pressure", score: 50, weight: 15, trend: "up" }, { label: "SLA performance", score: 35, weight: 10, trend: "flat" } ] },
+];
+
+const expansion = [
+  { clientKey: "c1", title: "New project compliance package", stage: "In Discussion", potentialValue: 18000, targetDate: iso(45), description: "Compliance support for upcoming project John mentioned." },
+  { clientKey: "c1", title: "Multi-state licensing add-on", stage: "Identified", potentialValue: 12000, targetDate: iso(90), description: "Potential expansion into a second state." },
+  { clientKey: "c3", title: "Monitoring add-on", stage: "Proposed", potentialValue: 9000, targetDate: iso(20), description: "Ongoing monitoring bundled with renewal." },
+  { clientKey: "c3", title: "Renewal upsell to premium tier", stage: "In Discussion", potentialValue: 15000, targetDate: iso(14), description: "Upgrade to premium compliance tier at renewal." },
+  { clientKey: "c4", title: "Second qualifier placement", stage: "Identified", potentialValue: 8000, targetDate: iso(60), description: "Client may add a second qualifier." },
+  { clientKey: "c5", title: "Referral lead — partner company", stage: "Identified", potentialValue: 11000, targetDate: iso(75), description: "Charlie referred a colleague at another company." },
+  { clientKey: "c6", title: "Qualifier placement for bid", stage: "Committed", potentialValue: 14000, targetDate: iso(10), description: "Placement tied to an upcoming bid." },
+];
+
+const invoices = [
+  { clientKey: "c1", invoiceNumber: "INV-1042", amount: 4500, amountPaid: 4500, issueDate: iso(-40), dueDate: iso(-10), status: "Paid" },
+  { clientKey: "c1", invoiceNumber: "INV-1081", amount: 3200, amountPaid: 0, issueDate: iso(-8), dueDate: iso(22), status: "Sent" },
+  { clientKey: "c2", invoiceNumber: "INV-1039", amount: 6800, amountPaid: 0, issueDate: iso(-50), dueDate: iso(-20), status: "Overdue" },
+  { clientKey: "c2", invoiceNumber: "INV-1055", amount: 2400, amountPaid: 1200, issueDate: iso(-30), dueDate: iso(-2), status: "Partial" },
+  { clientKey: "c2", invoiceNumber: "INV-1090", amount: 3600, amountPaid: 0, issueDate: iso(-5), dueDate: iso(25), status: "Sent" },
+  { clientKey: "c3", invoiceNumber: "INV-1061", amount: 5200, amountPaid: 5200, issueDate: iso(-35), dueDate: iso(-5), status: "Paid" },
+  { clientKey: "c3", invoiceNumber: "INV-1092", amount: 5200, amountPaid: 0, issueDate: iso(-3), dueDate: iso(27), status: "Sent" },
+  { clientKey: "c4", invoiceNumber: "INV-1070", amount: 2800, amountPaid: 2800, issueDate: iso(-25), dueDate: iso(5), status: "Paid" },
+  { clientKey: "c5", invoiceNumber: "INV-1075", amount: 3100, amountPaid: 3100, issueDate: iso(-28), dueDate: iso(2), status: "Paid" },
+  { clientKey: "c6", invoiceNumber: "INV-1088", amount: 4200, amountPaid: 0, issueDate: iso(-6), dueDate: iso(24), status: "Sent" },
+  { clientKey: "c6", invoiceNumber: "INV-1066", amount: 1500, amountPaid: 0, issueDate: iso(-45), dueDate: iso(-15), status: "Overdue" },
+];
+
+const slas = [
+  { clientKey: "c1", name: "Compliance doc review", description: "Review submitted compliance docs within 5 business days.", dueDate: iso(4), status: "On Track", owner: "Gregg" },
+  { clientKey: "c1", name: "Quarterly check-in", description: "Proactive quarterly account review.", dueDate: iso(18), status: "Upcoming", owner: "Gregg" },
+  { clientKey: "c2", name: "Refund determination", description: "Resolve refund request within 7 days.", dueDate: iso(-6), status: "Missed", owner: "Gregg" },
+  { clientKey: "c2", name: "Pricing exception decision", description: "Provide pricing decision by deadline.", dueDate: iso(2), status: "At Risk", owner: "Gregg" },
+  { clientKey: "c2", name: "Escalation acknowledgement", description: "Acknowledge escalation within 24h.", dueDate: iso(-8), status: "Met", owner: "Gregg" },
+  { clientKey: "c3", name: "Renewal agreement delivery", description: "Send renewal agreement within 3 days.", dueDate: iso(3), status: "On Track", owner: "Landon" },
+  { clientKey: "c3", name: "Monitoring quote", description: "Deliver add-on quote.", dueDate: iso(6), status: "Upcoming", owner: "Landon" },
+  { clientKey: "c4", name: "Qualifier confirmation", description: "Confirm qualifier ID within 10 days.", dueDate: iso(-1), status: "At Risk", owner: "Landon" },
+  { clientKey: "c5", name: "Monitoring call scheduling", description: "Schedule next monitoring call.", dueDate: iso(12), status: "Upcoming", owner: "Landon" },
+  { clientKey: "c6", name: "Onboarding doc collection", description: "Collect onboarding docs within 7 days.", dueDate: iso(-2), status: "Missed", owner: "Gregg" },
+  { clientKey: "c6", name: "Placement timeline confirmation", description: "Confirm placement timeline with client.", dueDate: iso(1), status: "At Risk", owner: "Gregg" },
+];
+
+const events = [
+  { clientKey: "c1", title: "Compliance docs review call", type: "Check-in", date: iso(3), time: "10:00", attendees: "Gregg, John Doe", withClient: true },
+  { clientKey: "c1", title: "Expansion scoping discussion", type: "Review", date: iso(12), time: "14:00", attendees: "Gregg, John Doe", withClient: true },
+  { clientKey: "c2", title: "Pricing exception decision call", type: "Escalation", date: iso(1), time: "09:30", attendees: "Gregg, Jane Smith", withClient: true },
+  { clientKey: "c2", title: "Internal remediation sync", type: "Review", date: iso(2), time: "16:00", attendees: "Gregg, Landon", withClient: false },
+  { clientKey: "c3", title: "Renewal walkthrough", type: "Renewal", date: iso(5), time: "11:00", attendees: "Landon, Bob Johnson", withClient: true },
+  { clientKey: "c4", title: "Qualifier requirements review", type: "Review", date: iso(8), time: "13:00", attendees: "Landon, Alice Williams", withClient: true },
+  { clientKey: "c5", title: "Monitoring check-in", type: "Check-in", date: iso(14), time: "15:30", attendees: "Landon, Charlie Brown", withClient: true },
+  { clientKey: "c6", title: "Onboarding status call", type: "Onboarding", date: iso(2), time: "10:30", attendees: "Gregg, David Lee", withClient: true },
+  { clientKey: "c6", title: "Placement approval review", type: "Placement", date: iso(4), time: "09:00", attendees: "Gregg, Leadership", withClient: false },
+];
+
+const contactLog = [
+  { clientKey: "c1", date: iso(-2), channel: "Call", internalPerson: "Gregg", direction: "Inbound", summary: "John confirmed compliance docs are coming." },
+  { clientKey: "c1", date: iso(-9), channel: "Email", internalPerson: "Landon", direction: "Outbound", summary: "Sent audit results summary." },
+  { clientKey: "c2", date: iso(-1), channel: "Call", internalPerson: "Gregg", direction: "Inbound", summary: "Jane escalated pricing exception again." },
+  { clientKey: "c2", date: iso(-7), channel: "Email", internalPerson: "Gregg", direction: "Outbound", summary: "Acknowledged refund request; requested invoice number." },
+  { clientKey: "c3", date: iso(-4), channel: "Call", internalPerson: "Landon", direction: "Inbound", summary: "Bob confirmed renewal and asked about monitoring." },
+  { clientKey: "c4", date: iso(-11), channel: "Call", internalPerson: "Landon", direction: "Inbound", summary: "Alice asked about qualifier requirements." },
+  { clientKey: "c5", date: iso(-16), channel: "Call", internalPerson: "Landon", direction: "Inbound", summary: "Routine monitoring check-in; referral mentioned." },
+  { clientKey: "c6", date: iso(-1), channel: "Meeting", internalPerson: "Gregg", direction: "Outbound", summary: "Onboarding call; legal-sensitive question routed to leadership." },
+];
+
+async function upsertSeedUser(
+  tx: Tx,
+  externalId: string,
+  email: string,
+  displayName: string,
+  role: string,
+): Promise<string> {
+  const existing = await tx
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.externalId, externalId))
+    .limit(1);
+  if (existing[0]) return existing[0].id;
+  const inserted = await tx
+    .insert(usersTable)
+    .values({ externalId, email, displayName, role })
+    .returning({ id: usersTable.id });
+  return inserted[0]!.id;
+}
+
+export async function seedDatabase(): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx.delete(activityLogTable);
+    await tx.delete(clientsTable);
+
+    const greggId = await upsertSeedUser(
+      tx,
+      "seed:gregg",
+      "gregg@contractorcompliance.example",
+      "Gregg",
+      "admin",
+    );
+    const landonId = await upsertSeedUser(
+      tx,
+      "seed:landon",
+      "landon@contractorcompliance.example",
+      "Landon",
+      "coordinator",
+    );
+    const ownerId = (label: string): string | null =>
+      label === "Gregg" ? greggId : label === "Landon" ? landonId : null;
+
+    const clientIds = new Map<string, string>();
+    for (const c of clients) {
+      const id = randomUUID();
+      clientIds.set(c.key, id);
+      await tx.insert(clientsTable).values({
+        id,
+        clientName: c.clientName,
+        companyName: c.companyName,
+        contactName: c.contactName,
+        phone: c.phone,
+        email: c.email,
+        clientStatus: c.clientStatus,
+        greggPriority: c.greggPriority,
+        riskLevel: c.riskLevel,
+        lastMeaningfulContact: dateOrNull(c.lastMeaningfulContact),
+        nextAction: c.nextAction,
+        nextOwnerLabel: c.nextOwner,
+        nextOwnerUserId: ownerId(c.nextOwner),
+        dueDate: dateOrNull(c.dueDate),
+        missingInformation: c.missingInformation,
+      });
+    }
+
+    const noteIds = new Map<string, string>();
+    for (const n of notes) {
+      const id = randomUUID();
+      noteIds.set(n.key, id);
+      await tx.insert(callNotesTable).values({
+        id,
+        clientId: clientIds.get(n.clientKey)!,
+        callDate: n.callDate,
+        caller: n.caller,
+        callType: n.callType,
+        rawRingCentralNote: n.rawRingCentralNote,
+        cleanSummary: n.cleanSummary,
+        clientConcern: n.clientConcern,
+        commitmentsMade: n.commitmentsMade,
+        missingInformation: n.missingInformation,
+        nextActions: n.nextActions,
+        opportunitySignals: n.opportunitySignals,
+        escalationFlags: n.escalationFlags,
+        routingStatus: n.routingStatus,
+        crmReadyNote: n.crmReadyNote,
+        clientFollowUpDraft: n.clientFollowUpDraft,
+        taskList: n.taskList,
+        createdByUserId: greggId,
+        createdAt: new Date(n.createdAt),
+        updatedAt: new Date(n.updatedAt),
+      });
+    }
+
+    for (const t of tasks) {
+      await tx.insert(tasksTable).values({
+        clientId: clientIds.get(t.clientKey)!,
+        sourceCallNoteId: noteIds.get(t.noteKey) ?? null,
+        title: t.title,
+        ownerLabel: t.owner,
+        ownerUserId: ownerId(t.owner),
+        dueDate: dateOrNull(t.dueDate),
+        priority: t.priority,
+        status: t.status,
+        escalationFlag: t.escalationFlag,
+        notes: t.notes,
+        createdByUserId: greggId,
+      });
+    }
+
+    for (const sig of signals) {
+      await tx.insert(opportunitySignalsTable).values({
+        clientId: clientIds.get(sig.clientKey)!,
+        sourceCallNoteId: noteIds.get(sig.noteKey) ?? null,
+        type: sig.type,
+        description: sig.description,
+        status: sig.status,
+        routedToLabel: sig.routedTo,
+        routedToUserId: ownerId(sig.routedTo),
+        createdByUserId: greggId,
+        createdAt: new Date(sig.createdAt),
+      });
+    }
+
+    for (const e of escalations) {
+      await tx.insert(escalationsTable).values({
+        clientId: clientIds.get(e.clientKey)!,
+        sourceCallNoteId: noteIds.get(e.noteKey) ?? null,
+        reason: e.reason,
+        riskLevel: e.riskLevel,
+        routedToLabel: e.routedTo,
+        routedToUserId: ownerId(e.routedTo),
+        decisionNeeded: e.decisionNeeded,
+        deadline: dateOrNull(e.deadline),
+        status: e.status,
+        createdByUserId: greggId,
+      });
+    }
+
+    for (const p of processes) {
+      await tx.insert(clientProcessesTable).values({
+        clientId: clientIds.get(p.clientKey)!,
+        name: p.name,
+        type: p.type,
+        status: p.status,
+        progress: p.progress,
+        ownerLabel: p.owner,
+        ownerUserId: ownerId(p.owner),
+        startedAt: dateOrNull(p.startedAt),
+        dueDate: dateOrNull(p.dueDate),
+        blockedReason: p.blockedReason,
+      });
+    }
+
+    for (const rp of riskProfiles) {
+      await tx.insert(clientRiskProfilesTable).values({
+        clientId: clientIds.get(rp.clientKey)!,
+        overallScore: rp.overallScore,
+        trend: rp.trend,
+        factors: rp.factors,
+        updatedAt: new Date(rp.updatedAt),
+      });
+    }
+
+    for (const a of audits) {
+      await tx.insert(clientAuditsTable).values({
+        clientId: clientIds.get(a.clientKey)!,
+        status: a.status,
+        auditType: a.auditType,
+        auditor: a.auditor,
+        lastAuditDate: dateOrNull(a.lastAuditDate),
+        nextAuditDate: dateOrNull(a.nextAuditDate),
+        overallScore: a.overallScore,
+        scoresheet: a.scoresheet,
+      });
+    }
+
+    for (const x of expansion) {
+      await tx.insert(expansionMilestonesTable).values({
+        clientId: clientIds.get(x.clientKey)!,
+        title: x.title,
+        stage: x.stage,
+        potentialValue: x.potentialValue,
+        targetDate: dateOrNull(x.targetDate),
+        description: x.description,
+      });
+    }
+
+    for (const inv of invoices) {
+      await tx.insert(invoicesTable).values({
+        clientId: clientIds.get(inv.clientKey)!,
+        invoiceNumber: inv.invoiceNumber,
+        amount: inv.amount,
+        amountPaid: inv.amountPaid,
+        issueDate: dateOrNull(inv.issueDate),
+        dueDate: dateOrNull(inv.dueDate),
+        status: inv.status,
+      });
+    }
+
+    for (const sla of slas) {
+      await tx.insert(slasTable).values({
+        clientId: clientIds.get(sla.clientKey)!,
+        name: sla.name,
+        description: sla.description,
+        dueDate: dateOrNull(sla.dueDate),
+        status: sla.status,
+        ownerLabel: sla.owner,
+        ownerUserId: ownerId(sla.owner),
+      });
+    }
+
+    for (const ev of events) {
+      await tx.insert(scheduledEventsTable).values({
+        clientId: clientIds.get(ev.clientKey)!,
+        title: ev.title,
+        type: ev.type,
+        date: dateOrNull(ev.date),
+        time: ev.time,
+        attendees: ev.attendees,
+        withClient: ev.withClient,
+      });
+    }
+
+    for (const cl of contactLog) {
+      await tx.insert(contactLogTable).values({
+        clientId: clientIds.get(cl.clientKey)!,
+        date: dateOrNull(cl.date),
+        channel: cl.channel,
+        internalPerson: cl.internalPerson,
+        direction: cl.direction,
+        summary: cl.summary,
+      });
+    }
+
+    const abcId = clientIds.get("c1");
+    if (abcId) {
+      await tx.insert(auditLinksTable).values({
+        clientId: abcId,
+        portalAuditId: 2,
+        portalClientName: "ABC Construction LLC",
+        matchMethod: "preconfirmed",
+        confirmedByUserId: greggId,
+        confirmedAt: new Date(),
+      });
+    }
+  });
+}

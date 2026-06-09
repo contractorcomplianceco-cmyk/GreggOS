@@ -1,9 +1,42 @@
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert } from "lucide-react";
+import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut } from "lucide-react";
+import { useUser, useClerk } from "@clerk/react";
+import { useGetCurrentUser } from "@workspace/api-client-react";
 import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+function UserFooter() {
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const label =
+    user?.primaryEmailAddress?.emailAddress ??
+    user?.fullName ??
+    user?.username ??
+    "Signed in";
+
+  return (
+    <div className="px-4 py-3 border-t border-sidebar-border/50 flex items-center justify-between gap-2">
+      <span className="text-[11px] text-sidebar-foreground/70 truncate" title={label}>
+        {label}
+      </span>
+      <button
+        type="button"
+        onClick={() => signOut({ redirectUrl: basePath || "/" })}
+        className="flex items-center gap-1 text-[11px] text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors shrink-0"
+        data-testid="button-logout"
+      >
+        <LogOut className="w-3.5 h-3.5" />
+        Log out
+      </button>
+    </div>
+  );
+}
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const { data: me } = useGetCurrentUser();
+  const isAdmin = me?.role === "admin";
 
   const navigation = [
     { name: "Gregg Today", href: "/", icon: LayoutDashboard },
@@ -13,7 +46,9 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
     { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },
     { name: "Call Note Processor", href: "/processor", icon: Briefcase },
     { name: "Weekly Review", href: "/weekly-review", icon: Calendar },
-    { name: "Admin / Setup", href: "/admin", icon: Settings },
+    ...(isAdmin
+      ? [{ name: "Admin / Setup", href: "/admin", icon: Settings }]
+      : []),
   ];
 
   return (
@@ -50,9 +85,12 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
         </div>
-        <div className="p-4 border-t border-sidebar-border/50 text-[10px] text-sidebar-foreground/60 leading-tight">
-          <p className="mb-2"><strong>Notice:</strong> This cockpit organizes relationship follow-through.</p>
-          <p>It does not approve pricing, refunds, legal advice, compliance opinions, qualifier placements, or final client commitments.</p>
+        <div>
+          <UserFooter />
+          <div className="p-4 border-t border-sidebar-border/50 text-[10px] text-sidebar-foreground/60 leading-tight">
+            <p className="mb-2"><strong>Notice:</strong> This cockpit organizes relationship follow-through.</p>
+            <p>It does not approve pricing, refunds, legal advice, compliance opinions, qualifier placements, or final client commitments.</p>
+          </div>
         </div>
       </div>
       

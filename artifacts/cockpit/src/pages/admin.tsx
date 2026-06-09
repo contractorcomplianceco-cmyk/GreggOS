@@ -1,33 +1,68 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { useStore } from "@/lib/store";
+import { exportData, useGetCurrentUser } from "@workspace/api-client-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { ShieldAlert } from "lucide-react";
 
 export default function Admin() {
   const { resetData } = useStore();
   const { toast } = useToast();
+  const { data: me, isLoading: meLoading } = useGetCurrentUser();
+  const isAdmin = me?.role === "admin";
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (confirm("Are you sure you want to reset all data to default seed values? This cannot be undone.")) {
-      resetData();
-      toast({ title: "Data Reset", description: "Application data has been restored to defaults." });
+      try {
+        await resetData();
+        toast({ title: "Data Reset", description: "Application data has been restored to defaults." });
+      } catch {
+        toast({
+          title: "Reset failed",
+          description: "Data could not be reset. Admin access is required.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const handleExport = () => {
-    const storeData = localStorage.getItem('cockpit-storage');
-    if (storeData) {
-      const blob = new Blob([storeData], { type: 'application/json' });
+  const handleExport = async () => {
+    try {
+      const data = await exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `cockpit-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `cockpit-export-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
       toast({ title: "Export Complete", description: "Data downloaded successfully." });
+    } catch {
+      toast({ title: "Export Failed", description: "Could not export data.", variant: "destructive" });
     }
   };
+
+  if (!meLoading && !isAdmin) {
+    return (
+      <SidebarLayout>
+        <div className="p-8 max-w-4xl">
+          <h1 className="text-3xl font-bold mb-6">Admin / Setup</h1>
+          <Card className="border-destructive/30 bg-destructive/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <ShieldAlert className="h-5 w-5" /> Admin access required
+              </CardTitle>
+              <CardDescription>
+                Your account does not have the admin role. Data management
+                actions (export, reset, import) are restricted to administrators.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </SidebarLayout>
+    );
+  }
 
   return (
     <SidebarLayout>
