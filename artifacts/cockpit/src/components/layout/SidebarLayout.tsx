@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut } from "lucide-react";
+import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
@@ -41,6 +41,8 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: "Gregg Today", href: "/", icon: LayoutDashboard },
     { name: "Account Oversight", href: "/oversight", icon: BarChart3 },
+    { name: "Expansion Pipeline", href: "/expansion", icon: TrendingUp },
+    { name: "Relationships", href: "/relationships", icon: HeartHandshake },
     { name: "Landon Work Queue", href: "/work-queue", icon: CheckSquare },
     { name: "Current Clients", href: "/clients", icon: Users },
     { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },

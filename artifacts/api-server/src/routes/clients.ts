@@ -18,7 +18,11 @@ import {
   contactLogTable,
 } from "@workspace/db";
 import { and, asc, eq, ilike, or } from "drizzle-orm";
-import { CreateClientBody, UpdateClientBody } from "@workspace/api-zod";
+import {
+  CreateClientBody,
+  UpdateClientBody,
+  HandoffClientBody,
+} from "@workspace/api-zod";
 import { countersForClients, countersForClient } from "../lib/counters";
 import {
   toClient,
@@ -238,6 +242,14 @@ router.patch("/clients/:clientId", async (req: Request, res: Response) => {
     updates["nextOwnerLabel"] = body.nextOwner;
     updates["nextOwnerUserId"] = await resolveOwnerUserId(body.nextOwner);
   }
+  if (body.coOwner !== undefined) {
+    updates["coOwnerLabel"] = body.coOwner;
+    updates["coOwnerUserId"] = await resolveOwnerUserId(body.coOwner);
+  }
+  if (body.involvementState !== undefined)
+    updates["involvementState"] = body.involvementState;
+  if (body.touchCadenceDays !== undefined)
+    updates["touchCadenceDays"] = body.touchCadenceDays;
   if (body.dueDate !== undefined) updates["dueDate"] = dateOrNull(body.dueDate);
   if (body.missingInformation !== undefined)
     updates["missingInformation"] = body.missingInformation;
@@ -265,5 +277,58 @@ router.patch("/clients/:clientId", async (req: Request, res: Response) => {
   });
   res.json(toClient(row, await countersForClient(row.id)));
 });
+
+router.post(
+  "/clients/:clientId/handoff",
+  async (req: Request, res: Response) => {
+    const clientId = strParam(req, "clientId");
+    const body = HandoffClientBody.parse(req.body);
+
+    const existingRows = await db
+      .select()
+      .from(clientsTable)
+      .where(eq(clientsTable.id, clientId))
+      .limit(1);
+    const existing = existingRows[0];
+    if (!existing) {
+      res.status(404).json({ error: "Client not found" });
+      return;
+    }
+
+    const fromOwner = existing.nextOwnerLabel;
+    const updates: Record<string, unknown> = {
+      nextOwnerLabel: body.toOwner,
+      nextOwnerUserId: await resolveOwnerUserId(body.toOwner),
+    };
+    if (body.involvementState !== undefined)
+      updates["involvementState"] = body.involvementState;
+
+    const updated = await db
+      .update(clientsTable)
+      .set(updates)
+      .where(eq(clientsTable.id, clientId))
+      .returning();
+    const row = updated[0]!;
+
+    const actor = actorOf(req);
+    const note = body.note?.trim();
+    const summary =
+      `Handed off ${row.clientName}` +
+      (fromOwner ? ` from ${fromOwner}` : "") +
+      ` to ${body.toOwner}` +
+      (note ? ` — ${note}` : "");
+    await logActivity(db, {
+      actorUserId: actor.id,
+      actorLabel: actor.label,
+      action: "handoff",
+      entityType: "client",
+      entityId: row.id,
+      clientId: row.id,
+      summary,
+      changes: { fromOwner, toOwner: body.toOwner, ...updates },
+    });
+    res.json(toClient(row, await countersForClient(row.id)));
+  },
+);
 
 export default router;

@@ -21,6 +21,11 @@ export interface Client {
   nextOwner: string;
   /** @nullable */
   nextOwnerUserId?: string | null;
+  coOwner: string;
+  /** @nullable */
+  coOwnerUserId?: string | null;
+  involvementState: string;
+  touchCadenceDays: number;
   dueDate: string;
   missingInformation: string;
   openTasks: number;

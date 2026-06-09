@@ -11,7 +11,14 @@ export interface ExpansionMilestone {
   clientId: string;
   title: string;
   stage: string;
+  status: string;
   potentialValue: number;
   targetDate: string;
   description: string;
+  owner: string;
+  /** @nullable */
+  ownerUserId?: string | null;
+  pinned: boolean;
+  priorityBoost: number;
+  lastMovementAt: string;
 }

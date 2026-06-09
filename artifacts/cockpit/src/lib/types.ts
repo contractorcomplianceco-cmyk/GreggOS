@@ -20,6 +20,10 @@ export interface CurrentClient {
   lastMeaningfulContact: string;
   nextAction: string;
   nextOwner: string;
+  coOwner: string;
+  coOwnerUserId?: string | null;
+  involvementState: string;
+  touchCadenceDays: number;
   dueDate: string;
   openTasks: number;
   missingInformation: string;
@@ -161,16 +165,22 @@ export interface ClientRiskProfile {
   factors: RiskFactor[];
 }
 
-export type RoadmapStage = 'Identified' | 'Proposed' | 'In Discussion' | 'Committed' | 'Live';
+export type RoadmapStage = 'Identified' | 'Qualifying' | 'Proposed' | 'Negotiation' | 'Closing';
 
 export interface ExpansionMilestone {
   id: string;
   clientId: string;
   title: string;
   stage: RoadmapStage;
+  status: string;
   potentialValue: number;
   targetDate: string;
   description: string;
+  owner: string;
+  ownerUserId?: string | null;
+  pinned: boolean;
+  priorityBoost: number;
+  lastMovementAt: string;
 }
 
 export type InvoiceStatus = 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Overdue';
@@ -216,6 +226,8 @@ export interface ScheduledEvent {
   time: string;
   attendees: string;
   withClient: boolean;
+  status: string;
+  owner: string;
 }
 
 export type ContactChannel = 'Call' | 'Email' | 'Meeting' | 'Text';

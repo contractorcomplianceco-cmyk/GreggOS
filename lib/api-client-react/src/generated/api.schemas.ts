@@ -64,6 +64,11 @@ export interface Client {
   nextOwner: string;
   /** @nullable */
   nextOwnerUserId?: string | null;
+  coOwner: string;
+  /** @nullable */
+  coOwnerUserId?: string | null;
+  involvementState: string;
+  touchCadenceDays: number;
   dueDate: string;
   missingInformation: string;
   openTasks: number;
@@ -100,6 +105,9 @@ export interface ClientUpdate {
   lastMeaningfulContact?: string;
   nextAction?: string;
   nextOwner?: string;
+  coOwner?: string;
+  involvementState?: string;
+  touchCadenceDays?: number;
   dueDate?: string;
   missingInformation?: string;
 }
@@ -326,9 +334,52 @@ export interface ExpansionMilestone {
   clientId: string;
   title: string;
   stage: string;
+  status: string;
   potentialValue: number;
   targetDate: string;
   description: string;
+  owner: string;
+  /** @nullable */
+  ownerUserId?: string | null;
+  pinned: boolean;
+  priorityBoost: number;
+  lastMovementAt: string;
+}
+
+export interface ExpansionInput {
+  clientId: string;
+  title: string;
+  stage: string;
+  status?: string;
+  potentialValue?: number;
+  targetDate?: string;
+  description?: string;
+  owner?: string;
+  pinned?: boolean;
+  priorityBoost?: number;
+}
+
+export interface ExpansionUpdate {
+  title?: string;
+  stage?: string;
+  status?: string;
+  potentialValue?: number;
+  targetDate?: string;
+  description?: string;
+  owner?: string;
+  pinned?: boolean;
+  priorityBoost?: number;
+}
+
+export interface ExpansionOpportunity {
+  milestone: ExpansionMilestone;
+  clientName: string;
+  companyName: string;
+  riskLevel: string;
+  priorityScore: number;
+  stalled: boolean;
+  daysSinceMovement: number;
+  sharedWithTara: boolean;
 }
 
 export interface Invoice {
@@ -361,6 +412,31 @@ export interface ScheduledEvent {
   time: string;
   attendees: string;
   withClient: boolean;
+  status: string;
+  owner: string;
+}
+
+export interface EventInput {
+  clientId: string;
+  title: string;
+  type: string;
+  date?: string;
+  time?: string;
+  attendees?: string;
+  withClient?: boolean;
+  status?: string;
+  owner?: string;
+}
+
+export interface EventUpdate {
+  title?: string;
+  type?: string;
+  date?: string;
+  time?: string;
+  attendees?: string;
+  withClient?: boolean;
+  status?: string;
+  owner?: string;
 }
 
 export interface ContactLogEntry {
@@ -371,6 +447,43 @@ export interface ContactLogEntry {
   internalPerson: string;
   direction: string;
   summary: string;
+}
+
+export interface ContactLogInput {
+  clientId: string;
+  date?: string;
+  channel: string;
+  internalPerson?: string;
+  direction?: string;
+  summary?: string;
+}
+
+export interface HandoffInput {
+  toOwner: string;
+  involvementState?: string;
+  note?: string;
+}
+
+export interface RelationshipSummary {
+  clientId: string;
+  clientName: string;
+  companyName: string;
+  owner: string;
+  coOwner: string;
+  involvementState: string;
+  clientStatus: string;
+  riskLevel: string;
+  greggPriority: string;
+  lastMeaningfulContact: string;
+  lastTouchDate: string;
+  /** @nullable */
+  daysSinceTouch: number | null;
+  touchCadenceDays: number;
+  warmth: string;
+  cadenceState: string;
+  nextEventDate: string;
+  nextEventTitle: string;
+  openExpansionCount: number;
 }
 
 export interface ActivityLogEntry {
@@ -451,5 +564,22 @@ status?: string;
 export type ListActivityParams = {
 clientId?: string;
 limit?: number;
+};
+
+export type ListRelationshipsParams = {
+owner?: string;
+warmth?: string;
+sharedWithTara?: boolean;
+};
+
+export type ListExpansionPipelineParams = {
+owner?: string;
+stage?: string;
+sharedWithTara?: boolean;
+};
+
+export type ListScheduledEventsParams = {
+clientId?: string;
+owner?: string;
 };
 

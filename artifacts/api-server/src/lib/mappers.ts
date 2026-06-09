@@ -66,6 +66,10 @@ export function toClient(row: DbClient, counters: ClientCounters): Client {
     nextAction: row.nextAction,
     nextOwner: row.nextOwnerLabel,
     nextOwnerUserId: row.nextOwnerUserId ?? null,
+    coOwner: row.coOwnerLabel,
+    coOwnerUserId: row.coOwnerUserId ?? null,
+    involvementState: row.involvementState,
+    touchCadenceDays: row.touchCadenceDays,
     dueDate: s(row.dueDate),
     missingInformation: row.missingInformation,
     openTasks: counters.openTasks,
@@ -195,9 +199,15 @@ export function toExpansion(row: DbExpansion): ExpansionMilestone {
     clientId: row.clientId,
     title: row.title,
     stage: row.stage,
+    status: row.status,
     potentialValue: row.potentialValue,
     targetDate: s(row.targetDate),
     description: row.description,
+    owner: row.ownerLabel,
+    ownerUserId: row.ownerUserId ?? null,
+    pinned: row.pinned,
+    priorityBoost: row.priorityBoost,
+    lastMovementAt: iso(row.lastMovementAt),
   };
 }
 
@@ -236,6 +246,8 @@ export function toEvent(row: DbEvent): ScheduledEvent {
     time: s(row.time),
     attendees: row.attendees,
     withClient: row.withClient,
+    status: row.status,
+    owner: row.ownerLabel,
   };
 }
 

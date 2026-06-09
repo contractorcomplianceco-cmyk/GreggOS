@@ -50,17 +50,20 @@ interface SeedClient {
   lastMeaningfulContact: string;
   nextAction: string;
   nextOwner: string;
+  coOwner?: string;
+  involvementState?: string;
+  touchCadenceDays?: number;
   dueDate: string;
   missingInformation: string;
 }
 
 const clients: SeedClient[] = [
-  { key: "c1", clientName: "ABC Construction", companyName: "ABC Construction LLC", contactName: "John Doe", phone: "555-0101", email: "john@abcconstruction.com", clientStatus: "Active", greggPriority: "High", riskLevel: "Low", lastMeaningfulContact: iso(-2), nextAction: "Review compliance docs", nextOwner: "Gregg", dueDate: iso(5), missingInformation: "None" },
-  { key: "c2", clientName: "BuildCorp", companyName: "BuildCorp Inc", contactName: "Jane Smith", phone: "555-0102", email: "jane@buildcorp.com", clientStatus: "At Risk", greggPriority: "Urgent", riskLevel: "High", lastMeaningfulContact: iso(-1), nextAction: "Address pricing exception", nextOwner: "Gregg", dueDate: iso(2), missingInformation: "Pricing history" },
-  { key: "c3", clientName: "CityBuilders", companyName: "CityBuilders Group", contactName: "Bob Johnson", phone: "555-0103", email: "bob@citybuilders.com", clientStatus: "Renewal Pending", greggPriority: "Medium", riskLevel: "Medium", lastMeaningfulContact: iso(-4), nextAction: "Send renewal agreement", nextOwner: "Landon", dueDate: iso(6), missingInformation: "None" },
-  { key: "c4", clientName: "Delta Construction", companyName: "Delta Construction Ltd", contactName: "Alice Williams", phone: "555-0104", email: "alice@deltaconstruction.com", clientStatus: "Active", greggPriority: "Low", riskLevel: "Low", lastMeaningfulContact: iso(-11), nextAction: "Check in on qualifier status", nextOwner: "Landon", dueDate: iso(9), missingInformation: "Qualifier ID" },
-  { key: "c5", clientName: "Echo Builders", companyName: "Echo Builders LLC", contactName: "Charlie Brown", phone: "555-0105", email: "charlie@echobuilders.com", clientStatus: "Active", greggPriority: "Medium", riskLevel: "Low", lastMeaningfulContact: iso(-16), nextAction: "Schedule monitoring call", nextOwner: "Landon", dueDate: iso(12), missingInformation: "None" },
-  { key: "c6", clientName: "Foxtrot Developments", companyName: "Foxtrot Developments Inc", contactName: "David Lee", phone: "555-0106", email: "david@foxtrot.com", clientStatus: "Onboarding", greggPriority: "High", riskLevel: "Low", lastMeaningfulContact: iso(-1), nextAction: "Complete onboarding", nextOwner: "Gregg", dueDate: iso(3), missingInformation: "Company docs" },
+  { key: "c1", clientName: "ABC Construction", companyName: "ABC Construction LLC", contactName: "John Doe", phone: "555-0101", email: "john@abcconstruction.com", clientStatus: "Active", greggPriority: "High", riskLevel: "Low", lastMeaningfulContact: iso(-2), nextAction: "Review compliance docs", nextOwner: "Gregg", coOwner: "Tara", involvementState: "Co-managed", touchCadenceDays: 14, dueDate: iso(5), missingInformation: "None" },
+  { key: "c2", clientName: "BuildCorp", companyName: "BuildCorp Inc", contactName: "Jane Smith", phone: "555-0102", email: "jane@buildcorp.com", clientStatus: "At Risk", greggPriority: "Urgent", riskLevel: "High", lastMeaningfulContact: iso(-1), nextAction: "Address pricing exception", nextOwner: "Gregg", involvementState: "Gregg lead", touchCadenceDays: 7, dueDate: iso(2), missingInformation: "Pricing history" },
+  { key: "c3", clientName: "CityBuilders", companyName: "CityBuilders Group", contactName: "Bob Johnson", phone: "555-0103", email: "bob@citybuilders.com", clientStatus: "Renewal Pending", greggPriority: "Medium", riskLevel: "Medium", lastMeaningfulContact: iso(-4), nextAction: "Send renewal agreement", nextOwner: "Landon", coOwner: "Tara", involvementState: "Co-managed", touchCadenceDays: 21, dueDate: iso(6), missingInformation: "None" },
+  { key: "c4", clientName: "Delta Construction", companyName: "Delta Construction Ltd", contactName: "Alice Williams", phone: "555-0104", email: "alice@deltaconstruction.com", clientStatus: "Active", greggPriority: "Low", riskLevel: "Low", lastMeaningfulContact: iso(-11), nextAction: "Check in on qualifier status", nextOwner: "Landon", involvementState: "Landon lead", touchCadenceDays: 30, dueDate: iso(9), missingInformation: "Qualifier ID" },
+  { key: "c5", clientName: "Echo Builders", companyName: "Echo Builders LLC", contactName: "Charlie Brown", phone: "555-0105", email: "charlie@echobuilders.com", clientStatus: "Active", greggPriority: "Medium", riskLevel: "Low", lastMeaningfulContact: iso(-16), nextAction: "Schedule monitoring call", nextOwner: "Landon", involvementState: "Landon lead", touchCadenceDays: 14, dueDate: iso(12), missingInformation: "None" },
+  { key: "c6", clientName: "Foxtrot Developments", companyName: "Foxtrot Developments Inc", contactName: "David Lee", phone: "555-0106", email: "david@foxtrot.com", clientStatus: "Onboarding", greggPriority: "High", riskLevel: "Low", lastMeaningfulContact: iso(-1), nextAction: "Complete onboarding", nextOwner: "Gregg", coOwner: "Tara", involvementState: "Tara onboarding support", touchCadenceDays: 7, dueDate: iso(3), missingInformation: "Company docs" },
 ];
 
 const noteDates = {
@@ -170,13 +173,13 @@ const riskProfiles: {
 ];
 
 const expansion = [
-  { clientKey: "c1", title: "New project compliance package", stage: "In Discussion", potentialValue: 18000, targetDate: iso(45), description: "Compliance support for upcoming project John mentioned." },
-  { clientKey: "c1", title: "Multi-state licensing add-on", stage: "Identified", potentialValue: 12000, targetDate: iso(90), description: "Potential expansion into a second state." },
-  { clientKey: "c3", title: "Monitoring add-on", stage: "Proposed", potentialValue: 9000, targetDate: iso(20), description: "Ongoing monitoring bundled with renewal." },
-  { clientKey: "c3", title: "Renewal upsell to premium tier", stage: "In Discussion", potentialValue: 15000, targetDate: iso(14), description: "Upgrade to premium compliance tier at renewal." },
-  { clientKey: "c4", title: "Second qualifier placement", stage: "Identified", potentialValue: 8000, targetDate: iso(60), description: "Client may add a second qualifier." },
-  { clientKey: "c5", title: "Referral lead — partner company", stage: "Identified", potentialValue: 11000, targetDate: iso(75), description: "Charlie referred a colleague at another company." },
-  { clientKey: "c6", title: "Qualifier placement for bid", stage: "Committed", potentialValue: 14000, targetDate: iso(10), description: "Placement tied to an upcoming bid." },
+  { clientKey: "c1", title: "New project compliance package", stage: "Proposed", status: "Open", potentialValue: 18000, targetDate: iso(45), description: "Compliance support for upcoming project John mentioned.", owner: "Gregg", pinned: true, priorityBoost: 0, movedDaysAgo: 3 },
+  { clientKey: "c1", title: "Multi-state licensing add-on", stage: "Identified", status: "Open", potentialValue: 12000, targetDate: iso(90), description: "Potential expansion into a second state.", owner: "Tara", pinned: false, priorityBoost: 0, movedDaysAgo: 30 },
+  { clientKey: "c3", title: "Monitoring add-on", stage: "Negotiation", status: "Open", potentialValue: 9000, targetDate: iso(20), description: "Ongoing monitoring bundled with renewal.", owner: "Landon", pinned: false, priorityBoost: 5, movedDaysAgo: 2 },
+  { clientKey: "c3", title: "Renewal upsell to premium tier", stage: "Proposed", status: "Open", potentialValue: 15000, targetDate: iso(14), description: "Upgrade to premium compliance tier at renewal.", owner: "Tara", pinned: false, priorityBoost: 0, movedDaysAgo: 25 },
+  { clientKey: "c4", title: "Second qualifier placement", stage: "Identified", status: "Open", potentialValue: 8000, targetDate: iso(60), description: "Client may add a second qualifier.", owner: "Landon", pinned: false, priorityBoost: 0, movedDaysAgo: 11 },
+  { clientKey: "c5", title: "Referral lead — partner company", stage: "Qualifying", status: "Open", potentialValue: 11000, targetDate: iso(75), description: "Charlie referred a colleague at another company.", owner: "Landon", pinned: false, priorityBoost: 0, movedDaysAgo: 16 },
+  { clientKey: "c6", title: "Qualifier placement for bid", stage: "Closing", status: "Open", potentialValue: 14000, targetDate: iso(10), description: "Placement tied to an upcoming bid.", owner: "Gregg", pinned: false, priorityBoost: 0, movedDaysAgo: 1 },
 ];
 
 const invoices = [
@@ -208,15 +211,17 @@ const slas = [
 ];
 
 const events = [
-  { clientKey: "c1", title: "Compliance docs review call", type: "Check-in", date: iso(3), time: "10:00", attendees: "Gregg, John Doe", withClient: true },
-  { clientKey: "c1", title: "Expansion scoping discussion", type: "Review", date: iso(12), time: "14:00", attendees: "Gregg, John Doe", withClient: true },
-  { clientKey: "c2", title: "Pricing exception decision call", type: "Escalation", date: iso(1), time: "09:30", attendees: "Gregg, Jane Smith", withClient: true },
-  { clientKey: "c2", title: "Internal remediation sync", type: "Review", date: iso(2), time: "16:00", attendees: "Gregg, Landon", withClient: false },
-  { clientKey: "c3", title: "Renewal walkthrough", type: "Renewal", date: iso(5), time: "11:00", attendees: "Landon, Bob Johnson", withClient: true },
-  { clientKey: "c4", title: "Qualifier requirements review", type: "Review", date: iso(8), time: "13:00", attendees: "Landon, Alice Williams", withClient: true },
-  { clientKey: "c5", title: "Monitoring check-in", type: "Check-in", date: iso(14), time: "15:30", attendees: "Landon, Charlie Brown", withClient: true },
-  { clientKey: "c6", title: "Onboarding status call", type: "Onboarding", date: iso(2), time: "10:30", attendees: "Gregg, David Lee", withClient: true },
-  { clientKey: "c6", title: "Placement approval review", type: "Placement", date: iso(4), time: "09:00", attendees: "Gregg, Leadership", withClient: false },
+  { clientKey: "c1", title: "Compliance docs review call", type: "Check-in", date: iso(3), time: "10:00", attendees: "Gregg, John Doe", withClient: true, status: "Planned", owner: "Gregg" },
+  { clientKey: "c1", title: "Lunch with John (relationship)", type: "Meal", date: iso(6), time: "12:00", attendees: "Gregg, Tara, John Doe", withClient: true, status: "Planned", owner: "Tara" },
+  { clientKey: "c1", title: "Expansion scoping discussion", type: "Review", date: iso(12), time: "14:00", attendees: "Gregg, John Doe", withClient: true, status: "Planned", owner: "Gregg" },
+  { clientKey: "c2", title: "Pricing exception decision call", type: "Escalation", date: iso(1), time: "09:30", attendees: "Gregg, Jane Smith", withClient: true, status: "Planned", owner: "Gregg" },
+  { clientKey: "c2", title: "Internal remediation sync", type: "Review", date: iso(2), time: "16:00", attendees: "Gregg, Landon", withClient: false, status: "Planned", owner: "Gregg" },
+  { clientKey: "c3", title: "Renewal walkthrough", type: "Renewal", date: iso(5), time: "11:00", attendees: "Landon, Bob Johnson", withClient: true, status: "Planned", owner: "Landon" },
+  { clientKey: "c3", title: "On-site visit", type: "Visit", date: iso(9), time: "13:30", attendees: "Tara, Bob Johnson", withClient: true, status: "Planned", owner: "Tara" },
+  { clientKey: "c4", title: "Qualifier requirements review", type: "Review", date: iso(8), time: "13:00", attendees: "Landon, Alice Williams", withClient: true, status: "Planned", owner: "Landon" },
+  { clientKey: "c5", title: "Monitoring check-in", type: "Check-in", date: iso(14), time: "15:30", attendees: "Landon, Charlie Brown", withClient: true, status: "Planned", owner: "Landon" },
+  { clientKey: "c6", title: "Onboarding status call", type: "Onboarding", date: iso(2), time: "10:30", attendees: "Gregg, David Lee", withClient: true, status: "Planned", owner: "Gregg" },
+  { clientKey: "c6", title: "Placement approval review", type: "Placement", date: iso(4), time: "09:00", attendees: "Gregg, Leadership", withClient: false, status: "Planned", owner: "Gregg" },
 ];
 
 const contactLog = [
@@ -290,6 +295,10 @@ export async function seedDatabase(): Promise<void> {
         nextAction: c.nextAction,
         nextOwnerLabel: c.nextOwner,
         nextOwnerUserId: ownerId(c.nextOwner),
+        coOwnerLabel: c.coOwner ?? "",
+        coOwnerUserId: ownerId(c.coOwner ?? ""),
+        involvementState: c.involvementState ?? "",
+        touchCadenceDays: c.touchCadenceDays ?? 30,
         dueDate: dateOrNull(c.dueDate),
         missingInformation: c.missingInformation,
       });
@@ -411,9 +420,15 @@ export async function seedDatabase(): Promise<void> {
         clientId: clientIds.get(x.clientKey)!,
         title: x.title,
         stage: x.stage,
+        status: x.status,
         potentialValue: x.potentialValue,
         targetDate: dateOrNull(x.targetDate),
         description: x.description,
+        ownerLabel: x.owner,
+        ownerUserId: ownerId(x.owner),
+        pinned: x.pinned,
+        priorityBoost: x.priorityBoost,
+        lastMovementAt: new Date(Date.now() - x.movedDaysAgo * 86_400_000),
       });
     }
 
@@ -450,6 +465,8 @@ export async function seedDatabase(): Promise<void> {
         time: ev.time,
         attendees: ev.attendees,
         withClient: ev.withClient,
+        status: ev.status,
+        ownerLabel: ev.owner,
       });
     }
 

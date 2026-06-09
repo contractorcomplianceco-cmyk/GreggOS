@@ -1,42 +1,63 @@
 # Gregg + Landon Current Client Cockpit
 
-An internal operational web app for Contractor Compliance Authority that helps Gregg and Landon manage current-client relationships: triaging priorities, processing raw call notes into reviewed CRM-ready drafts, tracking tasks/escalations/opportunities, and running a weekly review. Frontend-only with localStorage persistence for cockpit data; it also reads LIVE audit data from the external CCA Audit Risk Portal (read-only, direct browser fetch).
+An internal operational web app for Contractor Compliance Authority that helps Gregg and Landon manage current-client relationships: triaging priorities, processing raw call notes into reviewed CRM-ready drafts, tracking tasks/escalations/opportunities, monitoring an expansion pipeline, tending relationship warmth/cadence, and running a weekly review. It also reads LIVE audit data from the external CCA Audit Risk Portal (read-only, direct browser fetch).
+
+## Architecture (full-stack, contract-first)
+
+This is a pnpm monorepo. The cockpit is a full-stack app:
+
+- **DB**: Drizzle ORM on the Replit Postgres (`DATABASE_URL`). Schema in `lib/db/src/schema/*`.
+- **API**: Express server (`artifacts/api-server`) behind Clerk auth, same-origin cookies.
+- **Contract**: OpenAPI spec (`lib/api-spec/openapi.yaml`) → Orval codegen → React Query hooks + Zod-ish types in `lib/api-client-react` (`@workspace/api-client-react`).
+- **Frontend**: React + Vite (TypeScript), Tailwind + shadcn/ui, routing via wouter (base = `import.meta.env.BASE_URL`).
+
+The flow is contract-first: change the schema → push → edit `openapi.yaml` → run codegen → implement server routes → consume generated hooks in the cockpit.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/cockpit run dev` — run the cockpit web app (Vite)
-- `pnpm --filter @workspace/cockpit run typecheck` — typecheck the cockpit app
-- App runs via the `artifacts/cockpit: web` workflow; preview path is `/`
-
-## Stack
-
-- React + Vite (TypeScript), Tailwind + shadcn/ui components
-- Routing: wouter (base = `import.meta.env.BASE_URL`)
-- State: Zustand with `persist` middleware to localStorage (key `cockpit-storage`)
-- No backend, no database, no API codegen — all data lives client-side
+- `pnpm --filter @workspace/cockpit run dev` — cockpit web app (Vite); preview path `/`
+- `pnpm --filter @workspace/api-server run dev` — API server; preview path `/api`
+- `pnpm --filter @workspace/api-server run seed` — reset DB to seed data (builds then runs `dist/seed/run.mjs`)
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate API client from `openapi.yaml`
+- `pnpm run typecheck` — canonical full typecheck (libs then leaf artifacts)
+- Admin reset is also available at `POST /api/admin/reset` (auth required).
 
 ## Where things live
 
-- `artifacts/cockpit/src/lib/types.ts` — data model (CurrentClient, CallNote, Task, OpportunitySignal, Escalation) and enums
-- `artifacts/cockpit/src/lib/auditPortal.ts` — live audit portal client: types + React Query hooks (`useAudits`, `useAuditDetail`, `useAuditPortalHealth`), base-URL helper (localStorage override, key `cockpit-audit-portal-url`), and `levelColor`/`layerAFactors` helpers
-- `artifacts/cockpit/src/pages/audit-risk.tsx` — live Audit Risk page (connection pill, audits list, detail: score summary, Layer A scoresheet, entity profile, findings, documents, monitoring)
-- `artifacts/cockpit/src/lib/store.ts` — Zustand store, persistence, and the `saveProcessedNote` action
-- `artifacts/cockpit/src/lib/seed.ts` — sample data (6 clients, 8 call notes, tasks/signals/escalations)
-- `artifacts/cockpit/src/pages/*.tsx` — six screens: gregg-today, work-queue, clients, client-detail, processor, weekly-review, admin
-- `artifacts/cockpit/src/components/layout/SidebarLayout.tsx` — sidebar nav + decision-boundary disclaimer
+### Frontend (`artifacts/cockpit/src`)
+- `lib/types.ts` — local data model mirrors (CurrentClient, CallNote, Task, OpportunitySignal, Escalation, ExpansionMilestone, ScheduledEvent, ContactLogEntry, …) and enums. Cockpit pages cast generated responses to these.
+- `lib/store.ts` — `useStore()` is a thin wrapper over the generated React Query hooks (server-backed) plus the `saveProcessedNote` flow. NOT a Zustand/localStorage store anymore.
+- `lib/auditPortal.ts` — live audit portal client (types + React Query hooks `useAudits`/`useAuditDetail`/`useAuditPortalHealth`, base-URL helper, `levelColor`/`layerAFactors`).
+- `pages/*.tsx` — gregg-today, work-queue, clients, client-detail, processor, weekly-review, oversight, admin, audit-risk, and the Phase-2 pages **expansion.tsx** and **relationships.tsx**.
+- `components/layout/SidebarLayout.tsx` — sidebar nav (incl. Expansion Pipeline + Relationships) + decision-boundary disclaimer.
 
-## Architecture decisions
-
-- This is intentionally a no-backend product: api-server and mockup-sandbox artifacts exist in the monorepo but are NOT part of this app.
-- Live audit data comes from the external CCA Audit Risk Portal (`https://audit-risk-model.replit.app`, endpoints `/api/audits`, `/api/audits/:id`, `/api/healthz`). The portal serves an OPEN, public CORS API (reflects any Origin), so the cockpit fetches it directly from the browser via React Query — no proxy/backend of our own. Read-only. Security note: those endpoints are public and unauthenticated at the portal; any cockpit user (and anyone hitting the portal) can read full audit payloads incl. EIN/financials. Locking that down would require auth on the portal itself, not a cockpit-side proxy.
-- The cockpit client ↔ live audit linkage on client-detail is best-effort name matching (normalized clientName/companyName), since the two systems share no common ID. When matched, the Audit Status & Scoresheet card, the Audit KPI, and the overall-health "Audit compliance" factor all render LIVE portal data (via `useAudits` + `useAuditDetail`); a non-matching client falls back to seed audit data and shows no Live badge. The portal is risk-oriented (higher `layerANormalized` = worse), so audit health is `100 - layerANormalized`, not the score directly. Seed client c1 is named "ABC Construction LLC" to align with the portal's sample audit so the linkage is demonstrable.
-- `saveProcessedNote` is the single source of truth for the Call Note Processor save flow: it upserts the call note and atomically regenerates the note's tasks/signals/escalations (matched by `sourceCallNoteId`) and recomputes the related client's `nextAction`, owner, due date, missing info, and counters.
-- Each `nextActions` line in the processor becomes a separate task.
-- Persist `version` is bumped when the seed shape changes so stale localStorage is replaced with the new seed.
+### Backend (`artifacts/api-server/src`)
+- `routes/*.ts` — one router per resource: clients (incl. `POST /clients/:id/handoff`), callNotes, tasks, signals, escalations, expansion, relationships, scheduledEvents, contactLog, activity, auditLinks, viewState, admin, me, health. Registered in `routes/index.ts`.
+- `lib/mappers.ts` — DB row → API shape (`toClient`, `toExpansion`, `toEvent`, `toRelationship`, `toExpansionOpportunity`, …).
+- `lib/priority.ts` — `priorityScore(value, stage, targetDate, warmth, riskScore, boost)` + stalled detection for the expansion pipeline.
+- `lib/activity.ts` — `logActivity` (writes shared timeline entries; handoff, touch, etc.).
+- `lib/owner.ts`, `lib/counters.ts`, `lib/http.ts`, `lib/logger.ts` — owner resolution, denormalized counters, request helpers, pino logger.
+- `seed/seedDatabase.ts` — sample data (clients incl. Tara co-ownership; expansion milestones incl. stalled examples; scheduled visits/meals).
 
 ## Product
 
-Six screens: Gregg Today (priorities, escalations, filters), Landon Work Queue (call notes by routing status), Current Clients (search/filter list + detail), Call Note Processor (raw note in, CRM note / follow-up draft / task list / JSON out, all with copy buttons), Weekly Review, and Admin/Setup (reset + export data). The app separates raw RingCentral notes from reviewed summaries and shows decision-boundary disclaimers throughout (it drafts; it does not approve pricing/refunds/legal/compliance/qualifier decisions).
+Screens: Gregg Today (priorities, escalations, filters, + a relationship lane: touches due / visits this week / going cold / top expansion), Landon Work Queue, Current Clients (search/filter + detail), Call Note Processor, Weekly Review, Oversight, Admin/Setup, Audit Risk (live portal), plus:
+
+- **Expansion Pipeline** — portfolio-wide, auto-prioritized stage board (Identified→Live) with priority scoring, stalled flags, owner / stage / shared-with-Tara filters, and manual pin + priority boost; create/edit milestones.
+- **Relationships** — warmth/cadence radar (days since touch, next touch, cold flag, cadence) with shared-with-Tara filter and log-touch + plan-touch dialogs.
+
+Client detail surfaces ownership overlap (co-owner, involvement state, touch cadence), an explicit **Hand off** action, a **Shared Activity Timeline**, and pin/boost on roadmap milestones.
+
+Decision-boundary disclaimers throughout: the app drafts and organizes; it does not approve pricing/refunds/legal/compliance/qualifier decisions.
+
+## Architecture decisions
+
+- **Contract-first**: never hand-edit generated files in `lib/api-client-react`. Change `openapi.yaml` and rerun codegen. Use entity-shaped request body names to avoid TS2308 collisions. Do not change the OpenAPI `info.title` (controls generated filenames).
+- **Auth**: Clerk, same-origin cookies. Unauthenticated API requests return 401. First user becomes admin (seed users break that — see admin provisioning memory).
+- **Priority scoring** lives server-side in `lib/priority.ts` so the pipeline ranks consistently; manual `pinned`/`priorityBoost` override the computed order. Stage/status movement resets the stalled clock (`lastMovementAt`).
+- **Overlap model**: clients carry `coOwner`/`involvementState`/`touchCadenceDays`; handoffs are explicit events that update ownership/involvement and log to the shared activity timeline.
+- **Live audit data** comes from the external CCA Audit Risk Portal (`https://audit-risk-model.replit.app`, `/api/audits`, `/api/audits/:id`, `/api/healthz`). The portal serves an OPEN public CORS API, so the cockpit fetches it directly from the browser — no proxy of our own. Read-only. Security note: those portal endpoints are public/unauthenticated (EIN/financials exposed); locking down would require auth on the portal itself.
+- Cockpit client ↔ live audit linkage on client-detail is best-effort name matching (no shared ID). When matched, the Audit card/KPI and the overall-health "Audit compliance" factor render LIVE data; otherwise it falls back to seed audit data and shows no Live badge. The portal is risk-oriented (higher `layerANormalized` = worse), so audit health is `100 - layerANormalized`. Seed client c1 ("ABC Construction LLC") aligns with the portal's sample audit.
 
 ## User preferences
 
@@ -44,9 +65,11 @@ Six screens: Gregg Today (priorities, escalations, filters), Landon Work Queue (
 
 ## Gotchas
 
-- Bump the persist `version` in `store.ts` whenever the seed/data shape changes, or existing users keep stale localStorage state.
-- In-app navigation that uses `window.location.href` must prepend `import.meta.env.BASE_URL` (see work-queue Process Note button) so it respects the artifact base path.
+- After any schema change: push, then update `openapi.yaml`, run codegen, then implement. Run `pnpm run typecheck:libs` before leaf-artifact typechecks if you touch `lib/*`.
+- The cockpit mirrors generated types in `lib/types.ts` and casts API responses to them; when you add fields to a schema, add them to the matching `lib/types.ts` interface too or the casts go stale.
+- In-app navigation using `window.location.href` must prepend `import.meta.env.BASE_URL` so it respects the artifact base path.
+- Verify artifacts with `pnpm --filter @workspace/<slug> run typecheck`, not `build` (build needs workflow-provided `PORT`/`BASE_PATH`).
 
 ## Pointers
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See the `pnpm-workspace` skill for workspace structure, TypeScript project references, OpenAPI/codegen, server routes, and DB migration details.

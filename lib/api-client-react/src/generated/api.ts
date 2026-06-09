@@ -29,15 +29,27 @@ import type {
   ClientDetail,
   ClientInput,
   ClientUpdate,
+  ContactLogEntry,
+  ContactLogInput,
   Escalation,
   EscalationUpdate,
+  EventInput,
+  EventUpdate,
+  ExpansionInput,
+  ExpansionMilestone,
+  ExpansionOpportunity,
+  ExpansionUpdate,
   ExportData,
+  HandoffInput,
   HealthStatus,
   ImportData,
   ListActivityParams,
   ListCallNotesParams,
   ListClientsParams,
   ListEscalationsParams,
+  ListExpansionPipelineParams,
+  ListRelationshipsParams,
+  ListScheduledEventsParams,
   ListSignalsParams,
   ListTasksParams,
   MutationResult,
@@ -46,6 +58,8 @@ import type {
   OpportunitySignal,
   ProcessNoteInput,
   ProcessNoteResult,
+  RelationshipSummary,
+  ScheduledEvent,
   SignalUpdate,
   Task,
   TaskInput,
@@ -2254,5 +2268,686 @@ export const useUpdateUser = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getUpdateUserMutationOptions(options));
+    }
+
+export const getListRelationshipsUrl = (params?: ListRelationshipsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/relationships?${stringifiedParams}` : `/api/relationships`
+}
+
+/**
+ * @summary List portfolio relationship summaries (warmth / cadence radar)
+ */
+export const listRelationships = async (params?: ListRelationshipsParams, options?: RequestInit): Promise<RelationshipSummary[]> => {
+
+  return customFetch<RelationshipSummary[]>(getListRelationshipsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListRelationshipsQueryKey = (params?: ListRelationshipsParams,) => {
+    return [
+    `/api/relationships`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListRelationshipsQueryOptions = <TData = Awaited<ReturnType<typeof listRelationships>>, TError = ErrorType<unknown>>(params?: ListRelationshipsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRelationships>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListRelationshipsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRelationships>>> = ({ signal }) => listRelationships(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listRelationships>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListRelationshipsQueryResult = NonNullable<Awaited<ReturnType<typeof listRelationships>>>
+export type ListRelationshipsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List portfolio relationship summaries (warmth / cadence radar)
+ */
+
+export function useListRelationships<TData = Awaited<ReturnType<typeof listRelationships>>, TError = ErrorType<unknown>>(
+ params?: ListRelationshipsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRelationships>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListRelationshipsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListExpansionPipelineUrl = (params?: ListExpansionPipelineParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/expansion-pipeline?${stringifiedParams}` : `/api/expansion-pipeline`
+}
+
+/**
+ * @summary List portfolio-wide expansion opportunities, scored and sorted
+ */
+export const listExpansionPipeline = async (params?: ListExpansionPipelineParams, options?: RequestInit): Promise<ExpansionOpportunity[]> => {
+
+  return customFetch<ExpansionOpportunity[]>(getListExpansionPipelineUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListExpansionPipelineQueryKey = (params?: ListExpansionPipelineParams,) => {
+    return [
+    `/api/expansion-pipeline`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListExpansionPipelineQueryOptions = <TData = Awaited<ReturnType<typeof listExpansionPipeline>>, TError = ErrorType<unknown>>(params?: ListExpansionPipelineParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExpansionPipeline>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListExpansionPipelineQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listExpansionPipeline>>> = ({ signal }) => listExpansionPipeline(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listExpansionPipeline>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListExpansionPipelineQueryResult = NonNullable<Awaited<ReturnType<typeof listExpansionPipeline>>>
+export type ListExpansionPipelineQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List portfolio-wide expansion opportunities, scored and sorted
+ */
+
+export function useListExpansionPipeline<TData = Awaited<ReturnType<typeof listExpansionPipeline>>, TError = ErrorType<unknown>>(
+ params?: ListExpansionPipelineParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExpansionPipeline>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListExpansionPipelineQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateExpansionMilestoneUrl = () => {
+
+
+
+
+  return `/api/expansion-milestones`
+}
+
+/**
+ * @summary Create an expansion milestone
+ */
+export const createExpansionMilestone = async (expansionInput: ExpansionInput, options?: RequestInit): Promise<ExpansionMilestone> => {
+
+  return customFetch<ExpansionMilestone>(getCreateExpansionMilestoneUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      expansionInput,)
+  }
+);}
+
+
+
+
+export const getCreateExpansionMilestoneMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createExpansionMilestone>>, TError,{data: BodyType<ExpansionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createExpansionMilestone>>, TError,{data: BodyType<ExpansionInput>}, TContext> => {
+
+const mutationKey = ['createExpansionMilestone'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createExpansionMilestone>>, {data: BodyType<ExpansionInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createExpansionMilestone(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateExpansionMilestoneMutationResult = NonNullable<Awaited<ReturnType<typeof createExpansionMilestone>>>
+    export type CreateExpansionMilestoneMutationBody = BodyType<ExpansionInput>
+    export type CreateExpansionMilestoneMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create an expansion milestone
+ */
+export const useCreateExpansionMilestone = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createExpansionMilestone>>, TError,{data: BodyType<ExpansionInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createExpansionMilestone>>,
+        TError,
+        {data: BodyType<ExpansionInput>},
+        TContext
+      > => {
+      return useMutation(getCreateExpansionMilestoneMutationOptions(options));
+    }
+
+export const getUpdateExpansionMilestoneUrl = (milestoneId: string,) => {
+
+
+
+
+  return `/api/expansion-milestones/${milestoneId}`
+}
+
+/**
+ * @summary Update an expansion milestone
+ */
+export const updateExpansionMilestone = async (milestoneId: string,
+    expansionUpdate: ExpansionUpdate, options?: RequestInit): Promise<ExpansionMilestone> => {
+
+  return customFetch<ExpansionMilestone>(getUpdateExpansionMilestoneUrl(milestoneId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      expansionUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateExpansionMilestoneMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExpansionMilestone>>, TError,{milestoneId: string;data: BodyType<ExpansionUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateExpansionMilestone>>, TError,{milestoneId: string;data: BodyType<ExpansionUpdate>}, TContext> => {
+
+const mutationKey = ['updateExpansionMilestone'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateExpansionMilestone>>, {milestoneId: string;data: BodyType<ExpansionUpdate>}> = (props) => {
+          const {milestoneId,data} = props ?? {};
+
+          return  updateExpansionMilestone(milestoneId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateExpansionMilestoneMutationResult = NonNullable<Awaited<ReturnType<typeof updateExpansionMilestone>>>
+    export type UpdateExpansionMilestoneMutationBody = BodyType<ExpansionUpdate>
+    export type UpdateExpansionMilestoneMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update an expansion milestone
+ */
+export const useUpdateExpansionMilestone = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExpansionMilestone>>, TError,{milestoneId: string;data: BodyType<ExpansionUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateExpansionMilestone>>,
+        TError,
+        {milestoneId: string;data: BodyType<ExpansionUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateExpansionMilestoneMutationOptions(options));
+    }
+
+export const getListScheduledEventsUrl = (params?: ListScheduledEventsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/scheduled-events?${stringifiedParams}` : `/api/scheduled-events`
+}
+
+/**
+ * @summary List scheduled events
+ */
+export const listScheduledEvents = async (params?: ListScheduledEventsParams, options?: RequestInit): Promise<ScheduledEvent[]> => {
+
+  return customFetch<ScheduledEvent[]>(getListScheduledEventsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListScheduledEventsQueryKey = (params?: ListScheduledEventsParams,) => {
+    return [
+    `/api/scheduled-events`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListScheduledEventsQueryOptions = <TData = Awaited<ReturnType<typeof listScheduledEvents>>, TError = ErrorType<unknown>>(params?: ListScheduledEventsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listScheduledEvents>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListScheduledEventsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listScheduledEvents>>> = ({ signal }) => listScheduledEvents(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listScheduledEvents>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListScheduledEventsQueryResult = NonNullable<Awaited<ReturnType<typeof listScheduledEvents>>>
+export type ListScheduledEventsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List scheduled events
+ */
+
+export function useListScheduledEvents<TData = Awaited<ReturnType<typeof listScheduledEvents>>, TError = ErrorType<unknown>>(
+ params?: ListScheduledEventsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listScheduledEvents>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListScheduledEventsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateScheduledEventUrl = () => {
+
+
+
+
+  return `/api/scheduled-events`
+}
+
+/**
+ * @summary Create a scheduled event
+ */
+export const createScheduledEvent = async (eventInput: EventInput, options?: RequestInit): Promise<ScheduledEvent> => {
+
+  return customFetch<ScheduledEvent>(getCreateScheduledEventUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      eventInput,)
+  }
+);}
+
+
+
+
+export const getCreateScheduledEventMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createScheduledEvent>>, TError,{data: BodyType<EventInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createScheduledEvent>>, TError,{data: BodyType<EventInput>}, TContext> => {
+
+const mutationKey = ['createScheduledEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createScheduledEvent>>, {data: BodyType<EventInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createScheduledEvent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateScheduledEventMutationResult = NonNullable<Awaited<ReturnType<typeof createScheduledEvent>>>
+    export type CreateScheduledEventMutationBody = BodyType<EventInput>
+    export type CreateScheduledEventMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a scheduled event
+ */
+export const useCreateScheduledEvent = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createScheduledEvent>>, TError,{data: BodyType<EventInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createScheduledEvent>>,
+        TError,
+        {data: BodyType<EventInput>},
+        TContext
+      > => {
+      return useMutation(getCreateScheduledEventMutationOptions(options));
+    }
+
+export const getUpdateScheduledEventUrl = (eventId: string,) => {
+
+
+
+
+  return `/api/scheduled-events/${eventId}`
+}
+
+/**
+ * @summary Update a scheduled event
+ */
+export const updateScheduledEvent = async (eventId: string,
+    eventUpdate: EventUpdate, options?: RequestInit): Promise<ScheduledEvent> => {
+
+  return customFetch<ScheduledEvent>(getUpdateScheduledEventUrl(eventId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      eventUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateScheduledEventMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateScheduledEvent>>, TError,{eventId: string;data: BodyType<EventUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateScheduledEvent>>, TError,{eventId: string;data: BodyType<EventUpdate>}, TContext> => {
+
+const mutationKey = ['updateScheduledEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateScheduledEvent>>, {eventId: string;data: BodyType<EventUpdate>}> = (props) => {
+          const {eventId,data} = props ?? {};
+
+          return  updateScheduledEvent(eventId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateScheduledEventMutationResult = NonNullable<Awaited<ReturnType<typeof updateScheduledEvent>>>
+    export type UpdateScheduledEventMutationBody = BodyType<EventUpdate>
+    export type UpdateScheduledEventMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update a scheduled event
+ */
+export const useUpdateScheduledEvent = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateScheduledEvent>>, TError,{eventId: string;data: BodyType<EventUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateScheduledEvent>>,
+        TError,
+        {eventId: string;data: BodyType<EventUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateScheduledEventMutationOptions(options));
+    }
+
+export const getCreateContactLogEntryUrl = () => {
+
+
+
+
+  return `/api/contact-log`
+}
+
+/**
+ * @summary Log a relationship touch (call, email, visit, meal)
+ */
+export const createContactLogEntry = async (contactLogInput: ContactLogInput, options?: RequestInit): Promise<ContactLogEntry> => {
+
+  return customFetch<ContactLogEntry>(getCreateContactLogEntryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      contactLogInput,)
+  }
+);}
+
+
+
+
+export const getCreateContactLogEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createContactLogEntry>>, TError,{data: BodyType<ContactLogInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createContactLogEntry>>, TError,{data: BodyType<ContactLogInput>}, TContext> => {
+
+const mutationKey = ['createContactLogEntry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createContactLogEntry>>, {data: BodyType<ContactLogInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createContactLogEntry(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateContactLogEntryMutationResult = NonNullable<Awaited<ReturnType<typeof createContactLogEntry>>>
+    export type CreateContactLogEntryMutationBody = BodyType<ContactLogInput>
+    export type CreateContactLogEntryMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Log a relationship touch (call, email, visit, meal)
+ */
+export const useCreateContactLogEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createContactLogEntry>>, TError,{data: BodyType<ContactLogInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createContactLogEntry>>,
+        TError,
+        {data: BodyType<ContactLogInput>},
+        TContext
+      > => {
+      return useMutation(getCreateContactLogEntryMutationOptions(options));
+    }
+
+export const getHandoffClientUrl = (clientId: string,) => {
+
+
+
+
+  return `/api/clients/${clientId}/handoff`
+}
+
+/**
+ * @summary Hand off a client to another owner and set involvement state
+ */
+export const handoffClient = async (clientId: string,
+    handoffInput: HandoffInput, options?: RequestInit): Promise<Client> => {
+
+  return customFetch<Client>(getHandoffClientUrl(clientId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      handoffInput,)
+  }
+);}
+
+
+
+
+export const getHandoffClientMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof handoffClient>>, TError,{clientId: string;data: BodyType<HandoffInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof handoffClient>>, TError,{clientId: string;data: BodyType<HandoffInput>}, TContext> => {
+
+const mutationKey = ['handoffClient'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof handoffClient>>, {clientId: string;data: BodyType<HandoffInput>}> = (props) => {
+          const {clientId,data} = props ?? {};
+
+          return  handoffClient(clientId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type HandoffClientMutationResult = NonNullable<Awaited<ReturnType<typeof handoffClient>>>
+    export type HandoffClientMutationBody = BodyType<HandoffInput>
+    export type HandoffClientMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Hand off a client to another owner and set involvement state
+ */
+export const useHandoffClient = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof handoffClient>>, TError,{clientId: string;data: BodyType<HandoffInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof handoffClient>>,
+        TError,
+        {clientId: string;data: BodyType<HandoffInput>},
+        TContext
+      > => {
+      return useMutation(getHandoffClientMutationOptions(options));
     }
 

@@ -6,15 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface ScheduledEvent {
-  id: string;
+export interface EventInput {
   clientId: string;
   title: string;
   type: string;
-  date: string;
-  time: string;
-  attendees: string;
-  withClient: boolean;
-  status: string;
-  owner: string;
+  date?: string;
+  time?: string;
+  attendees?: string;
+  withClient?: boolean;
+  status?: string;
+  owner?: string;
 }

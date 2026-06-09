@@ -572,6 +572,213 @@ paths:
               schema:
                 $ref: "#/components/schemas/User"
 
+  /relationships:
+    get:
+      operationId: listRelationships
+      tags: [relationships]
+      summary: List portfolio relationship summaries (warmth / cadence radar)
+      parameters:
+        - name: owner
+          in: query
+          required: false
+          schema: { type: string }
+        - name: warmth
+          in: query
+          required: false
+          schema: { type: string }
+        - name: sharedWithTara
+          in: query
+          required: false
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Relationship summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RelationshipSummary"
+
+  /expansion-pipeline:
+    get:
+      operationId: listExpansionPipeline
+      tags: [expansion]
+      summary: List portfolio-wide expansion opportunities, scored and sorted
+      parameters:
+        - name: owner
+          in: query
+          required: false
+          schema: { type: string }
+        - name: stage
+          in: query
+          required: false
+          schema: { type: string }
+        - name: sharedWithTara
+          in: query
+          required: false
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Expansion opportunities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExpansionOpportunity"
+
+  /expansion-milestones:
+    post:
+      operationId: createExpansionMilestone
+      tags: [expansion]
+      summary: Create an expansion milestone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpansionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExpansionMilestone"
+
+  /expansion-milestones/{milestoneId}:
+    parameters:
+      - name: milestoneId
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateExpansionMilestone
+      tags: [expansion]
+      summary: Update an expansion milestone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpansionUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExpansionMilestone"
+
+  /scheduled-events:
+    get:
+      operationId: listScheduledEvents
+      tags: [events]
+      summary: List scheduled events
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: owner
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Scheduled events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScheduledEvent"
+    post:
+      operationId: createScheduledEvent
+      tags: [events]
+      summary: Create a scheduled event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledEvent"
+
+  /scheduled-events/{eventId}:
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      operationId: updateScheduledEvent
+      tags: [events]
+      summary: Update a scheduled event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledEvent"
+
+  /contact-log:
+    post:
+      operationId: createContactLogEntry
+      tags: [contact-log]
+      summary: Log a relationship touch (call, email, visit, meal)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactLogInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactLogEntry"
+
+  /clients/{clientId}/handoff:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: handoffClient
+      tags: [clients]
+      summary: Hand off a client to another owner and set involvement state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HandoffInput"
+      responses:
+        "200":
+          description: Updated client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+
 components:
   schemas:
     HealthStatus:
@@ -641,6 +848,11 @@ components:
         nextOwner: { type: string }
         nextOwnerUserId:
           type: [string, "null"]
+        coOwner: { type: string }
+        coOwnerUserId:
+          type: [string, "null"]
+        involvementState: { type: string }
+        touchCadenceDays: { type: integer }
         dueDate: { type: string }
         missingInformation: { type: string }
         openTasks: { type: integer }
@@ -660,6 +872,9 @@ components:
         - lastMeaningfulContact
         - nextAction
         - nextOwner
+        - coOwner
+        - involvementState
+        - touchCadenceDays
         - dueDate
         - missingInformation
         - openTasks
@@ -699,6 +914,9 @@ components:
         lastMeaningfulContact: { type: string }
         nextAction: { type: string }
         nextOwner: { type: string }
+        coOwner: { type: string }
+        involvementState: { type: string }
+        touchCadenceDays: { type: integer }
         dueDate: { type: string }
         missingInformation: { type: string }
 
@@ -1030,17 +1248,79 @@ components:
         clientId: { type: string }
         title: { type: string }
         stage: { type: string }
+        status: { type: string }
         potentialValue: { type: number }
         targetDate: { type: string }
         description: { type: string }
+        owner: { type: string }
+        ownerUserId:
+          type: [string, "null"]
+        pinned: { type: boolean }
+        priorityBoost: { type: integer }
+        lastMovementAt: { type: string }
       required:
         - id
         - clientId
         - title
         - stage
+        - status
         - potentialValue
         - targetDate
         - description
+        - owner
+        - pinned
+        - priorityBoost
+        - lastMovementAt
+
+    ExpansionInput:
+      type: object
+      properties:
+        clientId: { type: string }
+        title: { type: string }
+        stage: { type: string }
+        status: { type: string }
+        potentialValue: { type: number }
+        targetDate: { type: string }
+        description: { type: string }
+        owner: { type: string }
+        pinned: { type: boolean }
+        priorityBoost: { type: integer }
+      required: [clientId, title, stage]
+
+    ExpansionUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        stage: { type: string }
+        status: { type: string }
+        potentialValue: { type: number }
+        targetDate: { type: string }
+        description: { type: string }
+        owner: { type: string }
+        pinned: { type: boolean }
+        priorityBoost: { type: integer }
+
+    ExpansionOpportunity:
+      type: object
+      properties:
+        milestone:
+          $ref: "#/components/schemas/ExpansionMilestone"
+        clientName: { type: string }
+        companyName: { type: string }
+        riskLevel: { type: string }
+        priorityScore: { type: number }
+        stalled: { type: boolean }
+        daysSinceMovement: { type: integer }
+        sharedWithTara: { type: boolean }
+      required:
+        - milestone
+        - clientName
+        - companyName
+        - riskLevel
+        - priorityScore
+        - stalled
+        - daysSinceMovement
+        - sharedWithTara
 
     Invoice:
       type: object
@@ -1093,6 +1373,8 @@ components:
         time: { type: string }
         attendees: { type: string }
         withClient: { type: boolean }
+        status: { type: string }
+        owner: { type: string }
       required:
         - id
         - clientId
@@ -1102,6 +1384,34 @@ components:
         - time
         - attendees
         - withClient
+        - status
+        - owner
+
+    EventInput:
+      type: object
+      properties:
+        clientId: { type: string }
+        title: { type: string }
+        type: { type: string }
+        date: { type: string }
+        time: { type: string }
+        attendees: { type: string }
+        withClient: { type: boolean }
+        status: { type: string }
+        owner: { type: string }
+      required: [clientId, title, type]
+
+    EventUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        type: { type: string }
+        date: { type: string }
+        time: { type: string }
+        attendees: { type: string }
+        withClient: { type: boolean }
+        status: { type: string }
+        owner: { type: string }
 
     ContactLogEntry:
       type: object
@@ -1121,6 +1431,67 @@ components:
         - internalPerson
         - direction
         - summary
+
+    ContactLogInput:
+      type: object
+      properties:
+        clientId: { type: string }
+        date: { type: string }
+        channel: { type: string }
+        internalPerson: { type: string }
+        direction: { type: string }
+        summary: { type: string }
+      required: [clientId, channel]
+
+    HandoffInput:
+      type: object
+      properties:
+        toOwner: { type: string }
+        involvementState: { type: string }
+        note: { type: string }
+      required: [toOwner]
+
+    RelationshipSummary:
+      type: object
+      properties:
+        clientId: { type: string }
+        clientName: { type: string }
+        companyName: { type: string }
+        owner: { type: string }
+        coOwner: { type: string }
+        involvementState: { type: string }
+        clientStatus: { type: string }
+        riskLevel: { type: string }
+        greggPriority: { type: string }
+        lastMeaningfulContact: { type: string }
+        lastTouchDate: { type: string }
+        daysSinceTouch:
+          type: [integer, "null"]
+        touchCadenceDays: { type: integer }
+        warmth: { type: string }
+        cadenceState: { type: string }
+        nextEventDate: { type: string }
+        nextEventTitle: { type: string }
+        openExpansionCount: { type: integer }
+      required:
+        - clientId
+        - clientName
+        - companyName
+        - owner
+        - coOwner
+        - involvementState
+        - clientStatus
+        - riskLevel
+        - greggPriority
+        - lastMeaningfulContact
+        - lastTouchDate
+        - daysSinceTouch
+        - touchCadenceDays
+        - warmth
+        - cadenceState
+        - nextEventDate
+        - nextEventTitle
+        - openExpansionCount
 
     ActivityLogEntry:
       type: object

@@ -1,11 +1,23 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
+import {
+  useListRelationships,
+  useListExpansionPipeline,
+} from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
-import { Flag, AlertTriangle, ListChecks, ArrowUpRight } from "lucide-react";
+import {
+  Flag,
+  AlertTriangle,
+  ListChecks,
+  ArrowUpRight,
+  Snowflake,
+  CalendarClock,
+  TrendingUp,
+} from "lucide-react";
 
 type Filter = "All" | "High priority" | "At risk" | "Due soon" | "Has escalation";
 
@@ -13,8 +25,29 @@ const FILTERS: Filter[] = ["All", "High priority", "At risk", "Due soon", "Has e
 
 export default function GreggToday() {
   const { clients, tasks, escalations } = useStore();
+  const { data: relationships } = useListRelationships();
+  const { data: pipeline } = useListExpansionPipeline();
   const [, setLocation] = useLocation();
   const [filter, setFilter] = useState<Filter>("All");
+
+  const rels = relationships ?? [];
+  const touchesDue = rels
+    .filter((r) => r.cadenceState === "Overdue" || r.cadenceState === "Due soon")
+    .sort((a, b) => (b.daysSinceTouch ?? 0) - (a.daysSinceTouch ?? 0));
+  const goingCold = rels.filter((r) => r.warmth === "Cold");
+  const visitsThisWeek = rels.filter((r) => {
+    if (!r.nextEventDate) return false;
+    const d = new Date(r.nextEventDate);
+    if (isNaN(d.getTime())) return false;
+    const now = new Date();
+    const wk = new Date();
+    wk.setDate(now.getDate() + 7);
+    return d >= now && d <= wk;
+  });
+  const topExpansion = (pipeline ?? [])
+    .slice()
+    .sort((a, b) => b.priorityScore - a.priorityScore)
+    .slice(0, 3);
 
   const openEscalations = escalations.filter(
     (e) => e.status === "Open" || e.status === "Under Review"
@@ -179,6 +212,130 @@ export default function GreggToday() {
             </Button>
           ))}
         </div>
+
+        <section className="mb-10">
+          <div className="flex items-center justify-between border-b border-border pb-2 mb-4">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-foreground/80">
+              Relationship Lane
+            </h2>
+            <Link href="/relationships">
+              <span className="text-xs font-medium text-accent hover:underline cursor-pointer">
+                Open radar
+              </span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <Card className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CalendarClock className="h-4 w-4" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.1em]">
+                  Touches Due
+                </span>
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">
+                {touchesDue.length}
+              </div>
+              <div className="mt-2 space-y-1">
+                {touchesDue.slice(0, 3).map((r) => (
+                  <Link key={r.clientId} href={`/clients/${r.clientId}`}>
+                    <div className="flex items-center justify-between text-xs cursor-pointer hover:text-foreground text-muted-foreground">
+                      <span className="truncate">{r.clientName}</span>
+                      <span className="tabular-nums shrink-0 ml-2">
+                        {r.daysSinceTouch == null ? "—" : `${r.daysSinceTouch}d`}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+                {touchesDue.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">All current.</p>
+                ) : null}
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CalendarClock className="h-4 w-4" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.1em]">
+                  Visits This Week
+                </span>
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">
+                {visitsThisWeek.length}
+              </div>
+              <div className="mt-2 space-y-1">
+                {visitsThisWeek.slice(0, 3).map((r) => (
+                  <Link key={r.clientId} href={`/clients/${r.clientId}`}>
+                    <div className="flex items-center justify-between text-xs cursor-pointer hover:text-foreground text-muted-foreground">
+                      <span className="truncate">{r.clientName}</span>
+                      <span className="tabular-nums shrink-0 ml-2">
+                        {r.nextEventDate}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+                {visitsThisWeek.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">None scheduled.</p>
+                ) : null}
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Snowflake className="h-4 w-4" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.1em]">
+                  Going Cold
+                </span>
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">
+                {goingCold.length}
+              </div>
+              <div className="mt-2 space-y-1">
+                {goingCold.slice(0, 3).map((r) => (
+                  <Link key={r.clientId} href={`/clients/${r.clientId}`}>
+                    <div className="flex items-center justify-between text-xs cursor-pointer hover:text-foreground text-muted-foreground">
+                      <span className="truncate">{r.clientName}</span>
+                      <span className="tabular-nums shrink-0 ml-2">
+                        {r.daysSinceTouch == null ? "—" : `${r.daysSinceTouch}d`}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+                {goingCold.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">None cold.</p>
+                ) : null}
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.1em]">
+                  Top Expansion
+                </span>
+              </div>
+              <div className="mt-2 space-y-1.5">
+                {topExpansion.map((o) => (
+                  <Link key={o.milestone.id} href={`/clients/${o.milestone.clientId}`}>
+                    <div className="text-xs cursor-pointer hover:text-foreground text-muted-foreground">
+                      <div className="flex items-center justify-between">
+                        <span className="truncate font-medium text-foreground">
+                          {o.clientName}
+                        </span>
+                        <span className="tabular-nums shrink-0 ml-2">
+                          {o.priorityScore}
+                        </span>
+                      </div>
+                      <span className="truncate block">{o.milestone.title}</span>
+                    </div>
+                  </Link>
+                ))}
+                {topExpansion.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No open items.</p>
+                ) : null}
+              </div>
+            </Card>
+          </div>
+        </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <section>

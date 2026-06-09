@@ -51,6 +51,10 @@ export const ListClientsResponseItem = zod.object({
   "nextAction": zod.string(),
   "nextOwner": zod.string(),
   "nextOwnerUserId": zod.string().nullish(),
+  "coOwner": zod.string(),
+  "coOwnerUserId": zod.string().nullish(),
+  "involvementState": zod.string(),
+  "touchCadenceDays": zod.number(),
   "dueDate": zod.string(),
   "missingInformation": zod.string(),
   "openTasks": zod.number(),
@@ -103,6 +107,10 @@ export const GetClientDetailResponse = zod.object({
   "nextAction": zod.string(),
   "nextOwner": zod.string(),
   "nextOwnerUserId": zod.string().nullish(),
+  "coOwner": zod.string(),
+  "coOwnerUserId": zod.string().nullish(),
+  "involvementState": zod.string(),
+  "touchCadenceDays": zod.number(),
   "dueDate": zod.string(),
   "missingInformation": zod.string(),
   "openTasks": zod.number(),
@@ -215,9 +223,15 @@ export const GetClientDetailResponse = zod.object({
   "clientId": zod.string(),
   "title": zod.string(),
   "stage": zod.string(),
+  "status": zod.string(),
   "potentialValue": zod.number(),
   "targetDate": zod.string(),
-  "description": zod.string()
+  "description": zod.string(),
+  "owner": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "pinned": zod.boolean(),
+  "priorityBoost": zod.number(),
+  "lastMovementAt": zod.string()
 })),
   "invoices": zod.array(zod.object({
   "id": zod.string(),
@@ -246,7 +260,9 @@ export const GetClientDetailResponse = zod.object({
   "date": zod.string(),
   "time": zod.string(),
   "attendees": zod.string(),
-  "withClient": zod.boolean()
+  "withClient": zod.boolean(),
+  "status": zod.string(),
+  "owner": zod.string()
 })),
   "contactLog": zod.array(zod.object({
   "id": zod.string(),
@@ -279,6 +295,9 @@ export const UpdateClientBody = zod.object({
   "lastMeaningfulContact": zod.string().optional(),
   "nextAction": zod.string().optional(),
   "nextOwner": zod.string().optional(),
+  "coOwner": zod.string().optional(),
+  "involvementState": zod.string().optional(),
+  "touchCadenceDays": zod.number().optional(),
   "dueDate": zod.string().optional(),
   "missingInformation": zod.string().optional()
 })
@@ -297,6 +316,10 @@ export const UpdateClientResponse = zod.object({
   "nextAction": zod.string(),
   "nextOwner": zod.string(),
   "nextOwnerUserId": zod.string().nullish(),
+  "coOwner": zod.string(),
+  "coOwnerUserId": zod.string().nullish(),
+  "involvementState": zod.string(),
+  "touchCadenceDays": zod.number(),
   "dueDate": zod.string(),
   "missingInformation": zod.string(),
   "openTasks": zod.number(),
@@ -773,6 +796,10 @@ export const ExportDataResponse = zod.object({
   "nextAction": zod.string(),
   "nextOwner": zod.string(),
   "nextOwnerUserId": zod.string().nullish(),
+  "coOwner": zod.string(),
+  "coOwnerUserId": zod.string().nullish(),
+  "involvementState": zod.string(),
+  "touchCadenceDays": zod.number(),
   "dueDate": zod.string(),
   "missingInformation": zod.string(),
   "openTasks": zod.number(),
@@ -904,6 +931,251 @@ export const UpdateUserResponse = zod.object({
   "displayName": zod.string(),
   "role": zod.string(),
   "active": zod.boolean()
+})
+
+
+/**
+ * @summary List portfolio relationship summaries (warmth / cadence radar)
+ */
+export const ListRelationshipsQueryParams = zod.object({
+  "owner": zod.coerce.string().optional(),
+  "warmth": zod.coerce.string().optional(),
+  "sharedWithTara": zod.coerce.boolean().optional()
+})
+
+export const ListRelationshipsResponseItem = zod.object({
+  "clientId": zod.string(),
+  "clientName": zod.string(),
+  "companyName": zod.string(),
+  "owner": zod.string(),
+  "coOwner": zod.string(),
+  "involvementState": zod.string(),
+  "clientStatus": zod.string(),
+  "riskLevel": zod.string(),
+  "greggPriority": zod.string(),
+  "lastMeaningfulContact": zod.string(),
+  "lastTouchDate": zod.string(),
+  "daysSinceTouch": zod.number().nullable(),
+  "touchCadenceDays": zod.number(),
+  "warmth": zod.string(),
+  "cadenceState": zod.string(),
+  "nextEventDate": zod.string(),
+  "nextEventTitle": zod.string(),
+  "openExpansionCount": zod.number()
+})
+export const ListRelationshipsResponse = zod.array(ListRelationshipsResponseItem)
+
+
+/**
+ * @summary List portfolio-wide expansion opportunities, scored and sorted
+ */
+export const ListExpansionPipelineQueryParams = zod.object({
+  "owner": zod.coerce.string().optional(),
+  "stage": zod.coerce.string().optional(),
+  "sharedWithTara": zod.coerce.boolean().optional()
+})
+
+export const ListExpansionPipelineResponseItem = zod.object({
+  "milestone": zod.object({
+  "id": zod.string(),
+  "clientId": zod.string(),
+  "title": zod.string(),
+  "stage": zod.string(),
+  "status": zod.string(),
+  "potentialValue": zod.number(),
+  "targetDate": zod.string(),
+  "description": zod.string(),
+  "owner": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "pinned": zod.boolean(),
+  "priorityBoost": zod.number(),
+  "lastMovementAt": zod.string()
+}),
+  "clientName": zod.string(),
+  "companyName": zod.string(),
+  "riskLevel": zod.string(),
+  "priorityScore": zod.number(),
+  "stalled": zod.boolean(),
+  "daysSinceMovement": zod.number(),
+  "sharedWithTara": zod.boolean()
+})
+export const ListExpansionPipelineResponse = zod.array(ListExpansionPipelineResponseItem)
+
+
+/**
+ * @summary Create an expansion milestone
+ */
+export const CreateExpansionMilestoneBody = zod.object({
+  "clientId": zod.string(),
+  "title": zod.string(),
+  "stage": zod.string(),
+  "status": zod.string().optional(),
+  "potentialValue": zod.number().optional(),
+  "targetDate": zod.string().optional(),
+  "description": zod.string().optional(),
+  "owner": zod.string().optional(),
+  "pinned": zod.boolean().optional(),
+  "priorityBoost": zod.number().optional()
+})
+
+
+/**
+ * @summary Update an expansion milestone
+ */
+export const UpdateExpansionMilestoneParams = zod.object({
+  "milestoneId": zod.coerce.string()
+})
+
+export const UpdateExpansionMilestoneBody = zod.object({
+  "title": zod.string().optional(),
+  "stage": zod.string().optional(),
+  "status": zod.string().optional(),
+  "potentialValue": zod.number().optional(),
+  "targetDate": zod.string().optional(),
+  "description": zod.string().optional(),
+  "owner": zod.string().optional(),
+  "pinned": zod.boolean().optional(),
+  "priorityBoost": zod.number().optional()
+})
+
+export const UpdateExpansionMilestoneResponse = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string(),
+  "title": zod.string(),
+  "stage": zod.string(),
+  "status": zod.string(),
+  "potentialValue": zod.number(),
+  "targetDate": zod.string(),
+  "description": zod.string(),
+  "owner": zod.string(),
+  "ownerUserId": zod.string().nullish(),
+  "pinned": zod.boolean(),
+  "priorityBoost": zod.number(),
+  "lastMovementAt": zod.string()
+})
+
+
+/**
+ * @summary List scheduled events
+ */
+export const ListScheduledEventsQueryParams = zod.object({
+  "clientId": zod.coerce.string().optional(),
+  "owner": zod.coerce.string().optional()
+})
+
+export const ListScheduledEventsResponseItem = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string(),
+  "title": zod.string(),
+  "type": zod.string(),
+  "date": zod.string(),
+  "time": zod.string(),
+  "attendees": zod.string(),
+  "withClient": zod.boolean(),
+  "status": zod.string(),
+  "owner": zod.string()
+})
+export const ListScheduledEventsResponse = zod.array(ListScheduledEventsResponseItem)
+
+
+/**
+ * @summary Create a scheduled event
+ */
+export const CreateScheduledEventBody = zod.object({
+  "clientId": zod.string(),
+  "title": zod.string(),
+  "type": zod.string(),
+  "date": zod.string().optional(),
+  "time": zod.string().optional(),
+  "attendees": zod.string().optional(),
+  "withClient": zod.boolean().optional(),
+  "status": zod.string().optional(),
+  "owner": zod.string().optional()
+})
+
+
+/**
+ * @summary Update a scheduled event
+ */
+export const UpdateScheduledEventParams = zod.object({
+  "eventId": zod.coerce.string()
+})
+
+export const UpdateScheduledEventBody = zod.object({
+  "title": zod.string().optional(),
+  "type": zod.string().optional(),
+  "date": zod.string().optional(),
+  "time": zod.string().optional(),
+  "attendees": zod.string().optional(),
+  "withClient": zod.boolean().optional(),
+  "status": zod.string().optional(),
+  "owner": zod.string().optional()
+})
+
+export const UpdateScheduledEventResponse = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string(),
+  "title": zod.string(),
+  "type": zod.string(),
+  "date": zod.string(),
+  "time": zod.string(),
+  "attendees": zod.string(),
+  "withClient": zod.boolean(),
+  "status": zod.string(),
+  "owner": zod.string()
+})
+
+
+/**
+ * @summary Log a relationship touch (call, email, visit, meal)
+ */
+export const CreateContactLogEntryBody = zod.object({
+  "clientId": zod.string(),
+  "date": zod.string().optional(),
+  "channel": zod.string(),
+  "internalPerson": zod.string().optional(),
+  "direction": zod.string().optional(),
+  "summary": zod.string().optional()
+})
+
+
+/**
+ * @summary Hand off a client to another owner and set involvement state
+ */
+export const HandoffClientParams = zod.object({
+  "clientId": zod.coerce.string()
+})
+
+export const HandoffClientBody = zod.object({
+  "toOwner": zod.string(),
+  "involvementState": zod.string().optional(),
+  "note": zod.string().optional()
+})
+
+export const HandoffClientResponse = zod.object({
+  "id": zod.string(),
+  "clientName": zod.string(),
+  "companyName": zod.string(),
+  "contactName": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string(),
+  "clientStatus": zod.string(),
+  "greggPriority": zod.string(),
+  "riskLevel": zod.string(),
+  "lastMeaningfulContact": zod.string(),
+  "nextAction": zod.string(),
+  "nextOwner": zod.string(),
+  "nextOwnerUserId": zod.string().nullish(),
+  "coOwner": zod.string(),
+  "coOwnerUserId": zod.string().nullish(),
+  "involvementState": zod.string(),
+  "touchCadenceDays": zod.number(),
+  "dueDate": zod.string(),
+  "missingInformation": zod.string(),
+  "openTasks": zod.number(),
+  "opportunitySignals": zod.number(),
+  "escalations": zod.number(),
+  "callNotes": zod.number()
 })
 
 

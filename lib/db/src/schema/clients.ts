@@ -1,4 +1,4 @@
-import { date, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { date, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { usersTable } from "./users";
 
 export const clientsTable = pgTable("clients", {
@@ -17,6 +17,12 @@ export const clientsTable = pgTable("clients", {
     onDelete: "set null",
   }),
   nextOwnerLabel: text("next_owner_label").notNull().default(""),
+  coOwnerUserId: uuid("co_owner_user_id").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
+  coOwnerLabel: text("co_owner_label").notNull().default(""),
+  involvementState: text("involvement_state").notNull().default(""),
+  touchCadenceDays: integer("touch_cadence_days").notNull().default(30),
   dueDate: date("due_date", { mode: "string" }),
   missingInformation: text("missing_information").notNull().default("None"),
   createdAt: timestamp("created_at", { withTimezone: true })

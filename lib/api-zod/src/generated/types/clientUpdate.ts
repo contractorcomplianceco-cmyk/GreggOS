@@ -18,6 +18,9 @@ export interface ClientUpdate {
   lastMeaningfulContact?: string;
   nextAction?: string;
   nextOwner?: string;
+  coOwner?: string;
+  involvementState?: string;
+  touchCadenceDays?: number;
   dueDate?: string;
   missingInformation?: string;
 }

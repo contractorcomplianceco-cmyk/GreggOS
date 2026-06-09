@@ -1,11 +1,39 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
-import { useGetClientDetail } from "@workspace/api-client-react";
+import {
+  useGetClientDetail,
+  useUpdateClient,
+  useHandoffClient,
+  useUpdateExpansionMilestone,
+  useListActivity,
+  getGetClientDetailQueryKey,
+  getListActivityQueryKey,
+} from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAudits, useAuditDetail, levelColor, layerAFactors, getPortalBaseUrl } from "@/lib/auditPortal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import {
   ArrowUp,
   ArrowDown,
@@ -26,6 +54,11 @@ import {
   Activity,
   ChevronRight,
   ExternalLink,
+  Pin,
+  PinOff,
+  ArrowRightLeft,
+  History,
+  UserCog,
 } from "lucide-react";
 import type {
   RiskLevel,
@@ -93,6 +126,12 @@ function fmtDate(value: string): string {
   const d = parseDate(value);
   if (!d) return "—";
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function fmtDateTime(value: string): string {
+  const d = parseDate(value);
+  if (!d) return "—";
+  return d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
 function relLabel(value: string): string {
@@ -192,7 +231,7 @@ const INVOICE_BADGE: Record<InvoiceStatus, string> = {
   Overdue: "bg-red-50 text-red-700 border-red-300",
 };
 
-const ROADMAP_STAGES: RoadmapStage[] = ["Identified", "Proposed", "In Discussion", "Committed", "Live"];
+const ROADMAP_STAGES: RoadmapStage[] = ["Identified", "Qualifying", "Proposed", "Negotiation", "Closing"];
 
 function TrendIcon({ trend, invert = false }: { trend: Trend; invert?: boolean }) {
   if (trend === "flat") return <Minus className="h-3.5 w-3.5 text-muted-foreground" />;
@@ -319,9 +358,137 @@ function SectionTitle({ icon, children }: { icon: React.ReactNode; children: Rea
   );
 }
 
+const OWNER_OPTIONS = ["Gregg", "Landon", "Tara"];
+const INVOLVEMENT_OPTIONS = ["Sole", "Shared", "Pre-sale support", "Monitoring", "Handed off"];
+
+function HandoffDialog({
+  clientId,
+  currentOwner,
+  onDone,
+}: {
+  clientId: string;
+  currentOwner: string;
+  onDone: () => void;
+}) {
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [toOwner, setToOwner] = useState("");
+  const [involvementState, setInvolvementState] = useState("Shared");
+  const [note, setNote] = useState("");
+  const handoffM = useHandoffClient({
+    mutation: {
+      onSuccess: () => {
+        toast({ title: "Handoff recorded", description: `Ownership moved to ${toOwner}.` });
+        setOpen(false);
+        setToOwner("");
+        setNote("");
+        onDone();
+      },
+    },
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1.5">
+          <ArrowRightLeft className="h-3.5 w-3.5" /> Hand off
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hand off client</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <p className="text-sm text-muted-foreground">
+            Current owner: <span className="font-medium text-foreground">{currentOwner}</span>
+          </p>
+          <div className="space-y-1.5">
+            <Label>Hand off to</Label>
+            <Select value={toOwner} onValueChange={setToOwner}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select new owner" />
+              </SelectTrigger>
+              <SelectContent>
+                {OWNER_OPTIONS.filter((o) => o !== currentOwner).map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Outgoing owner involvement</Label>
+            <Select value={involvementState} onValueChange={setInvolvementState}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {INVOLVEMENT_OPTIONS.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Handoff note (optional)</Label>
+            <Textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Context for the receiving owner…"
+              rows={3}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!toOwner || handoffM.isPending}
+            onClick={() =>
+              handoffM.mutate({
+                clientId,
+                data: { toOwner, involvementState, note: note.trim() || undefined },
+              })
+            }
+          >
+            {handoffM.isPending ? "Recording…" : "Record handoff"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function ClientDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: detail } = useGetClientDetail(id);
+  const qc = useQueryClient();
+  const { toast } = useToast();
+
+  const { data: activity } = useListActivity(
+    { clientId: id, limit: 30 },
+    { query: { queryKey: getListActivityQueryKey({ clientId: id, limit: 30 }) } }
+  );
+
+  const invalidateClient = () => {
+    qc.invalidateQueries({ queryKey: getGetClientDetailQueryKey(id) });
+    qc.invalidateQueries({ queryKey: getListActivityQueryKey({ clientId: id, limit: 30 }) });
+    // Pin/boost, overlap and handoff changes also feed the portfolio views.
+    qc.invalidateQueries({ queryKey: ["/api/expansion-pipeline"] });
+    qc.invalidateQueries({ queryKey: ["/api/relationships"] });
+    qc.invalidateQueries({ queryKey: ["/api/clients"] });
+  };
+
+  const updateClientM = useUpdateClient({
+    mutation: { onSuccess: invalidateClient },
+  });
+  const updateMilestoneM = useUpdateExpansionMilestone({
+    mutation: { onSuccess: invalidateClient },
+  });
 
   const clients = (detail?.client ? [detail.client] : []) as unknown as CurrentClient[];
   const callNotes = (detail?.callNotes ?? []) as unknown as CallNote[];
@@ -538,6 +705,74 @@ export default function ClientDetail() {
             </div>
           </div>
         </div>
+
+        {/* Overlap & handoff */}
+        <Card id="section-overlap" className="scroll-mt-6">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <SectionTitle icon={<UserCog className="h-4 w-4" />}>Ownership & Overlap</SectionTitle>
+              <HandoffDialog clientId={client.id} currentOwner={client.nextOwner} onDone={invalidateClient} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Co-owner</Label>
+                <Select
+                  value={client.coOwner || "__none__"}
+                  onValueChange={(v) =>
+                    updateClientM.mutate({ clientId: client.id, data: { coOwner: v === "__none__" ? "" : v } })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">None</SelectItem>
+                    {OWNER_OPTIONS.filter((o) => o !== client.nextOwner).map((o) => (
+                      <SelectItem key={o} value={o}>
+                        {o}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Involvement state</Label>
+                <Select
+                  value={client.involvementState || "Sole"}
+                  onValueChange={(v) => updateClientM.mutate({ clientId: client.id, data: { involvementState: v } })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INVOLVEMENT_OPTIONS.map((o) => (
+                      <SelectItem key={o} value={o}>
+                        {o}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Touch cadence (days)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  defaultValue={client.touchCadenceDays}
+                  key={client.touchCadenceDays}
+                  onBlur={(e) => {
+                    const n = parseInt(e.target.value, 10);
+                    if (!Number.isNaN(n) && n > 0 && n !== client.touchCadenceDays) {
+                      updateClientM.mutate({ clientId: client.id, data: { touchCadenceDays: n } });
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Critical alerts */}
         {alerts.length > 0 && (
@@ -924,12 +1159,66 @@ export default function ClientDetail() {
                     {data.roadmap.map((x) => {
                       const stageIdx = ROADMAP_STAGES.indexOf(x.stage);
                       return (
-                        <div key={x.id} className="rounded-md border p-3">
+                        <div key={x.id} className={`rounded-md border p-3 ${x.pinned ? "border-cyan-300 bg-cyan-50/40" : ""}`}>
                           <div className="flex items-start justify-between gap-2">
-                            <div className="font-medium text-sm">{x.title}</div>
-                            <div className="text-sm font-semibold text-cyan-700 whitespace-nowrap">{money(x.potentialValue)}</div>
+                            <div className="flex items-center gap-1.5 font-medium text-sm">
+                              {x.pinned && <Pin className="h-3.5 w-3.5 text-cyan-700" />}
+                              {x.title}
+                              {x.priorityBoost > 0 && (
+                                <Badge variant="outline" className="border-cyan-300 text-cyan-700">+{x.priorityBoost} boost</Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 whitespace-nowrap">
+                              <div className="text-sm font-semibold text-cyan-700">{money(x.potentialValue)}</div>
+                              <div className="flex items-center gap-0.5">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  title={x.pinned ? "Unpin" : "Pin"}
+                                  disabled={updateMilestoneM.isPending}
+                                  onClick={() =>
+                                    updateMilestoneM.mutate({ milestoneId: x.id, data: { pinned: !x.pinned } })
+                                  }
+                                >
+                                  {x.pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  title="Boost priority"
+                                  disabled={updateMilestoneM.isPending}
+                                  onClick={() =>
+                                    updateMilestoneM.mutate({
+                                      milestoneId: x.id,
+                                      data: { priorityBoost: Math.min(x.priorityBoost + 10, 50) },
+                                    })
+                                  }
+                                >
+                                  <ArrowUp className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  title="Lower priority"
+                                  disabled={updateMilestoneM.isPending || x.priorityBoost <= 0}
+                                  onClick={() =>
+                                    updateMilestoneM.mutate({
+                                      milestoneId: x.id,
+                                      data: { priorityBoost: Math.max(x.priorityBoost - 10, 0) },
+                                    })
+                                  }
+                                >
+                                  <ArrowDown className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-xs text-muted-foreground mb-2">{x.description} · target {fmtDate(x.targetDate)}</div>
+                          <div className="text-xs text-muted-foreground mb-2">
+                            {x.description} · {x.owner} · target {fmtDate(x.targetDate)}
+                          </div>
                           <div className="flex items-center gap-1">
                             {ROADMAP_STAGES.map((stage, i) => (
                               <div key={stage} className="flex-1 flex flex-col items-center gap-1">
@@ -947,6 +1236,33 @@ export default function ClientDetail() {
                       );
                     })}
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Shared activity timeline */}
+            <Card id="section-activity" className="scroll-mt-6 transition-all">
+              <CardHeader className="pb-3">
+                <SectionTitle icon={<History className="h-4 w-4" />}>Shared Activity Timeline</SectionTitle>
+              </CardHeader>
+              <CardContent>
+                {!activity || activity.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No recorded activity yet.</p>
+                ) : (
+                  <ol className="relative space-y-3 border-l pl-4">
+                    {activity.map((a) => (
+                      <li key={a.id} className="relative">
+                        <span className="absolute -left-[1.3rem] top-1 h-2 w-2 rounded-full bg-cyan-600" />
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-sm font-medium">{a.summary}</span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">{fmtDateTime(a.createdAt)}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {a.actorLabel} · {a.action} · {a.entityType}
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
                 )}
               </CardContent>
             </Card>

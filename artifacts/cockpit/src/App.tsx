@@ -9,6 +9,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import GreggToday from "@/pages/gregg-today";
 import Oversight from "@/pages/oversight";
+import Expansion from "@/pages/expansion";
+import Relationships from "@/pages/relationships";
 import WorkQueue from "@/pages/work-queue";
 import Clients from "@/pages/clients";
 import ClientDetail from "@/pages/client-detail";
@@ -221,6 +223,8 @@ function ClerkProviderWithRoutes() {
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/oversight" component={guarded(Oversight)} />
+            <Route path="/expansion" component={guarded(Expansion)} />
+            <Route path="/relationships" component={guarded(Relationships)} />
             <Route path="/work-queue" component={guarded(WorkQueue)} />
             <Route path="/clients" component={guarded(Clients)} />
             <Route path="/clients/:id" component={guarded(ClientDetail)} />

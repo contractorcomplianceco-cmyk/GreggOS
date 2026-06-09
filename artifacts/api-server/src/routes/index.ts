@@ -10,6 +10,10 @@ import escalationsRouter from "./escalations";
 import activityRouter from "./activity";
 import viewStateRouter from "./viewState";
 import adminRouter from "./admin";
+import relationshipsRouter from "./relationships";
+import expansionRouter from "./expansion";
+import scheduledEventsRouter from "./scheduledEvents";
+import contactLogRouter from "./contactLog";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -28,5 +32,9 @@ router.use(escalationsRouter);
 router.use(activityRouter);
 router.use(viewStateRouter);
 router.use(adminRouter);
+router.use(relationshipsRouter);
+router.use(expansionRouter);
+router.use(scheduledEventsRouter);
+router.use(contactLogRouter);
 
 export default router;

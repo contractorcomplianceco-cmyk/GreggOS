@@ -114,9 +114,19 @@ export const expansionMilestonesTable = pgTable("expansion_milestones", {
     .references(() => clientsTable.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   stage: text("stage").notNull(),
+  status: text("status").notNull().default("Open"),
   potentialValue: integer("potential_value").notNull().default(0),
   targetDate: date("target_date", { mode: "string" }),
   description: text("description").notNull().default(""),
+  ownerUserId: uuid("owner_user_id").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
+  ownerLabel: text("owner_label").notNull().default(""),
+  pinned: boolean("pinned").notNull().default(false),
+  priorityBoost: integer("priority_boost").notNull().default(0),
+  lastMovementAt: timestamp("last_movement_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -161,6 +171,8 @@ export const scheduledEventsTable = pgTable("scheduled_events", {
   time: time("time"),
   attendees: text("attendees").notNull().default(""),
   withClient: boolean("with_client").notNull().default(false),
+  status: text("status").notNull().default("Planned"),
+  ownerLabel: text("owner_label").notNull().default(""),
 });
 
 export const contactLogTable = pgTable("contact_log", {
