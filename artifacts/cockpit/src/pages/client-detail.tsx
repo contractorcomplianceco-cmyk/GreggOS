@@ -2,6 +2,7 @@ import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { useStore } from "@/lib/store";
 import { useParams, Link } from "wouter";
 import { useMemo } from "react";
+import { useAudits, levelColor } from "@/lib/auditPortal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -209,6 +210,7 @@ export default function ClientDetail() {
   const { clients, callNotes, tasks, escalations, signals, processes, audits, riskProfiles, expansion, invoices, slas, events, contactLog } = store;
 
   const client = clients.find((c) => c.id === id);
+  const { data: liveAudits } = useAudits();
 
   const data = useMemo(() => {
     if (!client) return null;
@@ -293,6 +295,11 @@ export default function ClientDetail() {
   }
 
   const isHighRisk = client.riskLevel === "High" || client.riskLevel === "Critical";
+
+  const norm = (s: string) => s.toLowerCase().replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
+  const liveAudit = liveAudits?.find(
+    (a) => norm(a.clientName) === norm(client.clientName) || norm(a.clientName) === norm(client.companyName),
+  );
 
   // Build critical alerts.
   const alerts: { label: string; detail: string }[] = [];
@@ -490,11 +497,24 @@ export default function ClientDetail() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <SectionTitle icon={<ClipboardCheck className="h-4 w-4" />}>Audit Status & Scoresheet</SectionTitle>
-                  {data.audit && (
-                    <Badge variant="outline" className={AUDIT_BADGE[data.audit.status]}>
-                      {data.audit.status}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {liveAudit && (
+                      <Link href="/audit-risk">
+                        <span
+                          className="inline-flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
+                          style={{ backgroundColor: `${levelColor(liveAudit.finalLevel)}1a`, color: levelColor(liveAudit.finalLevel) }}
+                          title="Live audit from CCA Audit Risk Portal"
+                        >
+                          <ShieldAlert className="h-3 w-3" /> Live: {liveAudit.finalStatus}
+                        </span>
+                      </Link>
+                    )}
+                    {data.audit && (
+                      <Badge variant="outline" className={AUDIT_BADGE[data.audit.status]}>
+                        {data.audit.status}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>

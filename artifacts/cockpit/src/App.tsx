@@ -8,6 +8,7 @@ import Oversight from "@/pages/oversight";
 import WorkQueue from "@/pages/work-queue";
 import Clients from "@/pages/clients";
 import ClientDetail from "@/pages/client-detail";
+import AuditRisk from "@/pages/audit-risk";
 import Processor from "@/pages/processor";
 import WeeklyReview from "@/pages/weekly-review";
 import Admin from "@/pages/admin";
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/work-queue" component={WorkQueue} />
       <Route path="/clients" component={Clients} />
       <Route path="/clients/:id" component={ClientDetail} />
+      <Route path="/audit-risk" component={AuditRisk} />
       <Route path="/processor" component={Processor} />
       <Route path="/weekly-review" component={WeeklyReview} />
       <Route path="/admin" component={Admin} />

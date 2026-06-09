@@ -1,6 +1,6 @@
 # Gregg + Landon Current Client Cockpit
 
-An internal operational web app for Contractor Compliance Authority that helps Gregg and Landon manage current-client relationships: triaging priorities, processing raw call notes into reviewed CRM-ready drafts, tracking tasks/escalations/opportunities, and running a weekly review. Frontend-only with localStorage persistence — no backend or live integrations.
+An internal operational web app for Contractor Compliance Authority that helps Gregg and Landon manage current-client relationships: triaging priorities, processing raw call notes into reviewed CRM-ready drafts, tracking tasks/escalations/opportunities, and running a weekly review. Frontend-only with localStorage persistence for cockpit data; it also reads LIVE audit data from the external CCA Audit Risk Portal (read-only, direct browser fetch).
 
 ## Run & Operate
 
@@ -18,6 +18,8 @@ An internal operational web app for Contractor Compliance Authority that helps G
 ## Where things live
 
 - `artifacts/cockpit/src/lib/types.ts` — data model (CurrentClient, CallNote, Task, OpportunitySignal, Escalation) and enums
+- `artifacts/cockpit/src/lib/auditPortal.ts` — live audit portal client: types + React Query hooks (`useAudits`, `useAuditDetail`, `useAuditPortalHealth`), base-URL helper (localStorage override, key `cockpit-audit-portal-url`), and `levelColor`/`layerAFactors` helpers
+- `artifacts/cockpit/src/pages/audit-risk.tsx` — live Audit Risk page (connection pill, audits list, detail: score summary, Layer A scoresheet, entity profile, findings, documents, monitoring)
 - `artifacts/cockpit/src/lib/store.ts` — Zustand store, persistence, and the `saveProcessedNote` action
 - `artifacts/cockpit/src/lib/seed.ts` — sample data (6 clients, 8 call notes, tasks/signals/escalations)
 - `artifacts/cockpit/src/pages/*.tsx` — six screens: gregg-today, work-queue, clients, client-detail, processor, weekly-review, admin
@@ -26,6 +28,8 @@ An internal operational web app for Contractor Compliance Authority that helps G
 ## Architecture decisions
 
 - This is intentionally a no-backend product: api-server and mockup-sandbox artifacts exist in the monorepo but are NOT part of this app.
+- Live audit data comes from the external CCA Audit Risk Portal (`https://audit-risk-model.replit.app`, endpoints `/api/audits`, `/api/audits/:id`, `/api/healthz`). The portal serves an OPEN, public CORS API (reflects any Origin), so the cockpit fetches it directly from the browser via React Query — no proxy/backend of our own. Read-only. Security note: those endpoints are public and unauthenticated at the portal; any cockpit user (and anyone hitting the portal) can read full audit payloads incl. EIN/financials. Locking that down would require auth on the portal itself, not a cockpit-side proxy.
+- The cockpit client ↔ live audit linkage on client-detail is best-effort name matching (normalized clientName/companyName), since the two systems share no common ID. A non-matching client simply shows no Live badge.
 - `saveProcessedNote` is the single source of truth for the Call Note Processor save flow: it upserts the call note and atomically regenerates the note's tasks/signals/escalations (matched by `sourceCallNoteId`) and recomputes the related client's `nextAction`, owner, due date, missing info, and counters.
 - Each `nextActions` line in the processor becomes a separate task.
 - Persist `version` is bumped when the seed shape changes so stale localStorage is replaced with the new seed.

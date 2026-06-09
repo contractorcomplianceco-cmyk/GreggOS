@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3 } from "lucide-react";
+import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert } from "lucide-react";
 import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
@@ -10,6 +10,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
     { name: "Account Oversight", href: "/oversight", icon: BarChart3 },
     { name: "Landon Work Queue", href: "/work-queue", icon: CheckSquare },
     { name: "Current Clients", href: "/clients", icon: Users },
+    { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },
     { name: "Call Note Processor", href: "/processor", icon: Briefcase },
     { name: "Weekly Review", href: "/weekly-review", icon: Calendar },
     { name: "Admin / Setup", href: "/admin", icon: Settings },
