@@ -35,6 +35,21 @@ import type {
   InvoiceStatus,
 } from "@/lib/types";
 
+const BASE_URL = import.meta.env.BASE_URL;
+
+function scrollToSection(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  el.classList.add("ring-2", "ring-primary", "ring-offset-2");
+  window.setTimeout(() => el.classList.remove("ring-2", "ring-primary", "ring-offset-2"), 1600);
+}
+
+function openNote(noteId: string | null | undefined) {
+  if (!noteId) return;
+  window.location.href = `${BASE_URL}processor?noteId=${encodeURIComponent(noteId)}`;
+}
+
 function parseDate(value: string): Date | null {
   if (!value) return null;
   const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
@@ -172,6 +187,7 @@ function Kpi({
   sub,
   accent,
   alert = false,
+  targetId,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -179,9 +195,28 @@ function Kpi({
   sub?: string;
   accent: string;
   alert?: boolean;
+  targetId?: string;
 }) {
+  const clickable = !!targetId;
   return (
-    <Card className={`relative overflow-hidden ${alert ? "border-red-300" : ""}`}>
+    <Card
+      className={`relative overflow-hidden transition ${alert ? "border-red-300" : ""} ${
+        clickable ? "cursor-pointer hover:shadow-md hover:border-primary/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" : ""
+      }`}
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={clickable ? () => scrollToSection(targetId!) : undefined}
+      onKeyDown={
+        clickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                scrollToSection(targetId!);
+              }
+            }
+          : undefined
+      }
+    >
       <div className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: accent }} />
       <CardContent className="p-3 pl-4">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -302,15 +337,15 @@ export default function ClientDetail() {
   );
 
   // Build critical alerts.
-  const alerts: { label: string; detail: string }[] = [];
-  if (client.clientStatus === "At Risk") alerts.push({ label: "Account At Risk", detail: client.nextAction });
-  data.openEscalations.forEach((e) => alerts.push({ label: `Escalation: ${e.reason}`, detail: e.decisionNeeded }));
-  data.missedSlas.forEach((s) => alerts.push({ label: `Missed SLA: ${s.name}`, detail: `${s.description} (due ${relLabel(s.dueDate)})` }));
-  if (data.arOverdue > 0) alerts.push({ label: "Overdue invoice", detail: `${money(data.arOverdue)} past due` });
+  const alerts: { label: string; detail: string; target: string }[] = [];
+  if (client.clientStatus === "At Risk") alerts.push({ label: "Account At Risk", detail: client.nextAction, target: "section-tasks" });
+  data.openEscalations.forEach((e) => alerts.push({ label: `Escalation: ${e.reason}`, detail: e.decisionNeeded, target: "section-escalations" }));
+  data.missedSlas.forEach((s) => alerts.push({ label: `Missed SLA: ${s.name}`, detail: `${s.description} (due ${relLabel(s.dueDate)})`, target: "section-slas" }));
+  if (data.arOverdue > 0) alerts.push({ label: "Overdue invoice", detail: `${money(data.arOverdue)} past due`, target: "section-invoices" });
   data.clientProcesses
     .filter((p) => p.status === "Blocked")
-    .forEach((p) => alerts.push({ label: `Blocked: ${p.name}`, detail: p.blockedReason }));
-  data.overdueTasks.forEach((t) => alerts.push({ label: "Overdue task", detail: `${t.title} (due ${relLabel(t.dueDate)})` }));
+    .forEach((p) => alerts.push({ label: `Blocked: ${p.name}`, detail: p.blockedReason, target: "section-processes" }));
+  data.overdueTasks.forEach((t) => alerts.push({ label: "Overdue task", detail: `${t.title} (due ${relLabel(t.dueDate)})`, target: "section-tasks" }));
 
   return (
     <SidebarLayout>
@@ -335,7 +370,14 @@ export default function ClientDetail() {
               </div>
               <p className="text-muted-foreground">{client.companyName}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                {client.contactName} · {client.phone} · {client.email}
+                {client.contactName} ·{" "}
+                <a href={`tel:${client.phone.replace(/[^+\d]/g, "")}`} className="hover:text-foreground hover:underline">
+                  {client.phone}
+                </a>{" "}
+                ·{" "}
+                <a href={`mailto:${client.email}`} className="hover:text-foreground hover:underline">
+                  {client.email}
+                </a>
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -365,12 +407,18 @@ export default function ClientDetail() {
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
                 {alerts.map((a, i) => (
-                  <li key={i} className="text-sm flex gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
-                    <span>
-                      <span className="font-medium text-red-800">{a.label}.</span>{" "}
-                      <span className="text-red-700/90">{a.detail}</span>
-                    </span>
+                  <li key={i}>
+                    <button
+                      type="button"
+                      onClick={() => scrollToSection(a.target)}
+                      className="group flex w-full gap-2 rounded-md p-1 text-left text-sm transition-colors hover:bg-red-100/70"
+                    >
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+                      <span>
+                        <span className="font-medium text-red-800 group-hover:underline">{a.label}.</span>{" "}
+                        <span className="text-red-700/90">{a.detail}</span>
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -387,6 +435,7 @@ export default function ClientDetail() {
             sub={data.risk ? `trend ${data.risk.trend}` : undefined}
             accent={data.risk ? riskColor(data.risk.overallScore) : "#64748b"}
             alert={!!data.risk && data.risk.overallScore >= 67}
+            targetId="section-risk"
           />
           <Kpi
             icon={<ClipboardCheck className="h-4 w-4" />}
@@ -394,6 +443,7 @@ export default function ClientDetail() {
             value={data.audit && data.audit.overallScore > 0 ? `${data.audit.overallScore}%` : "—"}
             sub={data.audit?.status}
             accent={data.audit && data.audit.overallScore > 0 ? scoreColor(data.audit.overallScore) : "#64748b"}
+            targetId="section-audit"
           />
           <Kpi
             icon={<Workflow className="h-4 w-4" />}
@@ -401,6 +451,7 @@ export default function ClientDetail() {
             value={String(data.openProcesses.length)}
             sub={`${data.clientProcesses.length} total`}
             accent="#1d6fd6"
+            targetId="section-processes"
           />
           <Kpi
             icon={<ListChecks className="h-4 w-4" />}
@@ -409,6 +460,7 @@ export default function ClientDetail() {
             sub={data.overdueTasks.length > 0 ? `${data.overdueTasks.length} overdue` : "on track"}
             accent={data.overdueTasks.length > 0 ? "#dc2626" : "#1d6fd6"}
             alert={data.overdueTasks.length > 0}
+            targetId="section-tasks"
           />
           <Kpi
             icon={<CircleDollarSign className="h-4 w-4" />}
@@ -417,6 +469,7 @@ export default function ClientDetail() {
             sub={data.arOverdue > 0 ? `${money(data.arOverdue)} overdue` : "current"}
             accent={data.arOverdue > 0 ? "#dc2626" : "#16a34a"}
             alert={data.arOverdue > 0}
+            targetId="section-invoices"
           />
           <Kpi
             icon={<Timer className="h-4 w-4" />}
@@ -425,6 +478,7 @@ export default function ClientDetail() {
             sub={data.atRiskSlas.length > 0 ? `${data.atRiskSlas.length} at risk` : undefined}
             accent={data.missedSlas.length > 0 ? "#dc2626" : "#16a34a"}
             alert={data.missedSlas.length > 0}
+            targetId="section-slas"
           />
           <Kpi
             icon={<ShieldAlert className="h-4 w-4" />}
@@ -432,6 +486,7 @@ export default function ClientDetail() {
             value={String(data.openEscalations.length)}
             accent={data.openEscalations.length > 0 ? "#dc2626" : "#16a34a"}
             alert={data.openEscalations.length > 0}
+            targetId={data.clientEscalations.length > 0 ? "section-escalations" : undefined}
           />
           <Kpi
             icon={<TrendingUp className="h-4 w-4" />}
@@ -439,6 +494,7 @@ export default function ClientDetail() {
             value={money(data.pipelineValue)}
             sub={`${data.roadmap.length} opportunities`}
             accent="#0e9bb8"
+            targetId="section-roadmap"
           />
         </div>
 
@@ -447,7 +503,7 @@ export default function ClientDetail() {
           {/* Left + middle (2 cols of content) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Live risk scoring */}
-            <Card>
+            <Card id="section-risk" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <SectionTitle icon={<ShieldAlert className="h-4 w-4" />}>Live Risk Scoring</SectionTitle>
@@ -493,7 +549,7 @@ export default function ClientDetail() {
             </Card>
 
             {/* Audit + scoresheet */}
-            <Card>
+            <Card id="section-audit" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <SectionTitle icon={<ClipboardCheck className="h-4 w-4" />}>Audit Status & Scoresheet</SectionTitle>
@@ -562,7 +618,7 @@ export default function ClientDetail() {
             </Card>
 
             {/* Processes */}
-            <Card>
+            <Card id="section-processes" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <SectionTitle icon={<Workflow className="h-4 w-4" />}>
                   Processing Status ({data.openProcesses.length} open)
@@ -600,7 +656,7 @@ export default function ClientDetail() {
             </Card>
 
             {/* Expansion roadmap */}
-            <Card>
+            <Card id="section-roadmap" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <SectionTitle icon={<GitBranch className="h-4 w-4" />}>Expansion Roadmap</SectionTitle>
@@ -643,7 +699,7 @@ export default function ClientDetail() {
             </Card>
 
             {/* Invoices / AR */}
-            <Card>
+            <Card id="section-invoices" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <SectionTitle icon={<Receipt className="h-4 w-4" />}>Invoices / Accounts Receivable</SectionTitle>
@@ -689,20 +745,26 @@ export default function ClientDetail() {
             </Card>
 
             {/* Recent call notes */}
-            <Card>
+            <Card id="section-notes" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <SectionTitle icon={<Phone className="h-4 w-4" />}>Recent Call Notes</SectionTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {data.notes.length === 0 && <p className="text-sm text-muted-foreground">No call notes yet.</p>}
                 {data.notes.map((note) => (
-                  <div key={note.id} className="rounded-md border p-3">
+                  <button
+                    key={note.id}
+                    type="button"
+                    onClick={() => openNote(note.id)}
+                    className="block w-full rounded-md border p-3 text-left transition-colors hover:border-primary/50 hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    title="Open in Call Note Processor"
+                  >
                     <div className="flex justify-between items-center mb-1">
                       <span className="font-medium text-sm">{fmtDate(note.callDate)} · {note.callType} · {note.caller}</span>
                       <Badge variant="secondary">{note.routingStatus}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">{note.cleanSummary || note.rawRingCentralNote}</p>
-                  </div>
+                  </button>
                 ))}
               </CardContent>
             </Card>
@@ -711,7 +773,7 @@ export default function ClientDetail() {
           {/* Right rail */}
           <div className="space-y-6">
             {/* Next actions / tasks */}
-            <Card>
+            <Card id="section-tasks" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <SectionTitle icon={<ListChecks className="h-4 w-4" />}>Next Action Items</SectionTitle>
               </CardHeader>
@@ -730,8 +792,28 @@ export default function ClientDetail() {
                   {data.clientTasks.length === 0 && <p className="text-sm text-muted-foreground">No tasks.</p>}
                   {data.clientTasks.map((t) => {
                     const overdue = (daysUntil(t.dueDate) ?? 0) < 0 && t.status !== "Completed" && t.status !== "Canceled";
+                    const linkable = !!t.sourceCallNoteId;
                     return (
-                      <div key={t.id} className="flex items-start justify-between gap-2 rounded-md border p-2.5">
+                      <div
+                        key={t.id}
+                        className={`flex items-start justify-between gap-2 rounded-md border p-2.5 ${
+                          linkable ? "cursor-pointer transition-colors hover:border-primary/50 hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" : ""
+                        }`}
+                        role={linkable ? "button" : undefined}
+                        tabIndex={linkable ? 0 : undefined}
+                        onClick={linkable ? () => openNote(t.sourceCallNoteId) : undefined}
+                        onKeyDown={
+                          linkable
+                            ? (e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  openNote(t.sourceCallNoteId);
+                                }
+                              }
+                            : undefined
+                        }
+                        title={linkable ? "Open source call note in Processor" : undefined}
+                      >
                         <div>
                           <div className="text-sm font-medium flex items-center gap-1.5">
                             {t.escalationFlag && <AlertTriangle className="h-3.5 w-3.5 text-red-500" />}
@@ -751,7 +833,7 @@ export default function ClientDetail() {
             </Card>
 
             {/* SLAs */}
-            <Card>
+            <Card id="section-slas" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <SectionTitle icon={<Timer className="h-4 w-4" />}>SLAs</SectionTitle>
               </CardHeader>
@@ -791,7 +873,7 @@ export default function ClientDetail() {
             </Card>
 
             {/* Schedule */}
-            <Card>
+            <Card id="section-schedule" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <SectionTitle icon={<CalendarClock className="h-4 w-4" />}>Schedule with Client</SectionTitle>
               </CardHeader>
@@ -821,7 +903,7 @@ export default function ClientDetail() {
             </Card>
 
             {/* Last contact + contact log */}
-            <Card>
+            <Card id="section-contact" className="scroll-mt-6 transition-all">
               <CardHeader className="pb-3">
                 <SectionTitle icon={<Phone className="h-4 w-4" />}>Contact History</SectionTitle>
               </CardHeader>
@@ -858,13 +940,32 @@ export default function ClientDetail() {
 
             {/* Escalations */}
             {data.clientEscalations.length > 0 && (
-              <Card>
+              <Card id="section-escalations" className="scroll-mt-6 transition-all">
                 <CardHeader className="pb-3">
                   <SectionTitle icon={<ShieldAlert className="h-4 w-4" />}>Escalations</SectionTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {data.clientEscalations.map((esc) => (
-                    <div key={esc.id} className="rounded-md border border-red-200 bg-red-50/60 p-3">
+                    <div
+                      key={esc.id}
+                      className={`rounded-md border border-red-200 bg-red-50/60 p-3 ${
+                        esc.sourceCallNoteId ? "cursor-pointer transition-colors hover:border-red-400 hover:bg-red-100/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" : ""
+                      }`}
+                      role={esc.sourceCallNoteId ? "button" : undefined}
+                      tabIndex={esc.sourceCallNoteId ? 0 : undefined}
+                      onClick={esc.sourceCallNoteId ? () => openNote(esc.sourceCallNoteId) : undefined}
+                      onKeyDown={
+                        esc.sourceCallNoteId
+                          ? (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                openNote(esc.sourceCallNoteId);
+                              }
+                            }
+                          : undefined
+                      }
+                      title={esc.sourceCallNoteId ? "Open source call note in Processor" : undefined}
+                    >
                       <div className="flex justify-between items-start gap-2">
                         <p className="font-medium text-sm text-red-800">{esc.reason}</p>
                         <Badge variant="destructive">{esc.status}</Badge>
@@ -879,13 +980,32 @@ export default function ClientDetail() {
 
             {/* Opportunity signals */}
             {data.clientSignals.length > 0 && (
-              <Card>
+              <Card id="section-signals" className="scroll-mt-6 transition-all">
                 <CardHeader className="pb-3">
                   <SectionTitle icon={<TrendingUp className="h-4 w-4" />}>Opportunity Signals</SectionTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {data.clientSignals.map((s) => (
-                    <div key={s.id} className="rounded-md border p-2.5">
+                    <div
+                      key={s.id}
+                      className={`rounded-md border p-2.5 ${
+                        s.sourceCallNoteId ? "cursor-pointer transition-colors hover:border-primary/50 hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" : ""
+                      }`}
+                      role={s.sourceCallNoteId ? "button" : undefined}
+                      tabIndex={s.sourceCallNoteId ? 0 : undefined}
+                      onClick={s.sourceCallNoteId ? () => openNote(s.sourceCallNoteId) : undefined}
+                      onKeyDown={
+                        s.sourceCallNoteId
+                          ? (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                openNote(s.sourceCallNoteId);
+                              }
+                            }
+                          : undefined
+                      }
+                      title={s.sourceCallNoteId ? "Open source call note in Processor" : undefined}
+                    >
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">{s.type}</span>
                         <Badge variant="outline">{s.status}</Badge>
