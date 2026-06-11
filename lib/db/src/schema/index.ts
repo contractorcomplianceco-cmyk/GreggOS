@@ -5,3 +5,4 @@ export * from "./workItems";
 export * from "./clientContext";
 export * from "./activity";
 export * from "./crm";
+export * from "./communicationDrafts";

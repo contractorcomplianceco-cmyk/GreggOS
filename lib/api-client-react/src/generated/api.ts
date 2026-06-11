@@ -30,6 +30,9 @@ import type {
   ClientDetail,
   ClientInput,
   ClientUpdate,
+  CommunicationDraft,
+  CommunicationDraftGenerateInput,
+  CommunicationDraftUpdate,
   ContactLogEntry,
   ContactLogInput,
   CrmExportPayload,
@@ -54,6 +57,7 @@ import type {
   ListActivityParams,
   ListCallNotesParams,
   ListClientsParams,
+  ListCommunicationDraftsParams,
   ListCrmExportParams,
   ListCrmLinksParams,
   ListEscalationsParams,
@@ -3272,6 +3276,380 @@ export function useListCrmExport<TData = Awaited<ReturnType<typeof listCrmExport
 
 
 
+
+export const getListCommunicationDraftsUrl = (params?: ListCommunicationDraftsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/communication-drafts?${stringifiedParams}` : `/api/communication-drafts`
+}
+
+/**
+ * @summary List saved communication drafts
+ */
+export const listCommunicationDrafts = async (params?: ListCommunicationDraftsParams, options?: RequestInit): Promise<CommunicationDraft[]> => {
+
+  return customFetch<CommunicationDraft[]>(getListCommunicationDraftsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCommunicationDraftsQueryKey = (params?: ListCommunicationDraftsParams,) => {
+    return [
+    `/api/communication-drafts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCommunicationDraftsQueryOptions = <TData = Awaited<ReturnType<typeof listCommunicationDrafts>>, TError = ErrorType<unknown>>(params?: ListCommunicationDraftsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCommunicationDrafts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCommunicationDraftsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCommunicationDrafts>>> = ({ signal }) => listCommunicationDrafts(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCommunicationDrafts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCommunicationDraftsQueryResult = NonNullable<Awaited<ReturnType<typeof listCommunicationDrafts>>>
+export type ListCommunicationDraftsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List saved communication drafts
+ */
+
+export function useListCommunicationDrafts<TData = Awaited<ReturnType<typeof listCommunicationDrafts>>, TError = ErrorType<unknown>>(
+ params?: ListCommunicationDraftsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCommunicationDrafts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCommunicationDraftsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGenerateCommunicationDraftUrl = () => {
+
+
+
+
+  return `/api/communication-drafts/generate`
+}
+
+/**
+ * @summary Generate a client communication draft (AI with template fallback). Draft-only; nothing is sent.
+ */
+export const generateCommunicationDraft = async (communicationDraftGenerateInput: CommunicationDraftGenerateInput, options?: RequestInit): Promise<CommunicationDraft> => {
+
+  return customFetch<CommunicationDraft>(getGenerateCommunicationDraftUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      communicationDraftGenerateInput,)
+  }
+);}
+
+
+
+
+export const getGenerateCommunicationDraftMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateCommunicationDraft>>, TError,{data: BodyType<CommunicationDraftGenerateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateCommunicationDraft>>, TError,{data: BodyType<CommunicationDraftGenerateInput>}, TContext> => {
+
+const mutationKey = ['generateCommunicationDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateCommunicationDraft>>, {data: BodyType<CommunicationDraftGenerateInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateCommunicationDraft(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateCommunicationDraftMutationResult = NonNullable<Awaited<ReturnType<typeof generateCommunicationDraft>>>
+    export type GenerateCommunicationDraftMutationBody = BodyType<CommunicationDraftGenerateInput>
+    export type GenerateCommunicationDraftMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Generate a client communication draft (AI with template fallback). Draft-only; nothing is sent.
+ */
+export const useGenerateCommunicationDraft = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateCommunicationDraft>>, TError,{data: BodyType<CommunicationDraftGenerateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof generateCommunicationDraft>>,
+        TError,
+        {data: BodyType<CommunicationDraftGenerateInput>},
+        TContext
+      > => {
+      return useMutation(getGenerateCommunicationDraftMutationOptions(options));
+    }
+
+export const getGetCommunicationDraftUrl = (draftId: string,) => {
+
+
+
+
+  return `/api/communication-drafts/${draftId}`
+}
+
+/**
+ * @summary Get a communication draft
+ */
+export const getCommunicationDraft = async (draftId: string, options?: RequestInit): Promise<CommunicationDraft> => {
+
+  return customFetch<CommunicationDraft>(getGetCommunicationDraftUrl(draftId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCommunicationDraftQueryKey = (draftId: string,) => {
+    return [
+    `/api/communication-drafts/${draftId}`
+    ] as const;
+    }
+
+
+export const getGetCommunicationDraftQueryOptions = <TData = Awaited<ReturnType<typeof getCommunicationDraft>>, TError = ErrorType<unknown>>(draftId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCommunicationDraft>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCommunicationDraftQueryKey(draftId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCommunicationDraft>>> = ({ signal }) => getCommunicationDraft(draftId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(draftId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCommunicationDraft>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCommunicationDraftQueryResult = NonNullable<Awaited<ReturnType<typeof getCommunicationDraft>>>
+export type GetCommunicationDraftQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get a communication draft
+ */
+
+export function useGetCommunicationDraft<TData = Awaited<ReturnType<typeof getCommunicationDraft>>, TError = ErrorType<unknown>>(
+ draftId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCommunicationDraft>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCommunicationDraftQueryOptions(draftId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateCommunicationDraftUrl = (draftId: string,) => {
+
+
+
+
+  return `/api/communication-drafts/${draftId}`
+}
+
+/**
+ * @summary Edit a communication draft (subject/body/status)
+ */
+export const updateCommunicationDraft = async (draftId: string,
+    communicationDraftUpdate: CommunicationDraftUpdate, options?: RequestInit): Promise<CommunicationDraft> => {
+
+  return customFetch<CommunicationDraft>(getUpdateCommunicationDraftUrl(draftId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      communicationDraftUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateCommunicationDraftMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCommunicationDraft>>, TError,{draftId: string;data: BodyType<CommunicationDraftUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCommunicationDraft>>, TError,{draftId: string;data: BodyType<CommunicationDraftUpdate>}, TContext> => {
+
+const mutationKey = ['updateCommunicationDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCommunicationDraft>>, {draftId: string;data: BodyType<CommunicationDraftUpdate>}> = (props) => {
+          const {draftId,data} = props ?? {};
+
+          return  updateCommunicationDraft(draftId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCommunicationDraftMutationResult = NonNullable<Awaited<ReturnType<typeof updateCommunicationDraft>>>
+    export type UpdateCommunicationDraftMutationBody = BodyType<CommunicationDraftUpdate>
+    export type UpdateCommunicationDraftMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Edit a communication draft (subject/body/status)
+ */
+export const useUpdateCommunicationDraft = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCommunicationDraft>>, TError,{draftId: string;data: BodyType<CommunicationDraftUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateCommunicationDraft>>,
+        TError,
+        {draftId: string;data: BodyType<CommunicationDraftUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateCommunicationDraftMutationOptions(options));
+    }
+
+export const getDeleteCommunicationDraftUrl = (draftId: string,) => {
+
+
+
+
+  return `/api/communication-drafts/${draftId}`
+}
+
+/**
+ * @summary Delete a communication draft
+ */
+export const deleteCommunicationDraft = async (draftId: string, options?: RequestInit): Promise<MutationResult> => {
+
+  return customFetch<MutationResult>(getDeleteCommunicationDraftUrl(draftId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteCommunicationDraftMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCommunicationDraft>>, TError,{draftId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteCommunicationDraft>>, TError,{draftId: string}, TContext> => {
+
+const mutationKey = ['deleteCommunicationDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteCommunicationDraft>>, {draftId: string}> = (props) => {
+          const {draftId} = props ?? {};
+
+          return  deleteCommunicationDraft(draftId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteCommunicationDraftMutationResult = NonNullable<Awaited<ReturnType<typeof deleteCommunicationDraft>>>
+
+    export type DeleteCommunicationDraftMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a communication draft
+ */
+export const useDeleteCommunicationDraft = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCommunicationDraft>>, TError,{draftId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteCommunicationDraft>>,
+        TError,
+        {draftId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteCommunicationDraftMutationOptions(options));
+    }
 
 export const getGetRelationshipReportUrl = (params?: GetRelationshipReportParams,) => {
   const normalizedParams = new URLSearchParams();

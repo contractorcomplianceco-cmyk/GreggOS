@@ -16,6 +16,7 @@ import scheduledEventsRouter from "./scheduledEvents";
 import contactLogRouter from "./contactLog";
 import crmRouter from "./crm";
 import reportsRouter from "./reports";
+import communicationsRouter from "./communications";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -40,5 +41,6 @@ router.use(scheduledEventsRouter);
 router.use(contactLogRouter);
 router.use(crmRouter);
 router.use(reportsRouter);
+router.use(communicationsRouter);
 
 export default router;

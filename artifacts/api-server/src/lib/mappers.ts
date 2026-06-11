@@ -15,6 +15,7 @@ import type {
   ContactLogEntry as DbContactLog,
   ActivityLogEntry as DbActivity,
   CrmLink as DbCrmLink,
+  CommunicationDraft as DbCommunicationDraft,
 } from "@workspace/db";
 import type {
   Client,
@@ -33,6 +34,7 @@ import type {
   ContactLogEntry,
   ActivityLogEntry,
   CrmLink,
+  CommunicationDraft,
 } from "@workspace/api-zod";
 
 const s = (v: string | null | undefined): string => v ?? "";
@@ -281,6 +283,26 @@ export function toContactLog(row: DbContactLog): ContactLogEntry {
     internalPerson: row.internalPerson,
     direction: row.direction,
     summary: row.summary,
+  };
+}
+
+export function toCommunicationDraft(
+  row: DbCommunicationDraft,
+): CommunicationDraft {
+  return {
+    id: row.id,
+    clientId: row.clientId,
+    intent: row.intent,
+    channel: row.channel,
+    tone: row.tone,
+    instructions: row.instructions,
+    subject: row.subject,
+    body: row.body,
+    source: row.source,
+    status: row.status,
+    createdByLabel: row.createdByLabel,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
   };
 }
 

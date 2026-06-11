@@ -17,6 +17,7 @@ import {
   contactLogTable,
   activityLogTable,
   crmLinksTable,
+  communicationDraftsTable,
   type RiskFactor,
   type AuditScoreItem,
 } from "@workspace/db";
@@ -577,6 +578,82 @@ export async function seedDatabase(): Promise<void> {
         internalPerson: cl.internalPerson,
         direction: cl.direction,
         summary: cl.summary,
+      });
+    }
+
+    const commDrafts: Array<{
+      clientKey: string;
+      intent: string;
+      channel: string;
+      tone: string;
+      instructions: string;
+      subject: string;
+      body: string;
+      source: string;
+      createdDaysAgo: number;
+    }> = [
+      {
+        clientKey: "c1",
+        intent: "follow_up",
+        channel: "email",
+        tone: "Warm",
+        instructions: "Reference the renewal conversation and the outstanding W-9.",
+        source: "ai",
+        createdDaysAgo: 1,
+        subject: "Follow-up — ABC Construction LLC",
+        body: [
+          "Hi Dana,",
+          "",
+          "Thank you for the time on our call this week. I wanted to follow up on the next steps we discussed so we keep everything moving smoothly ahead of your renewal.",
+          "",
+          "When you have a moment, could you send over the updated W-9 so we can finalize the file on our end?",
+          "",
+          "Please let me know if any questions come up — I'm glad to help.",
+          "",
+          "Best regards,",
+          "Gregg",
+        ].join("\n"),
+      },
+      {
+        clientKey: "c2",
+        intent: "check_in",
+        channel: "email",
+        tone: "Professional",
+        instructions: "",
+        source: "template",
+        createdDaysAgo: 3,
+        subject: "Relationship check-in — Summit Builders",
+        body: [
+          "Hello,",
+          "",
+          "I wanted to check in and see how things are going on your end.",
+          "",
+          "Our next step is to schedule your quarterly compliance review.",
+          "",
+          "Please let me know if you have any questions — I'm glad to help.",
+          "",
+          "Best regards,",
+          "Gregg",
+        ].join("\n"),
+      },
+    ];
+
+    for (const d of commDrafts) {
+      const cid = clientIds.get(d.clientKey);
+      if (!cid) continue;
+      await tx.insert(communicationDraftsTable).values({
+        clientId: cid,
+        intent: d.intent,
+        channel: d.channel,
+        tone: d.tone,
+        instructions: d.instructions,
+        subject: d.subject,
+        body: d.body,
+        source: d.source,
+        status: "draft",
+        createdByUserId: greggId,
+        createdByLabel: "Gregg",
+        createdAt: new Date(Date.now() - d.createdDaysAgo * 86_400_000),
       });
     }
 

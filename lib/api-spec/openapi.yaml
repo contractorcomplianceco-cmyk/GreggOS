@@ -19,6 +19,7 @@ tags:
   - name: activity
   - name: view-state
   - name: admin
+  - name: communications
 paths:
   /healthz:
     get:
@@ -859,6 +860,89 @@ paths:
                 items:
                   $ref: "#/components/schemas/CrmExportPayload"
 
+  /communication-drafts:
+    get:
+      operationId: listCommunicationDrafts
+      tags: [communications]
+      summary: List saved communication drafts
+      parameters:
+        - { name: clientId, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Communication drafts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommunicationDraft"
+
+  /communication-drafts/generate:
+    post:
+      operationId: generateCommunicationDraft
+      tags: [communications]
+      summary: Generate a client communication draft (AI with template fallback). Draft-only; nothing is sent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunicationDraftGenerateInput"
+      responses:
+        "201":
+          description: Generated and saved draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunicationDraft"
+
+  /communication-drafts/{draftId}:
+    parameters:
+      - name: draftId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getCommunicationDraft
+      tags: [communications]
+      summary: Get a communication draft
+      responses:
+        "200":
+          description: Communication draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunicationDraft"
+    patch:
+      operationId: updateCommunicationDraft
+      tags: [communications]
+      summary: Edit a communication draft (subject/body/status)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunicationDraftUpdate"
+      responses:
+        "200":
+          description: Updated draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunicationDraft"
+    delete:
+      operationId: deleteCommunicationDraft
+      tags: [communications]
+      summary: Delete a communication draft
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
   /reports/relationships:
     get:
       operationId: getRelationshipReport
@@ -1517,6 +1601,60 @@ components:
         - recordTitle
         - syncStatus
         - fields
+
+    CommunicationDraft:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string }
+        intent: { type: string }
+        channel: { type: string }
+        tone: { type: string }
+        instructions: { type: string }
+        subject: { type: string }
+        body: { type: string }
+        source: { type: string }
+        status: { type: string }
+        createdByLabel: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - clientId
+        - intent
+        - channel
+        - tone
+        - instructions
+        - subject
+        - body
+        - source
+        - status
+        - createdByLabel
+        - createdAt
+        - updatedAt
+
+    CommunicationDraftGenerateInput:
+      type: object
+      properties:
+        clientId: { type: string }
+        intent: { type: string }
+        channel: { type: string }
+        tone: { type: string }
+        instructions: { type: string }
+      required: [clientId, intent]
+
+    CommunicationDraftUpdate:
+      type: object
+      properties:
+        subject: { type: string }
+        body: { type: string }
+        intent: { type: string }
+        channel: { type: string }
+        tone: { type: string }
+        status:
+          type: string
+          description: Draft-lifecycle status only. There is no send path.
+          enum: [draft, archived]
 
     RelationshipReport:
       type: object

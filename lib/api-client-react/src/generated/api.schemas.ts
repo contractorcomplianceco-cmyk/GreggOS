@@ -432,6 +432,51 @@ export interface CrmExportPayload {
   fields: CrmExportPayloadFields;
 }
 
+export interface CommunicationDraft {
+  id: string;
+  clientId: string;
+  intent: string;
+  channel: string;
+  tone: string;
+  instructions: string;
+  subject: string;
+  body: string;
+  source: string;
+  status: string;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommunicationDraftGenerateInput {
+  clientId: string;
+  intent: string;
+  channel?: string;
+  tone?: string;
+  instructions?: string;
+}
+
+/**
+ * Draft-lifecycle status only. There is no send path.
+ */
+export type CommunicationDraftUpdateStatus = typeof CommunicationDraftUpdateStatus[keyof typeof CommunicationDraftUpdateStatus];
+
+
+export const CommunicationDraftUpdateStatus = {
+  draft: 'draft',
+  archived: 'archived',
+} as const;
+
+export interface CommunicationDraftUpdate {
+  subject?: string;
+  body?: string;
+  intent?: string;
+  channel?: string;
+  tone?: string;
+  /** Draft-lifecycle status only. There is no send path. */
+  status?: CommunicationDraftUpdateStatus;
+}
+
 export type RelationshipReportByWarmthItem = {
   warmth: string;
   count: number;
@@ -708,6 +753,11 @@ export type ListCrmExportParams = {
 entityType?: string;
 entityId?: string;
 syncStatus?: string;
+};
+
+export type ListCommunicationDraftsParams = {
+clientId?: string;
+status?: string;
 };
 
 export type GetRelationshipReportParams = {

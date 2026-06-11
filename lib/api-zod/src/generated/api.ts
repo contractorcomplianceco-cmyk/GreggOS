@@ -1291,6 +1291,114 @@ export const ListCrmExportResponse = zod.array(ListCrmExportResponseItem)
 
 
 /**
+ * @summary List saved communication drafts
+ */
+export const ListCommunicationDraftsQueryParams = zod.object({
+  "clientId": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListCommunicationDraftsResponseItem = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string(),
+  "intent": zod.string(),
+  "channel": zod.string(),
+  "tone": zod.string(),
+  "instructions": zod.string(),
+  "subject": zod.string(),
+  "body": zod.string(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListCommunicationDraftsResponse = zod.array(ListCommunicationDraftsResponseItem)
+
+
+/**
+ * @summary Generate a client communication draft (AI with template fallback). Draft-only; nothing is sent.
+ */
+export const GenerateCommunicationDraftBody = zod.object({
+  "clientId": zod.string(),
+  "intent": zod.string(),
+  "channel": zod.string().optional(),
+  "tone": zod.string().optional(),
+  "instructions": zod.string().optional()
+})
+
+
+/**
+ * @summary Get a communication draft
+ */
+export const GetCommunicationDraftParams = zod.object({
+  "draftId": zod.coerce.string()
+})
+
+export const GetCommunicationDraftResponse = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string(),
+  "intent": zod.string(),
+  "channel": zod.string(),
+  "tone": zod.string(),
+  "instructions": zod.string(),
+  "subject": zod.string(),
+  "body": zod.string(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Edit a communication draft (subject/body/status)
+ */
+export const UpdateCommunicationDraftParams = zod.object({
+  "draftId": zod.coerce.string()
+})
+
+export const UpdateCommunicationDraftBody = zod.object({
+  "subject": zod.string().optional(),
+  "body": zod.string().optional(),
+  "intent": zod.string().optional(),
+  "channel": zod.string().optional(),
+  "tone": zod.string().optional(),
+  "status": zod.enum(['draft', 'archived']).optional().describe('Draft-lifecycle status only. There is no send path.')
+})
+
+export const UpdateCommunicationDraftResponse = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string(),
+  "intent": zod.string(),
+  "channel": zod.string(),
+  "tone": zod.string(),
+  "instructions": zod.string(),
+  "subject": zod.string(),
+  "body": zod.string(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a communication draft
+ */
+export const DeleteCommunicationDraftParams = zod.object({
+  "draftId": zod.coerce.string()
+})
+
+export const DeleteCommunicationDraftResponse = zod.object({
+  "ok": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
  * @summary Relationship activity report (operational + leadership)
  */
 export const GetRelationshipReportQueryParams = zod.object({

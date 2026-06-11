@@ -3,4 +3,5 @@
 - [Cockpit live audit portal integration](audit-portal-integration.md) — cockpit reads live audits from external open-CORS portal via direct browser fetch; name-match linkage; portal endpoints are public/unauth.
 - [Cockpit data conventions](cockpit-data-conventions.md) — audit.overallScore 0 = "not audited" sentinel; overall health gauge blend/N-A rules
 - [Admin role JIT provisioning](admin-provisioning.md) — seed users break "first user = admin"; promote via SQL or ADMIN_EMAILS; role change needs frontend reload (/api/me cached).
+- [OpenAI integration + AI boundary guard](openai-integration-and-ai-boundary-guard.md) — server-only OpenAI lib (gpt-5.4, no temperature, lazy import); AI features MUST have deterministic template fallback + post-gen boundary guard, not prompt-only.
 - [CRM export lifecycle](crm-export-lifecycle.md) — crm_links approve(POST)/push(PATCH) split is server-enforced (export-only); closedAt server-managed, not a writable input.

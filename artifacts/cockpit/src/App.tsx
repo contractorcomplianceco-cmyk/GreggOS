@@ -12,6 +12,7 @@ import Oversight from "@/pages/oversight";
 import Expansion from "@/pages/expansion";
 import Relationships from "@/pages/relationships";
 import Reporting from "@/pages/reporting";
+import Communications from "@/pages/communications";
 import WorkQueue from "@/pages/work-queue";
 import Clients from "@/pages/clients";
 import ClientDetail from "@/pages/client-detail";
@@ -227,6 +228,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/expansion" component={guarded(Expansion)} />
             <Route path="/relationships" component={guarded(Relationships)} />
             <Route path="/reporting" component={guarded(Reporting)} />
+            <Route path="/communications" component={guarded(Communications)} />
             <Route path="/work-queue" component={guarded(WorkQueue)} />
             <Route path="/clients" component={guarded(Clients)} />
             <Route path="/clients/:id" component={guarded(ClientDetail)} />

@@ -260,6 +260,33 @@ export interface ActivityReport {
   handoffs: number;
 }
 
+export type CommunicationIntent =
+  | 'follow_up'
+  | 'check_in'
+  | 'escalation_ack'
+  | 'expansion_outreach'
+  | 'renewal'
+  | 'other';
+export type CommunicationChannel = 'email' | 'text' | 'call_script';
+export type CommunicationDraftStatus = 'draft' | 'archived';
+export type CommunicationDraftSource = 'ai' | 'template';
+
+export interface CommunicationDraft {
+  id: string;
+  clientId: string;
+  intent: string;
+  channel: string;
+  tone: string;
+  instructions: string;
+  subject: string;
+  body: string;
+  source: string;
+  status: string;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type InvoiceStatus = 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Overdue';
 
 export interface Invoice {
