@@ -1654,7 +1654,7 @@ components:
         status:
           type: string
           description: Draft-lifecycle status only. There is no send path.
-          enum: [draft, archived]
+          enum: [draft, edited, used, discarded]
 
     RelationshipReport:
       type: object

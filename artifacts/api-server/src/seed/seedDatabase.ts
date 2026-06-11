@@ -590,6 +590,7 @@ export async function seedDatabase(): Promise<void> {
       subject: string;
       body: string;
       source: string;
+      status: string;
       createdDaysAgo: number;
     }> = [
       {
@@ -599,6 +600,7 @@ export async function seedDatabase(): Promise<void> {
         tone: "Warm",
         instructions: "Reference the renewal conversation and the outstanding W-9.",
         source: "ai",
+        status: "used",
         createdDaysAgo: 1,
         subject: "Follow-up — ABC Construction LLC",
         body: [
@@ -621,6 +623,7 @@ export async function seedDatabase(): Promise<void> {
         tone: "Professional",
         instructions: "",
         source: "template",
+        status: "draft",
         createdDaysAgo: 3,
         subject: "Relationship check-in — Summit Builders",
         body: [
@@ -650,7 +653,7 @@ export async function seedDatabase(): Promise<void> {
         subject: d.subject,
         body: d.body,
         source: d.source,
-        status: "draft",
+        status: d.status,
         createdByUserId: greggId,
         createdByLabel: "Gregg",
         createdAt: new Date(Date.now() - d.createdDaysAgo * 86_400_000),

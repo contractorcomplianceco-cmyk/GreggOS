@@ -9,7 +9,11 @@ import {
   useUpdateCommunicationDraft,
   useDeleteCommunicationDraft,
 } from "@workspace/api-client-react";
-import type { CommunicationDraft, CurrentClient } from "@/lib/types";
+import type {
+  CommunicationDraft,
+  CommunicationDraftStatus,
+  CurrentClient,
+} from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +28,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Save, Trash2, Copy, FileText } from "lucide-react";
+import {
+  Sparkles,
+  Save,
+  Trash2,
+  Copy,
+  FileText,
+  CheckCheck,
+  Ban,
+  RotateCcw,
+} from "lucide-react";
 
 const INTENTS: { value: string; label: string }[] = [
   { value: "follow_up", label: "Follow-up" },
@@ -43,12 +56,37 @@ const CHANNELS: { value: string; label: string }[] = [
 
 const TONES = ["Warm", "Professional", "Direct", "Reassuring", "Concise"];
 
+const STATUS_LABELS: Record<CommunicationDraftStatus, string> = {
+  draft: "Draft",
+  edited: "Edited",
+  used: "Used",
+  discarded: "Discarded",
+};
+
+function statusVariant(
+  status: string,
+): "default" | "secondary" | "outline" | "destructive" {
+  if (status === "used") return "default";
+  if (status === "discarded") return "destructive";
+  if (status === "edited") return "outline";
+  return "secondary";
+}
+
+function statusLabel(status: string): string {
+  return STATUS_LABELS[status as CommunicationDraftStatus] ?? status;
+}
+
 function intentLabel(value: string): string {
   return INTENTS.find((i) => i.value === value)?.label ?? value;
 }
 
 function channelLabel(value: string): string {
   return CHANNELS.find((c) => c.value === value)?.label ?? value;
+}
+
+function clientIdFromUrl(): string {
+  if (typeof window === "undefined") return "";
+  return new URLSearchParams(window.location.search).get("clientId") ?? "";
 }
 
 export default function Communications() {
@@ -59,7 +97,7 @@ export default function Communications() {
     void qc.invalidateQueries();
   };
 
-  const [clientId, setClientId] = useState<string>("");
+  const [clientId, setClientId] = useState<string>(() => clientIdFromUrl());
   const [intent, setIntent] = useState<string>("follow_up");
   const [channel, setChannel] = useState<string>("email");
   const [tone, setTone] = useState<string>("Warm");
@@ -138,6 +176,16 @@ export default function Communications() {
       toast({ title: "Draft saved" });
     } catch {
       toast({ title: "Could not save draft", variant: "destructive" });
+    }
+  }
+
+  async function handleSetStatus(status: CommunicationDraftStatus) {
+    if (!selected) return;
+    try {
+      await updateM.mutateAsync({ draftId: selected.id, data: { status } });
+      toast({ title: `Marked ${STATUS_LABELS[status].toLowerCase()}` });
+    } catch {
+      toast({ title: "Could not update status", variant: "destructive" });
     }
   }
 
@@ -335,6 +383,12 @@ export default function Communications() {
                         </Badge>
                       </div>
                       <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+                        <Badge
+                          variant={statusVariant(d.status)}
+                          className="shrink-0 text-[10px]"
+                        >
+                          {statusLabel(d.status)}
+                        </Badge>
                         <span>{intentLabel(d.intent)}</span>
                         <span>·</span>
                         <span>{channelLabel(d.channel)}</span>
@@ -371,6 +425,12 @@ export default function Communications() {
                         {selected.source === "ai"
                           ? "AI draft"
                           : "Template draft"}
+                      </Badge>
+                      <Badge
+                        variant={statusVariant(selected.status)}
+                        data-testid="badge-status"
+                      >
+                        {statusLabel(selected.status)}
                       </Badge>
                       <span className="text-[11px] text-muted-foreground">
                         {intentLabel(selected.intent)} ·{" "}
@@ -410,6 +470,48 @@ export default function Communications() {
                         Save
                       </Button>
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 border-t border-border/60 pt-3">
+                    <span className="text-[11px] uppercase tracking-wide text-muted-foreground mr-1">
+                      Lifecycle
+                    </span>
+                    {selected.status !== "used" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSetStatus("used")}
+                        disabled={updateM.isPending}
+                        data-testid="button-mark-used"
+                      >
+                        <CheckCheck className="w-4 h-4 mr-1.5" />
+                        Mark used
+                      </Button>
+                    )}
+                    {selected.status !== "discarded" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSetStatus("discarded")}
+                        disabled={updateM.isPending}
+                        data-testid="button-discard"
+                      >
+                        <Ban className="w-4 h-4 mr-1.5" />
+                        Discard
+                      </Button>
+                    )}
+                    {selected.status !== "draft" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSetStatus("draft")}
+                        disabled={updateM.isPending}
+                        data-testid="button-reopen"
+                      >
+                        <RotateCcw className="w-4 h-4 mr-1.5" />
+                        Reopen
+                      </Button>
+                    )}
                   </div>
 
                   {selected.channel !== "text" && (

@@ -1365,7 +1365,7 @@ export const UpdateCommunicationDraftBody = zod.object({
   "intent": zod.string().optional(),
   "channel": zod.string().optional(),
   "tone": zod.string().optional(),
-  "status": zod.enum(['draft', 'archived']).optional().describe('Draft-lifecycle status only. There is no send path.')
+  "status": zod.enum(['draft', 'edited', 'used', 'discarded']).optional().describe('Draft-lifecycle status only. There is no send path.')
 })
 
 export const UpdateCommunicationDraftResponse = zod.object({

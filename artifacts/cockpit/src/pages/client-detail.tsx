@@ -59,6 +59,7 @@ import {
   ArrowRightLeft,
   History,
   UserCog,
+  MessageSquareText,
 } from "lucide-react";
 import type {
   RiskLevel,
@@ -689,6 +690,17 @@ export default function ClientDetail() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() =>
+                  (window.location.href = `${BASE_URL}communications?clientId=${encodeURIComponent(client.id)}`)
+                }
+                data-testid="button-draft-communication"
+              >
+                <MessageSquareText className="h-4 w-4" /> Draft communication
+              </Button>
               <div className="rounded-md border px-3 py-1.5 text-sm">
                 <span className="text-muted-foreground">Owner: </span>
                 <span className="font-semibold">{client.nextOwner}</span>

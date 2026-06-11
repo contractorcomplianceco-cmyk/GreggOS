@@ -268,7 +268,11 @@ export type CommunicationIntent =
   | 'renewal'
   | 'other';
 export type CommunicationChannel = 'email' | 'text' | 'call_script';
-export type CommunicationDraftStatus = 'draft' | 'archived';
+export type CommunicationDraftStatus =
+  | 'draft'
+  | 'edited'
+  | 'used'
+  | 'discarded';
 export type CommunicationDraftSource = 'ai' | 'template';
 
 export interface CommunicationDraft {

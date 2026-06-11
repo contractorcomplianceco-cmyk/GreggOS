@@ -107,8 +107,9 @@ function intentLabel(intent: string): string {
 }
 
 // Draft-lifecycle statuses only. There is deliberately NO "sent" state —
-// nothing is ever sent from this app.
-const ALLOWED_STATUSES = new Set(["draft", "archived"]);
+// nothing is ever sent from this app. "used" means Gregg copied the draft to
+// send it himself elsewhere; "discarded" means he abandoned it.
+const ALLOWED_STATUSES = new Set(["draft", "edited", "used", "discarded"]);
 
 // Deterministic decision-boundary guard. AI output is screened for language
 // that would imply approving/committing to a pricing, refund, legal,
@@ -402,6 +403,17 @@ router.patch(
       res.status(400).json({ error: "Invalid status" });
       return;
     }
+    const existingRows = await db
+      .select()
+      .from(communicationDraftsTable)
+      .where(eq(communicationDraftsTable.id, draftId))
+      .limit(1);
+    const existing = existingRows[0];
+    if (!existing) {
+      res.status(404).json({ error: "Draft not found" });
+      return;
+    }
+
     const updates: Record<string, unknown> = {};
     for (const key of [
       "subject",
@@ -413,17 +425,17 @@ router.patch(
     ] as const) {
       if (body[key] !== undefined) updates[key] = body[key];
     }
+
+    // Editing the content of a fresh draft moves it to "edited" so the
+    // lifecycle stays meaningful, unless the caller set status explicitly.
+    const editsContent =
+      updates.subject !== undefined || updates.body !== undefined;
+    if (editsContent && updates.status === undefined && existing.status === "draft") {
+      updates.status = "edited";
+    }
+
     if (Object.keys(updates).length === 0) {
-      const rows = await db
-        .select()
-        .from(communicationDraftsTable)
-        .where(eq(communicationDraftsTable.id, draftId))
-        .limit(1);
-      if (!rows[0]) {
-        res.status(404).json({ error: "Draft not found" });
-        return;
-      }
-      res.json(toCommunicationDraft(rows[0]));
+      res.json(toCommunicationDraft(existing));
       return;
     }
 

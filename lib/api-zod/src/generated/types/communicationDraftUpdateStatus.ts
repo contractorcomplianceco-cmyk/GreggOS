@@ -14,5 +14,7 @@ export type CommunicationDraftUpdateStatus = typeof CommunicationDraftUpdateStat
 
 export const CommunicationDraftUpdateStatus = {
   draft: 'draft',
-  archived: 'archived',
+  edited: 'edited',
+  used: 'used',
+  discarded: 'discarded',
 } as const;
