@@ -5,6 +5,8 @@ import {
   ChevronUp,
   Volume2,
   VolumeX,
+  Play,
+  Pause,
 } from 'lucide-react';
 import VideoTemplate, { SCENE_DURATIONS } from './VideoTemplate';
 import { useSceneControls } from './useSceneControls';
@@ -15,12 +17,14 @@ interface ControlBarProps {
   visible: boolean;
   collapsed: boolean;
   locked: boolean;
+  paused: boolean;
   muted: boolean;
   sceneKeys: string[];
   activeIndex: number;
   activeDuration: number;
   tick: number;
   onToggleLock: () => void;
+  onTogglePause: () => void;
   onToggleMuted: () => void;
   onJumpTo: (index: number) => void;
   onToggleCollapsed: () => void;
@@ -31,24 +35,27 @@ function ProgressSegments({
   activeIndex,
   activeDuration,
   tick,
+  paused,
   onJumpTo,
 }: {
   sceneKeys: string[];
   activeIndex: number;
   activeDuration: number;
   tick: number;
+  paused: boolean;
   onJumpTo: (index: number) => void;
 }) {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
     setElapsed(0);
+    if (paused) return;
     const start = performance.now();
     const id = window.setInterval(() => {
       setElapsed(performance.now() - start);
     }, PROGRESS_TICK_MS);
     return () => window.clearInterval(id);
-  }, [tick]);
+  }, [tick, paused]);
 
   const progress = activeDuration > 0 ? Math.min(1, elapsed / activeDuration) : 0;
 
@@ -80,12 +87,14 @@ function ControlBar({
   visible,
   collapsed,
   locked,
+  paused,
   muted,
   sceneKeys,
   activeIndex,
   activeDuration,
   tick,
   onToggleLock,
+  onTogglePause,
   onToggleMuted,
   onJumpTo,
   onToggleCollapsed,
@@ -99,6 +108,16 @@ function ControlBar({
       }`}
       aria-hidden={!visible}
     >
+      <button
+        onClick={onTogglePause}
+        className="w-14 h-14 flex items-center justify-center text-white bg-white/15 hover:bg-white/25 transition-colors rounded-lg shrink-0"
+        title={paused ? 'Play' : 'Pause'}
+        aria-label={paused ? 'Play' : 'Pause'}
+        aria-pressed={paused}
+      >
+        {paused ? <Play className="w-8 h-8" /> : <Pause className="w-8 h-8" />}
+      </button>
+
       <button
         onClick={onToggleLock}
         className={`w-14 h-14 flex items-center justify-center transition-colors rounded-lg shrink-0 ${
@@ -134,6 +153,7 @@ function ControlBar({
         activeIndex={activeIndex}
         activeDuration={activeDuration}
         tick={tick}
+        paused={paused}
         onJumpTo={onJumpTo}
       />
 
@@ -161,6 +181,7 @@ export default function VideoWithControls() {
     sceneKeys,
     activeIndex,
     locked,
+    paused,
     mountKey,
     tick,
     durations,
@@ -168,6 +189,7 @@ export default function VideoWithControls() {
     onSceneChange,
     jumpTo,
     toggleLock,
+    togglePause,
   } = useSceneControls(SCENE_DURATIONS);
 
   const [muted, setMuted] = useState(true);
@@ -216,8 +238,9 @@ export default function VideoWithControls() {
       <VideoTemplate
         key={mountKey}
         durations={durations}
-        loop
+        loop={!paused}
         muted={muted}
+        paused={paused}
         onSceneChange={onSceneChange}
       />
       <div
@@ -233,12 +256,14 @@ export default function VideoWithControls() {
           visible={barVisible}
           collapsed={collapsed}
           locked={locked}
+          paused={paused}
           muted={muted}
           sceneKeys={sceneKeys}
           activeIndex={activeIndex}
           activeDuration={activeDuration}
           tick={tick}
           onToggleLock={toggleLock}
+          onTogglePause={togglePause}
           onToggleMuted={() => setMuted((m) => !m)}
           onJumpTo={jumpTo}
           onToggleCollapsed={handleToggleCollapsed}

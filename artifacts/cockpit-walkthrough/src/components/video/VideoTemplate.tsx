@@ -42,11 +42,13 @@ export default function VideoTemplate({
   durations = SCENE_DURATIONS,
   loop = true,
   muted = false,
+  paused = false,
   onSceneChange,
 }: {
   durations?: Record<string, number>;
   loop?: boolean;
   muted?: boolean;
+  paused?: boolean;
   onSceneChange?: (sceneKey: string) => void;
 } = {}) {
   const { currentSceneKey } = useVideoPlayer({ durations, loop });
@@ -64,13 +66,17 @@ export default function VideoTemplate({
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = 0.45;
+    audio.volume = 0.85;
+    if (paused) {
+      audio.pause();
+      return;
+    }
     const targetTime = SCENE_START_SEC[baseSceneKey] ?? 0;
     if (Math.abs(audio.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) {
       audio.currentTime = targetTime;
     }
     audio.play().catch(() => {});
-  }, [currentSceneKey, baseSceneKey, muted]);
+  }, [currentSceneKey, baseSceneKey, muted, paused]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-primary data-grid-bg">
@@ -114,7 +120,7 @@ export default function VideoTemplate({
 
       <audio
         ref={audioRef}
-        src={`${import.meta.env.BASE_URL}audio/bg_music.mp3`}
+        src={`${import.meta.env.BASE_URL}audio/composite_audio.mp3`}
         preload="auto"
         autoPlay
         muted={muted}

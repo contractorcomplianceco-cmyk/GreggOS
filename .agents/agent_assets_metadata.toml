@@ -6,3 +6,39 @@ id = "7K1NZmfBYZ4StqXcqmYhY"
 uri = "file://artifacts/cockpit-walkthrough/public/audio/bg_music.mp3"
 type = "audio"
 title = "background music"
+
+[[outputs]]
+id = "h7e0OG-LejiO3Ux5nhM9W"
+uri = "file://artifacts/cockpit-walkthrough/public/audio/vo_open.mp3"
+type = "audio"
+title = "open voiceover"
+
+[[outputs]]
+id = "YjympOOOH5AWugBCJj2xM"
+uri = "file://artifacts/cockpit-walkthrough/public/audio/vo_commandCenter.mp3"
+type = "audio"
+title = "commandCenter voiceover"
+
+[[outputs]]
+id = "J7O6QuQbRcFyJ8Kw_icW4"
+uri = "file://artifacts/cockpit-walkthrough/public/audio/vo_processor.mp3"
+type = "audio"
+title = "processor voiceover"
+
+[[outputs]]
+id = "XDKIVDuDOnnitgoLZDJ8U"
+uri = "file://artifacts/cockpit-walkthrough/public/audio/vo_expansion.mp3"
+type = "audio"
+title = "expansion voiceover"
+
+[[outputs]]
+id = "AOrGKhZl3HxMxmDVN3bOC"
+uri = "file://artifacts/cockpit-walkthrough/public/audio/vo_advisory.mp3"
+type = "audio"
+title = "advisory voiceover"
+
+[[outputs]]
+id = "bsrXo8u5_WSail42GyFb2"
+uri = "file://artifacts/cockpit-walkthrough/public/audio/vo_close.mp3"
+type = "audio"
+title = "close voiceover"

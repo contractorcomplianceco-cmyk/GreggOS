@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus } from "lucide-react";
+import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
@@ -75,6 +75,14 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
             </p>
           </div>
           <nav className="space-y-1 px-4">
+            <a
+              href="/cockpit-walkthrough/"
+              className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-sidebar-primary text-sidebar-primary-foreground hover:opacity-90 ring-1 ring-sidebar-border"
+              data-testid="link-start-here"
+            >
+              <PlayCircle className="w-4 h-4" />
+              Start Here
+            </a>
             {navigation.map((item) => {
               const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
               return (

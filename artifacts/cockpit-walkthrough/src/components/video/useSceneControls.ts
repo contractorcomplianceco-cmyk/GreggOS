@@ -24,21 +24,28 @@ function buildLockedDurations(key: string, duration: number): Record<string, num
   return { [`${key}_r1`]: duration, [`${key}_r2`]: duration };
 }
 
+const PAUSE_DURATION_MS = 10_000_000;
+
 export function useSceneControls(baseDurations: Record<string, number>) {
   const sceneKeys = useMemo(() => Object.keys(baseDurations), [baseDurations]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [locked, setLocked] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [mountKey, setMountKey] = useState(0);
   const [tick, setTick] = useState(0);
 
   const durations = useMemo(() => {
+    if (paused) {
+      const key = sceneKeys[activeIndex];
+      return { [key]: PAUSE_DURATION_MS };
+    }
     if (locked) {
       const key = sceneKeys[activeIndex];
       return buildLockedDurations(key, baseDurations[key]);
     }
     return rotateFromIndex(baseDurations, activeIndex);
-  }, [locked, activeIndex, sceneKeys, baseDurations]);
+  }, [paused, locked, activeIndex, sceneKeys, baseDurations]);
 
   const onSceneChange = useCallback(
     (rawKey: string) => {
@@ -62,10 +69,17 @@ export function useSceneControls(baseDurations: Record<string, number>) {
     setTick((t) => t + 1);
   }, []);
 
+  const togglePause = useCallback(() => {
+    setPaused((prev) => !prev);
+    setMountKey((k) => k + 1);
+    setTick((t) => t + 1);
+  }, []);
+
   return {
     sceneKeys,
     activeIndex,
     locked,
+    paused,
     mountKey,
     tick,
     durations,
@@ -73,5 +87,6 @@ export function useSceneControls(baseDurations: Record<string, number>) {
     onSceneChange,
     jumpTo,
     toggleLock,
+    togglePause,
   };
 }
