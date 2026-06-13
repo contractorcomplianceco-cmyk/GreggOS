@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "7K1NZmfBYZ4StqXcqmYhY"
+uri = "file://artifacts/cockpit-walkthrough/public/audio/bg_music.mp3"
+type = "audio"
+title = "background music"

@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #0a192f;
+  --color-secondary: #112240;
+  --color-accent: #00f0ff;
+
+  --color-bg-light: #0a192f;
+  --color-bg-dark: #020c1b;
+  --color-bg-muted: #112240;
+
+  --color-text-primary: #e6f1ff;
+  --color-text-secondary: #8892b0;
+  --color-text-muted: #495670;
+  --color-text-inverse: #0a192f;
+
+  --color-success: #00ff9d;
+  --color-warning: #00f0ff;
+  --color-error: #ff3366;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+  --color-bg-light: var(--color-bg-light);
+  --color-bg-dark: var(--color-bg-dark);
+  --color-bg-muted: var(--color-bg-muted);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-inverse: var(--color-text-inverse);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-primary);
+  overflow: hidden;
+}
+
+.data-grid-bg {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+}
+
+.glow-text {
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
