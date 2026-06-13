@@ -1,4 +1,4 @@
-import { describe, it, before, after } from "node:test";
+import { describe, it, before, after, mock } from "node:test";
 import assert from "node:assert/strict";
 import express, {
   type Express,
@@ -6,7 +6,8 @@ import express, {
   type Request,
   type Response,
 } from "express";
-import { pool } from "@workspace/db";
+import { eq } from "drizzle-orm";
+import { pool, db, clientsTable, communicationDraftsTable } from "@workspace/db";
 import { UpdateCommunicationDraftBody } from "@workspace/api-zod";
 import communicationsRouter from "./communications";
 import {
@@ -229,7 +230,6 @@ describe("PATCH /communication-drafts/:id rejects invalid status with 400", () =
 
   after(async () => {
     await new Promise<void>((resolve) => server.close(() => resolve()));
-    await pool.end();
   });
 
   for (const status of ["sent", "archived", "approved"]) {
@@ -242,4 +242,220 @@ describe("PATCH /communication-drafts/:id rejects invalid status with 400", () =
       assert.equal(res.status, 400);
     });
   }
+});
+
+// ---------------------------------------------------------------------------
+// 5. End-to-end: POST /communication-drafts/generate persists a safe draft.
+//    These exercise the full request path — gatherContext (real DB reads),
+//    aiDraft (mocked OpenAI), resolveDraft's guard, the INSERT, and the
+//    activity log — and then assert against the row actually written to the
+//    database (not just the resolveDraft decision). This is the gap the unit
+//    tests above could not cover: that a guard trip / missing AI produces a
+//    PERSISTED row with source="template" and a body that never leaks
+//    prohibited commitment language.
+// ---------------------------------------------------------------------------
+function makeGenerateApp(): Express {
+  const app = express();
+  app.use(express.json());
+  // The real server attaches `req.log` via pino-http; the generate handler
+  // calls it (e.g. when the guard trips). Provide a no-op logger so the bare
+  // test app mirrors that contract.
+  app.use((req: Request, _res: Response, next: NextFunction) => {
+    const noop = () => {};
+    const log: Record<string, unknown> = {
+      info: noop,
+      warn: noop,
+      error: noop,
+      debug: noop,
+      fatal: noop,
+      trace: noop,
+      silent: noop,
+      child: () => log,
+    };
+    (req as unknown as { log: unknown }).log = log;
+    next();
+  });
+  app.use(communicationsRouter);
+  app.use(
+    (err: unknown, _req: Request, res: Response, _next: NextFunction): void => {
+      const name =
+        err && typeof err === "object" && "name" in err
+          ? (err as { name?: string }).name
+          : undefined;
+      if (name === "ZodError") {
+        res.status(400).json({ error: "Validation failed" });
+        return;
+      }
+      res.status(500).json({ error: "Internal server error" });
+    },
+  );
+  return app;
+}
+
+async function startApp(app: Express): Promise<{
+  server: import("node:http").Server;
+  baseUrl: string;
+}> {
+  const server: import("node:http").Server = await new Promise((resolve) => {
+    const s = app.listen(0, () => resolve(s));
+  });
+  const addr = server.address();
+  const port = typeof addr === "object" && addr ? addr.port : 0;
+  return { server, baseUrl: `http://127.0.0.1:${port}` };
+}
+
+async function insertTestClient(): Promise<string> {
+  const rows = await db
+    .insert(clientsTable)
+    .values({
+      clientName: "E2E Test Client LLC",
+      companyName: "E2E Test Co",
+      contactName: "Dana",
+      clientStatus: "Active",
+      greggPriority: "Medium",
+      riskLevel: "Low",
+      lastMeaningfulContact: "2026-06-01",
+      nextAction: "schedule the quarterly review",
+    })
+    .returning({ id: clientsTable.id });
+  return rows[0]!.id;
+}
+
+describe("POST /communication-drafts/generate persists a safe draft", () => {
+  let server: import("node:http").Server;
+  let baseUrl = "";
+  let clientId = "";
+  const prevBaseUrl = process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
+  const prevApiKey = process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
+
+  before(async () => {
+    // Make aiDraft attempt the AI path (env present) but have the mocked
+    // OpenAI client return prohibited commitment language, so the guard must
+    // discard it and the persisted draft must fall back to the template.
+    process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"] = "http://mock.invalid";
+    process.env["AI_INTEGRATIONS_OPENAI_API_KEY"] = "test-key";
+    mock.module("@workspace/integrations-openai-ai-server", {
+      namedExports: {
+        openai: {
+          chat: {
+            completions: {
+              create: async () => ({
+                choices: [
+                  {
+                    message: {
+                      content:
+                        "Subject: Quick note\n\nGood news — we have approved your refund in full this week.",
+                    },
+                  },
+                ],
+              }),
+            },
+          },
+        },
+      },
+    });
+    clientId = await insertTestClient();
+    ({ server, baseUrl } = await startApp(makeGenerateApp()));
+  });
+
+  after(async () => {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    mock.reset();
+    await db.delete(clientsTable).where(eq(clientsTable.id, clientId));
+    if (prevBaseUrl === undefined)
+      delete process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
+    else process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"] = prevBaseUrl;
+    if (prevApiKey === undefined)
+      delete process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
+    else process.env["AI_INTEGRATIONS_OPENAI_API_KEY"] = prevApiKey;
+  });
+
+  it("forces the template fallback when the AI returns prohibited content", async () => {
+    const res = await fetch(`${baseUrl}/communication-drafts/generate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        clientId,
+        intent: "follow_up",
+        channel: "email",
+      }),
+    });
+    assert.equal(res.status, 201);
+    const payload = (await res.json()) as { id: string; source: string };
+    assert.equal(payload.source, "template");
+
+    // Assert against the row actually written to the database.
+    const rows = await db
+      .select()
+      .from(communicationDraftsTable)
+      .where(eq(communicationDraftsTable.id, payload.id))
+      .limit(1);
+    const persisted = rows[0]!;
+    assert.equal(persisted.source, "template");
+    assert.equal(
+      violatesBoundary(`${persisted.subject}\n${persisted.body}`),
+      false,
+      "persisted draft must not contain prohibited commitment language",
+    );
+    assert.ok(
+      persisted.body.includes("Gregg"),
+      "persisted body should be the deterministic template",
+    );
+  });
+});
+
+describe("POST /communication-drafts/generate with no AI configured", () => {
+  let server: import("node:http").Server;
+  let baseUrl = "";
+  let clientId = "";
+  const prevBaseUrl = process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
+  const prevApiKey = process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
+
+  before(async () => {
+    // No AI env configured -> aiDraft returns null before importing OpenAI,
+    // and the persisted draft must come from the template.
+    delete process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
+    delete process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
+    clientId = await insertTestClient();
+    ({ server, baseUrl } = await startApp(makeGenerateApp()));
+  });
+
+  after(async () => {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await db.delete(clientsTable).where(eq(clientsTable.id, clientId));
+    if (prevBaseUrl === undefined)
+      delete process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
+    else process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"] = prevBaseUrl;
+    if (prevApiKey === undefined)
+      delete process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
+    else process.env["AI_INTEGRATIONS_OPENAI_API_KEY"] = prevApiKey;
+  });
+
+  it("persists a template draft (source = template)", async () => {
+    const res = await fetch(`${baseUrl}/communication-drafts/generate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        clientId,
+        intent: "check_in",
+        channel: "email",
+      }),
+    });
+    assert.equal(res.status, 201);
+    const payload = (await res.json()) as { id: string; source: string };
+    assert.equal(payload.source, "template");
+
+    const rows = await db
+      .select()
+      .from(communicationDraftsTable)
+      .where(eq(communicationDraftsTable.id, payload.id))
+      .limit(1);
+    assert.equal(rows[0]!.source, "template");
+  });
+});
+
+// Single root teardown for the shared pg pool so suite ordering can't close it
+// out from under a later database-backed suite.
+after(async () => {
+  await pool.end();
 });
