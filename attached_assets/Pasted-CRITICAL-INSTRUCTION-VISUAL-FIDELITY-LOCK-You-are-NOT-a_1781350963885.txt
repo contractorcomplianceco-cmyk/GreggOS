@@ -1,0 +1,151 @@
+CRITICAL INSTRUCTION: VISUAL FIDELITY LOCK
+
+You are NOT allowed to simplify the design.
+
+You must recreate the GreggOS Command Center as a HIGH-DENSITY EXECUTIVE OPERATING SYSTEM.
+
+If any section is missing, collapsed, or simplified, the build is incorrect.
+
+You must treat the design like a FIXED WIREFRAME, not a suggestion.
+
+-------------------------
+VISUAL SYSTEM RULES
+-------------------------
+
+1. DO NOT use generic SaaS dashboard styling.
+2. DO NOT reduce number of modules.
+3. DO NOT replace sections with “cards” unless explicitly defined.
+4. DO NOT simplify layout density.
+5. DO NOT center everything.
+6. DO NOT use large whitespace layouts.
+
+This must feel like:
+“Bloomberg Terminal + Palantir Foundry + internal command OS”
+
+-------------------------
+LAYOUT STRUCTURE (MUST MATCH EXACTLY)
+
+LEFT SIDEBAR (PERMANENT FIXED WIDTH)
+Must include ALL items:
+
+- Dashboard
+- Clients
+- Nurturing Center
+- RingCentral Insights
+- Travel Planner
+- Expenses
+- Weekly Report
+- Training & Leveling
+- AI Prompt Library
+- Feedback Center
+- Walkthrough & Motivation
+- Call Note Processor
+
+No omissions. No grouping.
+
+-------------------------
+TOP HEADER BAR
+
+Must include:
+- “GreggOS Command Center”
+- Date
+- Executive status indicator
+- Risk pulse indicator (green/yellow/red global system state)
+
+-------------------------
+MAIN DASHBOARD GRID (DO NOT SIMPLIFY)
+
+Row 1 (CRITICAL SIGNALS - MUST BE RED ZONE VISUAL)
+
+- RED FLAGS (Critical Alerts)
+- ANOMALY DETECTION
+- CLIENT HEALTH MAP (mini table, not cards)
+- OPPORTUNITY RADAR
+
+Row 2 (EXECUTIVE ACTION LAYER)
+
+- TODAY’S EXECUTIVE PRIORITIES
+- ESCALATION STREAM
+- CLIENT NURTURING SIGNAL FEED
+- RISK TIMELINE (horizontal log view)
+
+Row 3 (SYSTEM INTELLIGENCE LAYER)
+
+- RINGCENTRAL INSIGHT FEED (full width)
+- WEEKLY TREND ANALYTICS PANEL (graph required)
+- TOP CLIENT MOVEMENT (gainers/decliners)
+
+Row 4 (COMMAND MODULES)
+
+Must be 6 MODULE TILES:
+- Travel
+- Expenses
+- Training
+- Prompts
+- Feedback
+- Motivation
+
+These must be SECONDARY, not primary focus.
+
+-------------------------
+CLIENT NURTURING CENTER (MUST BE DATA-HEAVY)
+
+This is NOT cards.
+
+It must be a table with:
+- client
+- engagement score
+- risk
+- opportunity type
+- next suggested action
+- intervention urgency
+
+Include color-coded risk bars.
+
+-------------------------
+VISUAL STYLE RULES
+
+- Dark navy background (#0B1220 base)
+- Accent: electric blue + red alert system
+- Must include glow-based alert states
+- Must include severity highlighting
+- Must use compact spacing (high density UI)
+
+Typography:
+- Titles: bold condensed
+- Data: small, tight spacing
+- Labels: uppercase micro text
+
+-------------------------
+INTERACTION RULES
+
+Must include:
+- filter chips (functional)
+- search bar for clients
+- clickable drill-down states
+- hover states for risk items
+- expandable client row
+
+-------------------------
+ANTI-SIMPLIFICATION RULE
+
+If the system “feels too clean or empty,” it is WRONG.
+
+This system must feel like:
+- control room
+- surveillance dashboard
+- executive intelligence cockpit
+
+NOT:
+- SaaS landing dashboard
+- CRM homepage
+- marketing UI
+
+-------------------------
+ACCEPTANCE TEST
+
+You are ONLY correct if:
+- A user can identify risk in under 3 seconds
+- There are at least 4 simultaneous data streams visible at all times
+- No section is decorative or empty
+- Every module contains real structured information
