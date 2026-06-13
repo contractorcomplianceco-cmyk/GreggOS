@@ -349,3 +349,62 @@ export interface ContactLogEntry {
   direction: 'Inbound' | 'Outbound';
   summary: string;
 }
+
+export type TravelStatus = 'Proposed' | 'Planned' | 'Booked' | 'Completed' | 'Cancelled';
+
+export interface TravelPlan {
+  id: string;
+  clientId: string | null;
+  location: string;
+  reason: string;
+  roiReason: string;
+  status: TravelStatus;
+  startDate: string;
+  endDate: string;
+  notes: string;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ExpenseCategory = 'Travel' | 'Client Visit' | 'Relationship' | 'Event' | 'Other';
+
+export interface Expense {
+  id: string;
+  category: ExpenseCategory;
+  description: string;
+  amount: number;
+  clientId: string | null;
+  spentOn: string;
+  notes: string;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type FeedbackType = 'risk' | 'opportunity' | 'system';
+export type FeedbackStatus = 'open' | 'reviewed' | 'actioned' | 'archived';
+
+export interface Feedback {
+  id: string;
+  type: FeedbackType;
+  title: string;
+  body: string;
+  status: FeedbackStatus;
+  clientId: string | null;
+  submittedByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TrainingModule {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  tier: string;
+  xp: number;
+  completed: boolean;
+  completedAt: string | null;
+  sortOrder: number;
+}

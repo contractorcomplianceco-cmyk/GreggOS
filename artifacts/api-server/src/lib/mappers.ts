@@ -16,6 +16,10 @@ import type {
   ActivityLogEntry as DbActivity,
   CrmLink as DbCrmLink,
   CommunicationDraft as DbCommunicationDraft,
+  TravelPlan as DbTravelPlan,
+  Expense as DbExpense,
+  Feedback as DbFeedback,
+  TrainingModule as DbTrainingModule,
 } from "@workspace/db";
 import type {
   Client,
@@ -35,6 +39,10 @@ import type {
   ActivityLogEntry,
   CrmLink,
   CommunicationDraft,
+  TravelPlan,
+  Expense,
+  Feedback,
+  TrainingModule,
 } from "@workspace/api-zod";
 
 const s = (v: string | null | undefined): string => v ?? "";
@@ -303,6 +311,66 @@ export function toCommunicationDraft(
     createdByLabel: row.createdByLabel,
     createdAt: iso(row.createdAt),
     updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toTravelPlan(row: DbTravelPlan): TravelPlan {
+  return {
+    id: row.id,
+    clientId: row.clientId ?? null,
+    location: row.location,
+    reason: row.reason,
+    roiReason: row.roiReason,
+    status: row.status,
+    startDate: s(row.startDate),
+    endDate: s(row.endDate),
+    notes: row.notes,
+    owner: row.ownerLabel,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toExpense(row: DbExpense): Expense {
+  return {
+    id: row.id,
+    category: row.category,
+    description: row.description,
+    amount: row.amountCents / 100,
+    clientId: row.clientId ?? null,
+    spentOn: s(row.spentOn),
+    notes: row.notes,
+    owner: row.ownerLabel,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toFeedback(row: DbFeedback): Feedback {
+  return {
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    body: row.body,
+    status: row.status,
+    clientId: row.clientId ?? null,
+    submittedByLabel: row.submittedByLabel,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toTrainingModule(row: DbTrainingModule): TrainingModule {
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    description: row.description,
+    tier: row.tier,
+    xp: row.xp,
+    completed: row.completed,
+    completedAt: row.completedAt ? row.completedAt.toISOString() : null,
+    sortOrder: row.sortOrder,
   };
 }
 

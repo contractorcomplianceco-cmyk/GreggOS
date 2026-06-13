@@ -1474,3 +1474,275 @@ export const GetActivityReportResponse = zod.object({
 })
 
 
+/**
+ * @summary List travel / client-visit plans
+ */
+export const ListTravelPlansQueryParams = zod.object({
+  "clientId": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListTravelPlansResponseItem = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string().nullish(),
+  "location": zod.string(),
+  "reason": zod.string(),
+  "roiReason": zod.string(),
+  "status": zod.string(),
+  "startDate": zod.string(),
+  "endDate": zod.string(),
+  "notes": zod.string(),
+  "owner": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListTravelPlansResponse = zod.array(ListTravelPlansResponseItem)
+
+
+/**
+ * @summary Create a travel plan
+ */
+export const CreateTravelPlanBody = zod.object({
+  "clientId": zod.string().nullish(),
+  "location": zod.string(),
+  "reason": zod.string().optional(),
+  "roiReason": zod.string().optional(),
+  "status": zod.string().optional(),
+  "startDate": zod.string().optional(),
+  "endDate": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "owner": zod.string().optional()
+})
+
+
+/**
+ * @summary Update a travel plan
+ */
+export const UpdateTravelPlanParams = zod.object({
+  "planId": zod.coerce.string()
+})
+
+export const UpdateTravelPlanBody = zod.object({
+  "clientId": zod.string().nullish(),
+  "location": zod.string().optional(),
+  "reason": zod.string().optional(),
+  "roiReason": zod.string().optional(),
+  "status": zod.string().optional(),
+  "startDate": zod.string().optional(),
+  "endDate": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "owner": zod.string().optional()
+})
+
+export const UpdateTravelPlanResponse = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string().nullish(),
+  "location": zod.string(),
+  "reason": zod.string(),
+  "roiReason": zod.string(),
+  "status": zod.string(),
+  "startDate": zod.string(),
+  "endDate": zod.string(),
+  "notes": zod.string(),
+  "owner": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a travel plan
+ */
+export const DeleteTravelPlanParams = zod.object({
+  "planId": zod.coerce.string()
+})
+
+export const DeleteTravelPlanResponse = zod.object({
+  "ok": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary List executive activity expenses
+ */
+export const ListExpensesQueryParams = zod.object({
+  "clientId": zod.coerce.string().optional(),
+  "category": zod.coerce.string().optional()
+})
+
+export const ListExpensesResponseItem = zod.object({
+  "id": zod.string(),
+  "category": zod.string(),
+  "description": zod.string(),
+  "amount": zod.number(),
+  "clientId": zod.string().nullish(),
+  "spentOn": zod.string(),
+  "notes": zod.string(),
+  "owner": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListExpensesResponse = zod.array(ListExpensesResponseItem)
+
+
+/**
+ * @summary Create an expense
+ */
+export const CreateExpenseBody = zod.object({
+  "category": zod.string(),
+  "description": zod.string().optional(),
+  "amount": zod.number(),
+  "clientId": zod.string().nullish(),
+  "spentOn": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "owner": zod.string().optional()
+})
+
+
+/**
+ * @summary Update an expense
+ */
+export const UpdateExpenseParams = zod.object({
+  "expenseId": zod.coerce.string()
+})
+
+export const UpdateExpenseBody = zod.object({
+  "category": zod.string().optional(),
+  "description": zod.string().optional(),
+  "amount": zod.number().optional(),
+  "clientId": zod.string().nullish(),
+  "spentOn": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "owner": zod.string().optional()
+})
+
+export const UpdateExpenseResponse = zod.object({
+  "id": zod.string(),
+  "category": zod.string(),
+  "description": zod.string(),
+  "amount": zod.number(),
+  "clientId": zod.string().nullish(),
+  "spentOn": zod.string(),
+  "notes": zod.string(),
+  "owner": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete an expense
+ */
+export const DeleteExpenseParams = zod.object({
+  "expenseId": zod.coerce.string()
+})
+
+export const DeleteExpenseResponse = zod.object({
+  "ok": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary List internal feedback items
+ */
+export const ListFeedbackQueryParams = zod.object({
+  "type": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListFeedbackResponseItem = zod.object({
+  "id": zod.string(),
+  "type": zod.string(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "status": zod.string(),
+  "clientId": zod.string().nullish(),
+  "submittedByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListFeedbackResponse = zod.array(ListFeedbackResponseItem)
+
+
+/**
+ * @summary Submit internal feedback
+ */
+export const CreateFeedbackBody = zod.object({
+  "type": zod.string(),
+  "title": zod.string().optional(),
+  "body": zod.string(),
+  "clientId": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update a feedback item (status/content)
+ */
+export const UpdateFeedbackParams = zod.object({
+  "feedbackId": zod.coerce.string()
+})
+
+export const UpdateFeedbackBody = zod.object({
+  "type": zod.string().optional(),
+  "title": zod.string().optional(),
+  "body": zod.string().optional(),
+  "clientId": zod.string().nullish(),
+  "status": zod.enum(['open', 'reviewed', 'actioned', 'archived']).optional()
+})
+
+export const UpdateFeedbackResponse = zod.object({
+  "id": zod.string(),
+  "type": zod.string(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "status": zod.string(),
+  "clientId": zod.string().nullish(),
+  "submittedByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List training modules with completion state
+ */
+export const ListTrainingModulesResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "category": zod.string(),
+  "description": zod.string(),
+  "tier": zod.string(),
+  "xp": zod.number(),
+  "completed": zod.boolean(),
+  "completedAt": zod.string().nullish(),
+  "sortOrder": zod.number()
+})
+export const ListTrainingModulesResponse = zod.array(ListTrainingModulesResponseItem)
+
+
+/**
+ * @summary Update a training module's completion state
+ */
+export const UpdateTrainingModuleParams = zod.object({
+  "moduleId": zod.coerce.string()
+})
+
+export const UpdateTrainingModuleBody = zod.object({
+  "completed": zod.boolean().optional()
+})
+
+export const UpdateTrainingModuleResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "category": zod.string(),
+  "description": zod.string(),
+  "tier": zod.string(),
+  "xp": zod.number(),
+  "completed": zod.boolean(),
+  "completedAt": zod.string().nullish(),
+  "sortOrder": zod.number()
+})
+
+

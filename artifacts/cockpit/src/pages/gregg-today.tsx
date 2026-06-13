@@ -17,6 +17,12 @@ import {
   Snowflake,
   CalendarClock,
   TrendingUp,
+  Plane,
+  Receipt,
+  GraduationCap,
+  Sparkles,
+  MessageSquarePlus,
+  Compass,
 } from "lucide-react";
 
 type Filter = "All" | "High priority" | "At risk" | "Due soon" | "Has escalation";
@@ -195,6 +201,36 @@ export default function GreggToday() {
               </Card>
             );
           })}
+        </div>
+
+        <div className="mb-10">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">
+            Command Center
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { name: "Travel", href: "/travel", icon: Plane },
+              { name: "Expenses", href: "/expenses", icon: Receipt },
+              { name: "Training", href: "/training", icon: GraduationCap },
+              { name: "Prompts", href: "/prompt-library", icon: Sparkles },
+              { name: "Feedback", href: "/feedback", icon: MessageSquarePlus },
+              { name: "Motivation", href: "/motivation", icon: Compass },
+            ].map((tile) => {
+              const Icon = tile.icon;
+              return (
+                <Link key={tile.name} href={tile.href}>
+                  <Card className="shadow-sm cursor-pointer transition-all hover:shadow-md hover:-translate-y-px">
+                    <CardContent className="p-4 flex flex-col items-center justify-center gap-2 text-center">
+                      <Icon className="h-5 w-5 text-accent" />
+                      <span className="text-xs font-medium text-foreground">
+                        {tile.name}
+                      </span>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-8">

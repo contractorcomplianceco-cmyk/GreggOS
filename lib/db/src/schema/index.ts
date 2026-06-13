@@ -6,3 +6,7 @@ export * from "./clientContext";
 export * from "./activity";
 export * from "./crm";
 export * from "./communicationDrafts";
+export * from "./travel";
+export * from "./expenses";
+export * from "./feedback";
+export * from "./training";

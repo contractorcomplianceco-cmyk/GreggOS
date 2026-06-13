@@ -695,6 +695,131 @@ export interface ImportData {
   clients: ClientInput[];
 }
 
+export interface TravelPlan {
+  id: string;
+  clientId?: string | null;
+  location: string;
+  reason: string;
+  roiReason: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  notes: string;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TravelPlanInput {
+  clientId?: string | null;
+  location: string;
+  reason?: string;
+  roiReason?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  notes?: string;
+  owner?: string;
+}
+
+export interface TravelPlanUpdate {
+  clientId?: string | null;
+  location?: string;
+  reason?: string;
+  roiReason?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  notes?: string;
+  owner?: string;
+}
+
+export interface Expense {
+  id: string;
+  category: string;
+  description: string;
+  amount: number;
+  clientId?: string | null;
+  spentOn: string;
+  notes: string;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExpenseInput {
+  category: string;
+  description?: string;
+  amount: number;
+  clientId?: string | null;
+  spentOn?: string;
+  notes?: string;
+  owner?: string;
+}
+
+export interface ExpenseUpdate {
+  category?: string;
+  description?: string;
+  amount?: number;
+  clientId?: string | null;
+  spentOn?: string;
+  notes?: string;
+  owner?: string;
+}
+
+export interface Feedback {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  status: string;
+  clientId?: string | null;
+  submittedByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FeedbackInput {
+  type: string;
+  title?: string;
+  body: string;
+  clientId?: string | null;
+}
+
+export type FeedbackUpdateStatus = typeof FeedbackUpdateStatus[keyof typeof FeedbackUpdateStatus];
+
+
+export const FeedbackUpdateStatus = {
+  open: 'open',
+  reviewed: 'reviewed',
+  actioned: 'actioned',
+  archived: 'archived',
+} as const;
+
+export interface FeedbackUpdate {
+  type?: string;
+  title?: string;
+  body?: string;
+  clientId?: string | null;
+  status?: FeedbackUpdateStatus;
+}
+
+export interface TrainingModule {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  tier: string;
+  xp: number;
+  completed: boolean;
+  completedAt?: string | null;
+  sortOrder: number;
+}
+
+export interface TrainingModuleUpdate {
+  completed?: boolean;
+}
+
 export type ListClientsParams = {
 search?: string;
 status?: string;
@@ -768,5 +893,20 @@ windowDays?: number;
 
 export type GetActivityReportParams = {
 windowDays?: number;
+};
+
+export type ListTravelPlansParams = {
+clientId?: string;
+status?: string;
+};
+
+export type ListExpensesParams = {
+clientId?: string;
+category?: string;
+};
+
+export type ListFeedbackParams = {
+type?: string;
+status?: string;
 };
 

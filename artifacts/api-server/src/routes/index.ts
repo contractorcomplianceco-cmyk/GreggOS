@@ -17,6 +17,10 @@ import contactLogRouter from "./contactLog";
 import crmRouter from "./crm";
 import reportsRouter from "./reports";
 import communicationsRouter from "./communications";
+import travelRouter from "./travel";
+import expensesRouter from "./expenses";
+import feedbackRouter from "./feedback";
+import trainingRouter from "./training";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -42,5 +46,9 @@ router.use(contactLogRouter);
 router.use(crmRouter);
 router.use(reportsRouter);
 router.use(communicationsRouter);
+router.use(travelRouter);
+router.use(expensesRouter);
+router.use(feedbackRouter);
+router.use(trainingRouter);
 
 export default router;

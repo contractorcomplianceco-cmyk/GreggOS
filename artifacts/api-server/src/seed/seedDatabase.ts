@@ -18,6 +18,10 @@ import {
   activityLogTable,
   crmLinksTable,
   communicationDraftsTable,
+  travelPlansTable,
+  expensesTable,
+  feedbackTable,
+  trainingModulesTable,
   type RiskFactor,
   type AuditScoreItem,
 } from "@workspace/db";
@@ -657,6 +661,219 @@ export async function seedDatabase(): Promise<void> {
         createdByUserId: greggId,
         createdByLabel: "Gregg",
         createdAt: new Date(Date.now() - d.createdDaysAgo * 86_400_000),
+      });
+    }
+
+    const travelPlans = [
+      {
+        clientKey: "c1",
+        location: "Phoenix, AZ",
+        reason: "High-value retention risk",
+        roiReason:
+          "Top-3 account showing cooling signals; in-person review protects ~$48k ARR and an active expansion.",
+        status: "Planned",
+        startDaysFromNow: 12,
+        endDaysFromNow: 13,
+        notes: "Pair with the quarterly compliance review.",
+        owner: "Gregg",
+      },
+      {
+        clientKey: null,
+        location: "Denver, CO — Regional Contractor Summit",
+        reason: "Strategic partnership growth",
+        roiReason:
+          "Three current clients attending; one face-to-face trip covers multiple relationships and prospecting.",
+        status: "Proposed",
+        startDaysFromNow: 30,
+        endDaysFromNow: 32,
+        notes: "Confirm which accounts are attending before booking.",
+        owner: "Gregg",
+      },
+      {
+        clientKey: "c2",
+        location: "Dallas, TX",
+        reason: "Expansion opportunity",
+        roiReason:
+          "Multi-entity expansion conversation is stalled; in-person meeting to unblock.",
+        status: "Booked",
+        startDaysFromNow: 5,
+        endDaysFromNow: 5,
+        notes: "Lunch meeting with the ownership group.",
+        owner: "Gregg",
+      },
+    ];
+    for (const t of travelPlans) {
+      const cid = t.clientKey ? clientIds.get(t.clientKey) ?? null : null;
+      await tx.insert(travelPlansTable).values({
+        clientId: cid,
+        location: t.location,
+        reason: t.reason,
+        roiReason: t.roiReason,
+        status: t.status,
+        startDate: iso(t.startDaysFromNow),
+        endDate: iso(t.endDaysFromNow),
+        notes: t.notes,
+        ownerLabel: t.owner,
+      });
+    }
+
+    const expenses = [
+      {
+        category: "Travel",
+        description: "Flight — Dallas client visit",
+        amountCents: 42800,
+        clientKey: "c2",
+        spentDaysAgo: 3,
+        owner: "Gregg",
+      },
+      {
+        category: "Client Visit",
+        description: "Lunch with ABC Construction ownership",
+        amountCents: 18650,
+        clientKey: "c1",
+        spentDaysAgo: 9,
+        owner: "Gregg",
+      },
+      {
+        category: "Relationship",
+        description: "Holiday gift baskets — top accounts",
+        amountCents: 32000,
+        clientKey: null,
+        spentDaysAgo: 20,
+        owner: "Gregg",
+      },
+      {
+        category: "Event",
+        description: "Regional Contractor Summit registration",
+        amountCents: 75000,
+        clientKey: null,
+        spentDaysAgo: 1,
+        owner: "Gregg",
+      },
+    ];
+    for (const e of expenses) {
+      const cid = e.clientKey ? clientIds.get(e.clientKey) ?? null : null;
+      await tx.insert(expensesTable).values({
+        category: e.category,
+        description: e.description,
+        amountCents: e.amountCents,
+        clientId: cid,
+        spentOn: iso(-e.spentDaysAgo),
+        notes: "",
+        ownerLabel: e.owner,
+      });
+    }
+
+    const feedbackItems = [
+      {
+        type: "risk",
+        title: "Repeated billing questions from mid-tier accounts",
+        body: "Three clients this month raised the same confusion about invoice line items. Possible systemic communication gap worth reviewing.",
+        status: "open",
+        clientKey: null,
+      },
+      {
+        type: "opportunity",
+        title: "Multi-entity expansion pattern",
+        body: "Several clients with multiple LLCs are only enrolled for one entity. Could be a repeatable expansion play.",
+        status: "reviewed",
+        clientKey: "c2",
+      },
+      {
+        type: "system",
+        title: "Call note processor could pre-fill owner",
+        body: "When a call note is clearly an escalation, defaulting the owner to Gregg would save a step.",
+        status: "open",
+        clientKey: null,
+      },
+    ];
+    for (const f of feedbackItems) {
+      const cid = f.clientKey ? clientIds.get(f.clientKey) ?? null : null;
+      await tx.insert(feedbackTable).values({
+        type: f.type,
+        title: f.title,
+        body: f.body,
+        status: f.status,
+        clientId: cid,
+        submittedByUserId: greggId,
+        submittedByLabel: "Gregg",
+      });
+    }
+
+    const trainingModules = [
+      {
+        title: "Audit risk fundamentals",
+        category: "Compliance",
+        description:
+          "Understand how the audit risk model scores accounts and what drives Layer A factors.",
+        tier: "Awareness",
+        xp: 100,
+        completed: true,
+        sortOrder: 1,
+      },
+      {
+        title: "Reading compliance escalation signals",
+        category: "Compliance",
+        description:
+          "Spot the call patterns that should route to leadership instead of staying at the coordinator level.",
+        tier: "Operator",
+        xp: 150,
+        completed: true,
+        sortOrder: 2,
+      },
+      {
+        title: "Zoho Deals lifecycle",
+        category: "Zoho CRM",
+        description:
+          "Approve, push, and reconcile expansion deals through the CRM export center.",
+        tier: "Operator",
+        xp: 150,
+        completed: false,
+        sortOrder: 3,
+      },
+      {
+        title: "Prompt-driven call analysis",
+        category: "AI & Automation",
+        description:
+          "Use the prompt library to turn raw RingCentral notes into CRM-ready structure.",
+        tier: "Strategic",
+        xp: 200,
+        completed: false,
+        sortOrder: 4,
+      },
+      {
+        title: "Expansion pipeline strategy",
+        category: "Client Strategy",
+        description:
+          "Prioritize the roadmap, manage stalled deals, and protect realized revenue.",
+        tier: "Strategic",
+        xp: 200,
+        completed: false,
+        sortOrder: 5,
+      },
+      {
+        title: "Executive client communication",
+        category: "Executive Communication",
+        description:
+          "Draft warm, professional, relationship-first messages that never overcommit.",
+        tier: "Executive",
+        xp: 250,
+        completed: false,
+        sortOrder: 6,
+      },
+    ];
+    for (const m of trainingModules) {
+      await tx.insert(trainingModulesTable).values({
+        title: m.title,
+        category: m.category,
+        description: m.description,
+        tier: m.tier,
+        xp: m.xp,
+        completed: m.completed,
+        completedAt: m.completed
+          ? new Date(Date.now() - 14 * 86_400_000)
+          : null,
+        sortOrder: m.sortOrder,
       });
     }
 

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText } from "lucide-react";
+import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
@@ -48,6 +48,12 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
     { name: "Current Clients", href: "/clients", icon: Users },
     { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },
     { name: "Communication Drafts", href: "/communications", icon: MessageSquareText },
+    { name: "Travel Planner", href: "/travel", icon: Plane },
+    { name: "Expense Tracker", href: "/expenses", icon: Receipt },
+    { name: "Training & Leveling", href: "/training", icon: GraduationCap },
+    { name: "AI Prompt Library", href: "/prompt-library", icon: Sparkles },
+    { name: "Feedback Center", href: "/feedback", icon: MessageSquarePlus },
+    { name: "Walkthrough & Motivation", href: "/motivation", icon: Compass },
     { name: "Call Note Processor", href: "/processor", icon: Briefcase },
     { name: "Weekly Review", href: "/weekly-review", icon: Calendar },
     ...(isAdmin

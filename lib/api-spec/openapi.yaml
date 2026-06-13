@@ -986,6 +986,228 @@ paths:
               schema:
                 $ref: "#/components/schemas/ActivityReport"
 
+  /travel-plans:
+    get:
+      operationId: listTravelPlans
+      tags: [travel]
+      summary: List travel / client-visit plans
+      parameters:
+        - { name: clientId, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Travel plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TravelPlan"
+    post:
+      operationId: createTravelPlan
+      tags: [travel]
+      summary: Create a travel plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TravelPlanInput"
+      responses:
+        "201":
+          description: Created travel plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TravelPlan"
+  /travel-plans/{planId}:
+    parameters:
+      - { name: planId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateTravelPlan
+      tags: [travel]
+      summary: Update a travel plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TravelPlanUpdate"
+      responses:
+        "200":
+          description: Updated travel plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TravelPlan"
+    delete:
+      operationId: deleteTravelPlan
+      tags: [travel]
+      summary: Delete a travel plan
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
+  /expenses:
+    get:
+      operationId: listExpenses
+      tags: [expenses]
+      summary: List executive activity expenses
+      parameters:
+        - { name: clientId, in: query, required: false, schema: { type: string } }
+        - { name: category, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Expense"
+    post:
+      operationId: createExpense
+      tags: [expenses]
+      summary: Create an expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseInput"
+      responses:
+        "201":
+          description: Created expense
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+  /expenses/{expenseId}:
+    parameters:
+      - { name: expenseId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateExpense
+      tags: [expenses]
+      summary: Update an expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseUpdate"
+      responses:
+        "200":
+          description: Updated expense
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+    delete:
+      operationId: deleteExpense
+      tags: [expenses]
+      summary: Delete an expense
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
+  /feedback:
+    get:
+      operationId: listFeedback
+      tags: [feedback]
+      summary: List internal feedback items
+      parameters:
+        - { name: type, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Feedback items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feedback"
+    post:
+      operationId: createFeedback
+      tags: [feedback]
+      summary: Submit internal feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackInput"
+      responses:
+        "201":
+          description: Created feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feedback"
+  /feedback/{feedbackId}:
+    parameters:
+      - { name: feedbackId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateFeedback
+      tags: [feedback]
+      summary: Update a feedback item (status/content)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackUpdate"
+      responses:
+        "200":
+          description: Updated feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feedback"
+
+  /training-modules:
+    get:
+      operationId: listTrainingModules
+      tags: [training]
+      summary: List training modules with completion state
+      responses:
+        "200":
+          description: Training modules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrainingModule"
+  /training-modules/{moduleId}:
+    parameters:
+      - { name: moduleId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateTrainingModule
+      tags: [training]
+      summary: Update a training module's completion state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrainingModuleUpdate"
+      responses:
+        "200":
+          description: Updated training module
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingModule"
+
 components:
   schemas:
     HealthStatus:
@@ -2069,3 +2291,167 @@ components:
           items:
             $ref: "#/components/schemas/ClientInput"
       required: [clients]
+
+    TravelPlan:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string, nullable: true }
+        location: { type: string }
+        reason: { type: string }
+        roiReason: { type: string }
+        status: { type: string }
+        startDate: { type: string }
+        endDate: { type: string }
+        notes: { type: string }
+        owner: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - location
+        - reason
+        - roiReason
+        - status
+        - startDate
+        - endDate
+        - notes
+        - owner
+        - createdAt
+        - updatedAt
+    TravelPlanInput:
+      type: object
+      properties:
+        clientId: { type: string, nullable: true }
+        location: { type: string }
+        reason: { type: string }
+        roiReason: { type: string }
+        status: { type: string }
+        startDate: { type: string }
+        endDate: { type: string }
+        notes: { type: string }
+        owner: { type: string }
+      required: [location]
+    TravelPlanUpdate:
+      type: object
+      properties:
+        clientId: { type: string, nullable: true }
+        location: { type: string }
+        reason: { type: string }
+        roiReason: { type: string }
+        status: { type: string }
+        startDate: { type: string }
+        endDate: { type: string }
+        notes: { type: string }
+        owner: { type: string }
+
+    Expense:
+      type: object
+      properties:
+        id: { type: string }
+        category: { type: string }
+        description: { type: string }
+        amount: { type: number }
+        clientId: { type: string, nullable: true }
+        spentOn: { type: string }
+        notes: { type: string }
+        owner: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - category
+        - description
+        - amount
+        - spentOn
+        - notes
+        - owner
+        - createdAt
+        - updatedAt
+    ExpenseInput:
+      type: object
+      properties:
+        category: { type: string }
+        description: { type: string }
+        amount: { type: number }
+        clientId: { type: string, nullable: true }
+        spentOn: { type: string }
+        notes: { type: string }
+        owner: { type: string }
+      required: [category, amount]
+    ExpenseUpdate:
+      type: object
+      properties:
+        category: { type: string }
+        description: { type: string }
+        amount: { type: number }
+        clientId: { type: string, nullable: true }
+        spentOn: { type: string }
+        notes: { type: string }
+        owner: { type: string }
+
+    Feedback:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string }
+        title: { type: string }
+        body: { type: string }
+        status: { type: string }
+        clientId: { type: string, nullable: true }
+        submittedByLabel: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - type
+        - title
+        - body
+        - status
+        - submittedByLabel
+        - createdAt
+        - updatedAt
+    FeedbackInput:
+      type: object
+      properties:
+        type: { type: string }
+        title: { type: string }
+        body: { type: string }
+        clientId: { type: string, nullable: true }
+      required: [type, body]
+    FeedbackUpdate:
+      type: object
+      properties:
+        type: { type: string }
+        title: { type: string }
+        body: { type: string }
+        clientId: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [open, reviewed, actioned, archived]
+
+    TrainingModule:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        category: { type: string }
+        description: { type: string }
+        tier: { type: string }
+        xp: { type: integer }
+        completed: { type: boolean }
+        completedAt: { type: string, nullable: true }
+        sortOrder: { type: integer }
+      required:
+        - id
+        - title
+        - category
+        - description
+        - tier
+        - xp
+        - completed
+        - sortOrder
+    TrainingModuleUpdate:
+      type: object
+      properties:
+        completed: { type: boolean }
