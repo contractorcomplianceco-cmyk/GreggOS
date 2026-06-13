@@ -302,14 +302,17 @@ async function aiDraft(
       .filter(Boolean)
       .join("\n");
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-5.4",
-      max_completion_tokens: 8192,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-    });
+    const completion = await openai.chat.completions.create(
+      {
+        model: "gpt-5.4",
+        max_completion_tokens: 8192,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+      },
+      { timeout: 30000, maxRetries: 0 },
+    );
     const text = completion.choices[0]?.message?.content?.trim();
     if (!text) return null;
 
