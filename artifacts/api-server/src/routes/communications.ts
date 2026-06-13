@@ -109,7 +109,12 @@ function intentLabel(intent: string): string {
 // Draft-lifecycle statuses only. There is deliberately NO "sent" state —
 // nothing is ever sent from this app. "used" means Gregg copied the draft to
 // send it himself elsewhere; "discarded" means he abandoned it.
-const ALLOWED_STATUSES = new Set(["draft", "edited", "used", "discarded"]);
+export const ALLOWED_STATUSES = new Set([
+  "draft",
+  "edited",
+  "used",
+  "discarded",
+]);
 
 // Deterministic decision-boundary guard. AI output is screened for language
 // that would imply approving/committing to a pricing, refund, legal,
@@ -126,8 +131,33 @@ const PROHIBITED_PATTERNS: RegExp[] = [
   /\b(approv\w+|guarant\w+|confirm\w+|secur\w+)\b[^.?!\n]{0,40}\b(qualifier|placement)/i,
 ];
 
-function violatesBoundary(text: string): boolean {
+export function violatesBoundary(text: string): boolean {
   return PROHIBITED_PATTERNS.some((re) => re.test(text));
+}
+
+// Decides whether to keep the AI draft or fall back to the safe template.
+// If the AI output trips the decision-boundary guard it is discarded and the
+// template is used instead, so the safety guarantee never depends on the model
+// honoring its prompt. `tripped` is true only when usable AI output was
+// rejected by the guard (so callers can log it).
+export function resolveDraft(
+  ai: { subject: string; body: string } | null,
+  ctx: DraftContext,
+  intent: string,
+  channel: string,
+): {
+  result: { subject: string; body: string };
+  source: "ai" | "template";
+  tripped: boolean;
+} {
+  let kept = ai;
+  let tripped = false;
+  if (kept && violatesBoundary(`${kept.subject}\n${kept.body}`)) {
+    kept = null;
+    tripped = true;
+  }
+  const result = kept ?? templateDraft(ctx, intent, channel);
+  return { result, source: kept ? "ai" : "template", tripped };
 }
 
 function contextSummary(ctx: DraftContext): string {
@@ -176,7 +206,7 @@ function contextSummary(ctx: DraftContext): string {
 
 // Deterministic fallback used whenever AI is unavailable or errors. Always
 // returns a usable, clearly business-appropriate draft.
-function templateDraft(
+export function templateDraft(
   ctx: DraftContext,
   intent: string,
   channel: string,
@@ -332,16 +362,14 @@ router.post(
     const tone = (body.tone ?? "").trim();
     const instructions = (body.instructions ?? "").trim();
 
-    let ai = await aiDraft(ctx, intent, channel, tone, instructions, req.log);
-    if (ai && violatesBoundary(`${ai.subject}\n${ai.body}`)) {
+    const ai = await aiDraft(ctx, intent, channel, tone, instructions, req.log);
+    const { result, source, tripped } = resolveDraft(ai, ctx, intent, channel);
+    if (tripped) {
       req.log.warn(
         { clientId: body.clientId },
         "AI draft tripped decision-boundary guard; using template fallback",
       );
-      ai = null;
     }
-    const result = ai ?? templateDraft(ctx, intent, channel);
-    const source = ai ? "ai" : "template";
 
     const actor = actorOf(req);
     const inserted = await db
