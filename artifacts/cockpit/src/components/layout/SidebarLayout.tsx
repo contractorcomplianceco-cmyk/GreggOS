@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, CheckSquare, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus } from "lucide-react";
+import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
@@ -44,7 +44,6 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
     { name: "Expansion Pipeline", href: "/expansion", icon: TrendingUp },
     { name: "Relationships", href: "/relationships", icon: HeartHandshake },
     { name: "Reporting & CRM", href: "/reporting", icon: PieChart },
-    { name: "Landon Work Queue", href: "/work-queue", icon: CheckSquare },
     { name: "Current Clients", href: "/clients", icon: Users },
     { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },
     { name: "Communication Drafts", href: "/communications", icon: MessageSquareText },

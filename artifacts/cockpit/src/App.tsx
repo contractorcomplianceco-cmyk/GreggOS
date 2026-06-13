@@ -19,7 +19,6 @@ import Training from "@/pages/training";
 import PromptLibrary from "@/pages/prompt-library";
 import Motivation from "@/pages/motivation";
 import FeedbackCenter from "@/pages/feedback";
-import WorkQueue from "@/pages/work-queue";
 import Clients from "@/pages/clients";
 import ClientDetail from "@/pages/client-detail";
 import AuditRisk from "@/pages/audit-risk";
@@ -241,7 +240,6 @@ function ClerkProviderWithRoutes() {
             <Route path="/prompt-library" component={guarded(PromptLibrary)} />
             <Route path="/motivation" component={guarded(Motivation)} />
             <Route path="/feedback" component={guarded(FeedbackCenter)} />
-            <Route path="/work-queue" component={guarded(WorkQueue)} />
             <Route path="/clients" component={guarded(Clients)} />
             <Route path="/clients/:id" component={guarded(ClientDetail)} />
             <Route path="/audit-risk" component={guarded(AuditRisk)} />
