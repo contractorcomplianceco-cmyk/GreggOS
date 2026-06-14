@@ -1,4 +1,6 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { StatCard } from "@/components/layout/StatCard";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
@@ -178,48 +180,20 @@ export default function Expenses() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-              Executive Activity
-            </p>
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground mt-2">
-              Expense Tracker
-            </h1>
-            <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-              Track travel, client-visit, relationship-building and event costs.
-              This log organizes spend for review — it does not approve
-              reimbursements or budgets.
-            </p>
-          </div>
-          <Button onClick={openCreate} data-testid="button-add-expense">
-            <Plus className="h-4 w-4 mr-1" /> Log expense
-          </Button>
-        </header>
+        <PageHeader
+          tag="Executive Activity"
+          title="Expense Tracker"
+          subtitle="Track travel, client-visit, relationship-building and event costs. This log organizes spend for review — it does not approve reimbursements or budgets."
+          action={
+            <Button onClick={openCreate} data-testid="button-add-expense">
+              <Plus className="h-4 w-4 mr-1" /> Log expense
+            </Button>
+          }
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Total Logged
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {usd(totals.total)}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-accent" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Entries
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {totals.count}
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard label="Total Logged" value={usd(totals.total)} accent="primary" />
+          <StatCard label="Entries" value={totals.count} accent="accent" />
           <Card className="relative overflow-hidden shadow-sm">
             <div className="absolute inset-x-0 top-0 h-1 bg-border" />
             <CardContent className="p-6">

@@ -1,4 +1,6 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { StatCard } from "@/components/layout/StatCard";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
@@ -137,59 +139,17 @@ export default function Expansion() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            Portfolio Growth
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-3 mt-2">
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground">
-              Expansion Pipeline
-            </h1>
-            <CreateMilestoneDialog onCreated={invalidate} />
-          </div>
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            Every open expansion opportunity across the portfolio, auto-prioritized
-            by value, stage, target date, relationship warmth, and risk. Pin or
-            boost items to override the ranking.
-          </p>
-        </header>
+        <PageHeader
+          tag="Portfolio Growth"
+          title="Expansion Pipeline"
+          subtitle="Every open expansion opportunity across the portfolio, auto-prioritized by value, stage, target date, relationship warmth, and risk. Pin or boost items to override the ranking."
+          action={<CreateMilestoneDialog onCreated={invalidate} />}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Open Opportunities
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {opportunities.length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-accent" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Pipeline Value
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {money(totalValue)}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div
-              className={`absolute inset-x-0 top-0 h-1 ${stalledCount > 0 ? "bg-destructive" : "bg-border"}`}
-            />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Stalled
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {stalledCount}
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard label="Open Opportunities" value={opportunities.length} accent="primary" />
+          <StatCard label="Pipeline Value" value={money(totalValue)} accent="accent" />
+          <StatCard label="Stalled" value={stalledCount} accent={stalledCount > 0 ? "destructive" : "border"} />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-8">

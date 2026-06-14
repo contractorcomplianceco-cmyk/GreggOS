@@ -1,0 +1,31 @@
+APP STRUCTURE RETROFIT PROMPT — Apply to an existing app
+
+Refactor this existing app to adopt the structural and interaction patterns below. Preserve the app's current visual identity — keep its existing color palette, typography, spacing scale, iconography, brand wordmark, and its own domain-specific pages/sections and terminology. This is a structure-and-consistency pass, not a redesign or rebrand. Where the app already follows a pattern below, leave it; only fill gaps and unify inconsistencies. Reuse the app's existing components, tokens, and naming conventions rather than introducing new ones.
+
+Before changing anything: inventory the current pages, navigation, shared components, and data sources. Pick the app's best-built existing page as the canonical reference, and bring other pages in line with it — don't impose an external template.
+
+1. App shell
+
+Ensure a persistent primary navigation (sidebar or the app's existing nav) that collapses to a mobile drawer. Keep the app's current nav items and section groupings; only regroup if items are clearly ungrouped or inconsistent.
+Keep the existing wordmark/descriptor and any footer/status/account block.
+Ensure a persistent top header with the app's existing context (greeting/page title), plus global search, status indicator, notifications, and account menu if the app already has or needs them — don't add features the app doesn't use.
+Main content scrolls independently beneath a sticky header.
+2. Standard page template — apply consistently to every list/management screen, using the app's existing components and styles:
+
+Page header: title, subtitle, primary action aligned right.
+Toolbar: search + filters.
+Primary view: table on desktop / cards on mobile, with status badges and a real empty state.
+Detail panel: row click opens a side sheet with edit/delete.
+Create/Edit dialog and a guarded confirm-delete dialog.
+3. Dashboard / home composition (only if the app has a dashboard)
+
+KPI summary cards row, then a wide primary panel + a right rail of smaller modules.
+Make every panel data-derived from the live data source — replace any hardcoded/placeholder values so panels stay truthful after edits. Keep the app's chosen metrics and modules.
+4. Cross-cutting patterns to unify
+
+Config-driven forms: consolidate per-entity field definitions into a central config rendered by one shared form component, so adding a field means editing config, not the dialog.
+Shared building blocks: factor repeated UI into single reusable components (PageHeader, Toolbar, Table/List, DetailSheet, RecordFormDialog, ConfirmDelete, EmptyState, Badges) and replace ad-hoc duplicates — reusing the app's existing styling.
+Responsive: sidebar → drawer; tables → stacked cards; right rail → below content.
+States: every screen handles loading, empty, and error; actions show success/failure toasts.
+Consistency over novelty: align spacing rhythm, card treatment, and interaction patterns across pages using the app's own design language — do not change its colors or fonts to achieve this.
+Guardrails: Do not alter the color scheme, typography, brand assets, or remove/rename domain-specific sections. Make incremental, reviewable changes. After each pass: typecheck passes, navigation works on all pages, CRUD + search/filter works on every entity, and the app is fully usable on mobile — with its original look intact.

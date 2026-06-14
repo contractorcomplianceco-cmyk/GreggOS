@@ -1,4 +1,6 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { StatCard } from "@/components/layout/StatCard";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
@@ -166,61 +168,21 @@ export default function FeedbackCenter() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-              Internal Signals
-            </p>
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground mt-2">
-              Feedback Center
-            </h1>
-            <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-              Capture client issues, risk-pattern observations, opportunities,
-              and system-improvement ideas. This is an internal log for review —
-              it does not commit the team to any action.
-            </p>
-          </div>
-          <Button onClick={() => setDialogOpen(true)} data-testid="button-add-feedback">
-            <Plus className="h-4 w-4 mr-1" /> Submit feedback
-          </Button>
-        </header>
+        <PageHeader
+          tag="Internal Signals"
+          title="Feedback Center"
+          subtitle="Capture client issues, risk-pattern observations, opportunities, and system-improvement ideas. This is an internal log for review — it does not commit the team to any action."
+          action={
+            <Button onClick={() => setDialogOpen(true)} data-testid="button-add-feedback">
+              <Plus className="h-4 w-4 mr-1" /> Submit feedback
+            </Button>
+          }
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Total Items
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {counts.total}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-accent" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Open
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {counts.open}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div
-              className={`absolute inset-x-0 top-0 h-1 ${counts.risk > 0 ? "bg-destructive" : "bg-border"}`}
-            />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Risk Items
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {counts.risk}
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard label="Total Items" value={counts.total} accent="primary" />
+          <StatCard label="Open" value={counts.open} accent="accent" />
+          <StatCard label="Risk Items" value={counts.risk} accent={counts.risk > 0 ? "destructive" : "border"} />
         </div>
 
         <div className="flex items-center gap-3 mb-6 flex-wrap">

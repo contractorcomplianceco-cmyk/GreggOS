@@ -1,4 +1,6 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { StatCard } from "@/components/layout/StatCard";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
@@ -83,58 +85,16 @@ export default function Relationships() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            Relationship Radar
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground mt-2">
-            Relationships
-          </h1>
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            Track relationship warmth and contact cadence across the portfolio. Log
-            touches as they happen and plan the next visit or call before an account
-            goes cold.
-          </p>
-        </header>
+        <PageHeader
+          tag="Relationship Radar"
+          title="Relationships"
+          subtitle="Track relationship warmth and contact cadence across the portfolio. Log touches as they happen and plan the next visit or call before an account goes cold."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Relationships
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {rows.length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div
-              className={`absolute inset-x-0 top-0 h-1 ${overdueCount > 0 ? "bg-destructive" : "bg-border"}`}
-            />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Touch Overdue
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {overdueCount}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div
-              className={`absolute inset-x-0 top-0 h-1 ${coldCount > 0 ? "bg-destructive" : "bg-border"}`}
-            />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Going Cold
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {coldCount}
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard label="Relationships" value={rows.length} accent="primary" />
+          <StatCard label="Touch Overdue" value={overdueCount} accent={overdueCount > 0 ? "destructive" : "border"} />
+          <StatCard label="Going Cold" value={coldCount} accent={coldCount > 0 ? "destructive" : "border"} />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-8">

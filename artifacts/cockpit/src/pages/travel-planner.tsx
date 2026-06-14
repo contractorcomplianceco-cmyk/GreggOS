@@ -1,4 +1,6 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { StatCard } from "@/components/layout/StatCard";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
@@ -190,59 +192,21 @@ export default function TravelPlanner() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-              Executive Travel
-            </p>
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground mt-2">
-              Travel Planner
-            </h1>
-            <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-              Plan strategic in-person client visits with an explicit ROI
-              justification. This board organizes proposed travel for review — it
-              does not approve travel spend or budgets.
-            </p>
-          </div>
-          <Button onClick={openCreate} data-testid="button-add-travel">
-            <Plus className="h-4 w-4 mr-1" /> New plan
-          </Button>
-        </header>
+        <PageHeader
+          tag="Executive Travel"
+          title="Travel Planner"
+          subtitle="Plan strategic in-person client visits with an explicit ROI justification. This board organizes proposed travel for review — it does not approve travel spend or budgets."
+          action={
+            <Button onClick={openCreate} data-testid="button-add-travel">
+              <Plus className="h-4 w-4 mr-1" /> New plan
+            </Button>
+          }
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Total Plans
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {counts.total}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-accent" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Active
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {counts.active}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="relative overflow-hidden shadow-sm">
-            <div className="absolute inset-x-0 top-0 h-1 bg-border" />
-            <CardContent className="p-6">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                Booked
-              </p>
-              <div className="mt-4 text-4xl font-semibold tabular-nums">
-                {counts.booked}
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard label="Total Plans" value={counts.total} accent="primary" />
+          <StatCard label="Active" value={counts.active} accent="accent" />
+          <StatCard label="Booked" value={counts.booked} accent="border" />
         </div>
 
         <div className="flex items-center gap-3 mb-6">

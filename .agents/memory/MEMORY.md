@@ -8,3 +8,4 @@
 - [CRM export lifecycle](crm-export-lifecycle.md) — crm_links approve(POST)/push(PATCH) split is server-enforced (export-only); closedAt server-managed, not a writable input.
 - [Prod stale/divergent published build](prod-stale-deployment-divergence.md) — prod behavior current code can't reproduce (per-route 403 split) = stale published snapshot; republish; dev tests default to admin, test coordinator role.
 - [Cockpit dual test runners](cockpit-test-runners.md) — node:test runs *.test.ts (structural), vitest+jsdom runs *.test.tsx (render); page render smoke tests need clerk mock + providers + fetch/observer stubs.
+- [Cockpit shared layout primitives](cockpit-layout-primitives.md) — reuse PageHeader/StatCard for themed pages; SidebarLayout has desktop+mobile-drawer shell; StatCard accents must be literal map entries (Tailwind purge).
