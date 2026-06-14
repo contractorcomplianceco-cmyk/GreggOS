@@ -4,7 +4,7 @@ import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, Shiel
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
+import ccaCrest from "@assets/cca-crest-inset_1781474011676.png";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -121,15 +121,20 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="bg-sidebar text-sidebar-foreground flex flex-col justify-between h-full">
       <div className="min-h-0 flex flex-col">
-        <div className="px-5 pt-6 pb-5 shrink-0">
+        <div className="px-4 pt-4 pb-3 shrink-0 flex items-center gap-2.5">
           <img
-            src={ccaLogo}
+            src={ccaCrest}
             alt="Contractor Compliance Authority"
-            className="w-full h-auto"
+            className="h-10 w-auto shrink-0"
           />
-          <p className="text-[11px] uppercase tracking-[0.18em] text-sidebar-foreground/60 mt-3">
-            Current Client Cockpit
-          </p>
+          <div className="leading-tight min-w-0">
+            <p className="text-sm font-bold tracking-tight text-sidebar-foreground">
+              GreggOS <span className="text-sky-400">Command Center</span>
+            </p>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-sidebar-foreground/60">
+              Current Client Cockpit
+            </p>
+          </div>
         </div>
         <nav className="space-y-1 px-4 overflow-y-auto pb-4">
           <a
