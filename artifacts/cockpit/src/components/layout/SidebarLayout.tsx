@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle, Menu } from "lucide-react";
+import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle, Menu, Network, IdCard, UserCog, Gift, Award, DollarSign, ListChecks } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -9,37 +9,79 @@ import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_178
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 type NavItem = { name: string; href: string; icon: typeof LayoutDashboard };
+type NavSection = { label: string; items: NavItem[] };
 
-function useNavigation(): NavItem[] {
+function useNavigation(): NavSection[] {
   const { data: me } = useGetCurrentUser();
   const isAdmin = me?.role === "admin";
 
   return [
-    { name: "Gregg Today", href: "/", icon: LayoutDashboard },
-    { name: "Account Oversight", href: "/oversight", icon: BarChart3 },
-    { name: "Expansion Pipeline", href: "/expansion", icon: TrendingUp },
-    { name: "Relationships", href: "/relationships", icon: HeartHandshake },
-    { name: "Reporting & CRM", href: "/reporting", icon: PieChart },
-    { name: "Current Clients", href: "/clients", icon: Users },
-    { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },
-    { name: "Communication Drafts", href: "/communications", icon: MessageSquareText },
-    { name: "Travel Planner", href: "/travel", icon: Plane },
-    { name: "Expense Tracker", href: "/expenses", icon: Receipt },
-    { name: "Training & Leveling", href: "/training", icon: GraduationCap },
-    { name: "AI Prompt Library", href: "/prompt-library", icon: Sparkles },
-    { name: "Feedback Center", href: "/feedback", icon: MessageSquarePlus },
-    { name: "Walkthrough & Motivation", href: "/motivation", icon: Compass },
-    { name: "Call Note Processor", href: "/processor", icon: Briefcase },
-    { name: "Weekly Review", href: "/weekly-review", icon: Calendar },
+    {
+      label: "Command Center",
+      items: [{ name: "Gregg Today", href: "/", icon: LayoutDashboard }],
+    },
+    {
+      label: "Clients & Accounts",
+      items: [
+        { name: "Current Clients", href: "/clients", icon: Users },
+        { name: "Account Oversight", href: "/oversight", icon: BarChart3 },
+        { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },
+      ],
+    },
+    {
+      label: "Growth & Placement",
+      items: [
+        { name: "Expansion Pipeline", href: "/expansion", icon: TrendingUp },
+        { name: "Relationships", href: "/relationships", icon: HeartHandshake },
+        { name: "Placement / Qualifier Network", href: "/placement", icon: Network },
+        { name: "Reporting & CRM", href: "/reporting", icon: PieChart },
+      ],
+    },
+    {
+      label: "Daily Work",
+      items: [
+        { name: "Call Note Processor", href: "/processor", icon: Briefcase },
+        { name: "Communication Drafts", href: "/communications", icon: MessageSquareText },
+        { name: "Weekly Review", href: "/weekly-review", icon: Calendar },
+      ],
+    },
+    {
+      label: "My Executive Office",
+      items: [
+        { name: "Executive Profile", href: "/executive-profile", icon: IdCard },
+        { name: "My Account", href: "/my-account", icon: UserCog },
+        { name: "My Benefits", href: "/my-benefits", icon: Gift },
+        { name: "Bonus Tracker", href: "/bonus-tracker", icon: Award },
+        { name: "Profit Sharing", href: "/profit-sharing", icon: DollarSign },
+        { name: "90 / 180-Day Success Plan", href: "/success-plan", icon: ListChecks },
+      ],
+    },
+    {
+      label: "Tools & Resources",
+      items: [
+        { name: "Travel Planner", href: "/travel", icon: Plane },
+        { name: "Expense Tracker", href: "/expenses", icon: Receipt },
+        { name: "Training & Leveling", href: "/training", icon: GraduationCap },
+        { name: "AI Prompt Library", href: "/prompt-library", icon: Sparkles },
+        { name: "Feedback Center", href: "/feedback", icon: MessageSquarePlus },
+        { name: "Walkthrough & Motivation", href: "/motivation", icon: Compass },
+      ],
+    },
     ...(isAdmin
-      ? [{ name: "Admin / Setup", href: "/admin", icon: Settings }]
+      ? [
+          {
+            label: "Administration",
+            items: [{ name: "Admin / Setup", href: "/admin", icon: Settings }],
+          },
+        ]
       : []),
   ];
 }
 
-function currentTitle(location: string, navigation: NavItem[]): string {
+function currentTitle(location: string, navigation: NavSection[]): string {
   if (location.startsWith("/clients/")) return "Client Detail";
-  const match = navigation.find(
+  const items = navigation.flatMap((s) => s.items);
+  const match = items.find(
     (item) => location === item.href || (item.href !== "/" && location.startsWith(item.href)),
   );
   return match?.name ?? "Current Client Cockpit";
@@ -98,23 +140,30 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             <PlayCircle className="w-4 h-4" />
             Start Here
           </a>
-          {navigation.map((item) => {
-            const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
-            return (
-              <Link key={item.name} href={item.href} onClick={onNavigate}>
-                <div
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.name}
-                </div>
-              </Link>
-            );
-          })}
+          {navigation.map((section) => (
+            <div key={section.label} className="mb-3">
+              <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/45">
+                {section.label}
+              </p>
+              {section.items.map((item) => {
+                const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
+                return (
+                  <Link key={item.name} href={item.href} onClick={onNavigate}>
+                    <div
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${
+                        isActive
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                          : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                      }`}
+                    >
+                      <item.icon className="w-4 h-4 shrink-0" />
+                      {item.name}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
       </div>
       <div className="shrink-0">

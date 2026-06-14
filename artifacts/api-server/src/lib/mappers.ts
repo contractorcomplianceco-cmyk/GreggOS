@@ -20,6 +20,11 @@ import type {
   Expense as DbExpense,
   Feedback as DbFeedback,
   TrainingModule as DbTrainingModule,
+  BonusEntry as DbBonusEntry,
+  ProfitShareProjection as DbProfitShareProjection,
+  Qualifier as DbQualifier,
+  Placement as DbPlacement,
+  SuccessPlanItem as DbSuccessPlanItem,
 } from "@workspace/db";
 import type {
   Client,
@@ -43,6 +48,11 @@ import type {
   Expense,
   Feedback,
   TrainingModule,
+  BonusEntry,
+  ProfitShareProjection,
+  Qualifier,
+  Placement,
+  SuccessPlanItem,
 } from "@workspace/api-zod";
 
 const s = (v: string | null | undefined): string => v ?? "";
@@ -371,6 +381,93 @@ export function toTrainingModule(row: DbTrainingModule): TrainingModule {
     completed: row.completed,
     completedAt: row.completedAt ? row.completedAt.toISOString() : null,
     sortOrder: row.sortOrder,
+  };
+}
+
+export function toBonusEntry(row: DbBonusEntry): BonusEntry {
+  return {
+    id: row.id,
+    category: row.category,
+    title: row.title,
+    clientId: row.clientId ?? null,
+    amount: row.amountCents / 100,
+    status: row.status,
+    periodLabel: row.periodLabel,
+    documentation: row.documentation,
+    notes: row.notes,
+    occurredOn: row.occurredOn ?? null,
+    createdByLabel: row.createdByLabel,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toProfitShare(
+  row: DbProfitShareProjection,
+): ProfitShareProjection {
+  return {
+    id: row.id,
+    periodLabel: row.periodLabel,
+    basis: row.basis,
+    projectedAmount: row.projectedAmountCents / 100,
+    status: row.status,
+    notes: row.notes,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toQualifier(row: DbQualifier): Qualifier {
+  return {
+    id: row.id,
+    name: row.name,
+    licenseType: row.licenseType,
+    state: row.state,
+    tradeClassification: row.tradeClassification,
+    availability: row.availability,
+    status: row.status,
+    contact: row.contact,
+    notes: row.notes,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toPlacement(row: DbPlacement): Placement {
+  return {
+    id: row.id,
+    clientId: row.clientId ?? null,
+    qualifierId: row.qualifierId ?? null,
+    title: row.title,
+    licenseType: row.licenseType,
+    state: row.state,
+    tradeClassification: row.tradeClassification,
+    stage: row.stage,
+    status: row.status,
+    timeline: row.timeline,
+    budget: row.budget,
+    expectations: row.expectations,
+    riskFlags: row.riskFlags,
+    nextStep: row.nextStep,
+    missingInfo: row.missingInfo,
+    targetDate: row.targetDate ?? null,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toSuccessPlanItem(row: DbSuccessPlanItem): SuccessPlanItem {
+  return {
+    id: row.id,
+    phase: row.phase,
+    title: row.title,
+    description: row.description,
+    completed: row.completed,
+    completedAt: row.completedAt ? row.completedAt.toISOString() : null,
+    notes: row.notes,
+    sortOrder: row.sortOrder,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
   };
 }
 

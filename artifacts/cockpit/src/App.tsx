@@ -19,6 +19,13 @@ import Training from "@/pages/training";
 import PromptLibrary from "@/pages/prompt-library";
 import Motivation from "@/pages/motivation";
 import FeedbackCenter from "@/pages/feedback";
+import BonusTracker from "@/pages/bonus-tracker";
+import ProfitSharing from "@/pages/profit-sharing";
+import PlacementNetwork from "@/pages/placement";
+import SuccessPlan from "@/pages/success-plan";
+import MyAccount from "@/pages/my-account";
+import MyBenefits from "@/pages/my-benefits";
+import ExecutiveProfile from "@/pages/executive-profile";
 import Clients from "@/pages/clients";
 import ClientDetail from "@/pages/client-detail";
 import AuditRisk from "@/pages/audit-risk";
@@ -240,6 +247,13 @@ function ClerkProviderWithRoutes() {
             <Route path="/prompt-library" component={guarded(PromptLibrary)} />
             <Route path="/motivation" component={guarded(Motivation)} />
             <Route path="/feedback" component={guarded(FeedbackCenter)} />
+            <Route path="/placement" component={guarded(PlacementNetwork)} />
+            <Route path="/bonus-tracker" component={guarded(BonusTracker)} />
+            <Route path="/profit-sharing" component={guarded(ProfitSharing)} />
+            <Route path="/success-plan" component={guarded(SuccessPlan)} />
+            <Route path="/my-account" component={guarded(MyAccount)} />
+            <Route path="/my-benefits" component={guarded(MyBenefits)} />
+            <Route path="/executive-profile" component={guarded(ExecutiveProfile)} />
             <Route path="/clients" component={guarded(Clients)} />
             <Route path="/clients/:id" component={guarded(ClientDetail)} />
             <Route path="/audit-risk" component={guarded(AuditRisk)} />

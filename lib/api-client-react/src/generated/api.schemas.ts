@@ -820,6 +820,257 @@ export interface TrainingModuleUpdate {
   completed?: boolean;
 }
 
+export interface BonusEntry {
+  id: string;
+  category: string;
+  title: string;
+  clientId?: string | null;
+  amount: number;
+  status: string;
+  periodLabel: string;
+  documentation: string;
+  notes: string;
+  occurredOn?: string | null;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BonusEntryInput {
+  category: string;
+  title: string;
+  clientId?: string | null;
+  amount: number;
+  status?: string;
+  periodLabel?: string;
+  documentation?: string;
+  notes?: string;
+  occurredOn?: string | null;
+}
+
+export type BonusEntryUpdateStatus = typeof BonusEntryUpdateStatus[keyof typeof BonusEntryUpdateStatus];
+
+
+export const BonusEntryUpdateStatus = {
+  eligible: 'eligible',
+  pending_approval: 'pending_approval',
+  approved: 'approved',
+  paid: 'paid',
+} as const;
+
+export interface BonusEntryUpdate {
+  category?: string;
+  title?: string;
+  clientId?: string | null;
+  amount?: number;
+  status?: BonusEntryUpdateStatus;
+  periodLabel?: string;
+  documentation?: string;
+  notes?: string;
+  occurredOn?: string | null;
+}
+
+export interface ProfitShareProjection {
+  id: string;
+  periodLabel: string;
+  basis: string;
+  projectedAmount: number;
+  status: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProfitShareProjectionInput {
+  periodLabel: string;
+  basis: string;
+  projectedAmount?: number;
+  status?: string;
+  notes?: string;
+}
+
+export type ProfitShareProjectionUpdateStatus = typeof ProfitShareProjectionUpdateStatus[keyof typeof ProfitShareProjectionUpdateStatus];
+
+
+export const ProfitShareProjectionUpdateStatus = {
+  illustrative: 'illustrative',
+  under_discussion: 'under_discussion',
+  documented: 'documented',
+} as const;
+
+export interface ProfitShareProjectionUpdate {
+  periodLabel?: string;
+  basis?: string;
+  projectedAmount?: number;
+  status?: ProfitShareProjectionUpdateStatus;
+  notes?: string;
+}
+
+export interface Qualifier {
+  id: string;
+  name: string;
+  licenseType: string;
+  state: string;
+  tradeClassification: string;
+  availability: string;
+  status: string;
+  contact: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QualifierInput {
+  name: string;
+  licenseType?: string;
+  state?: string;
+  tradeClassification?: string;
+  availability?: string;
+  status?: string;
+  contact?: string;
+  notes?: string;
+}
+
+export type QualifierUpdateAvailability = typeof QualifierUpdateAvailability[keyof typeof QualifierUpdateAvailability];
+
+
+export const QualifierUpdateAvailability = {
+  available: 'available',
+  engaged: 'engaged',
+  unavailable: 'unavailable',
+} as const;
+
+export type QualifierUpdateStatus = typeof QualifierUpdateStatus[keyof typeof QualifierUpdateStatus];
+
+
+export const QualifierUpdateStatus = {
+  prospect: 'prospect',
+  intake: 'intake',
+  verified: 'verified',
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export interface QualifierUpdate {
+  name?: string;
+  licenseType?: string;
+  state?: string;
+  tradeClassification?: string;
+  availability?: QualifierUpdateAvailability;
+  status?: QualifierUpdateStatus;
+  contact?: string;
+  notes?: string;
+}
+
+export interface Placement {
+  id: string;
+  clientId?: string | null;
+  qualifierId?: string | null;
+  title: string;
+  licenseType: string;
+  state: string;
+  tradeClassification: string;
+  stage: string;
+  status: string;
+  timeline: string;
+  budget: string;
+  expectations: string;
+  riskFlags: string;
+  nextStep: string;
+  missingInfo: string;
+  targetDate?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PlacementInput {
+  clientId?: string | null;
+  qualifierId?: string | null;
+  title: string;
+  licenseType?: string;
+  state?: string;
+  tradeClassification?: string;
+  stage?: string;
+  status?: string;
+  timeline?: string;
+  budget?: string;
+  expectations?: string;
+  riskFlags?: string;
+  nextStep?: string;
+  missingInfo?: string;
+  targetDate?: string | null;
+}
+
+export type PlacementUpdateStage = typeof PlacementUpdateStage[keyof typeof PlacementUpdateStage];
+
+
+export const PlacementUpdateStage = {
+  interest: 'interest',
+  fit_review: 'fit_review',
+  internal_review: 'internal_review',
+  placed: 'placed',
+  renewal: 'renewal',
+  replacement: 'replacement',
+} as const;
+
+export type PlacementUpdateStatus = typeof PlacementUpdateStatus[keyof typeof PlacementUpdateStatus];
+
+
+export const PlacementUpdateStatus = {
+  open: 'open',
+  on_hold: 'on_hold',
+  placed: 'placed',
+  closed: 'closed',
+} as const;
+
+export interface PlacementUpdate {
+  clientId?: string | null;
+  qualifierId?: string | null;
+  title?: string;
+  licenseType?: string;
+  state?: string;
+  tradeClassification?: string;
+  stage?: PlacementUpdateStage;
+  status?: PlacementUpdateStatus;
+  timeline?: string;
+  budget?: string;
+  expectations?: string;
+  riskFlags?: string;
+  nextStep?: string;
+  missingInfo?: string;
+  targetDate?: string | null;
+}
+
+export interface SuccessPlanItem {
+  id: string;
+  phase: string;
+  title: string;
+  description: string;
+  completed: boolean;
+  completedAt?: string | null;
+  notes: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SuccessPlanItemInput {
+  phase: string;
+  title: string;
+  description?: string;
+  notes?: string;
+  sortOrder?: number;
+}
+
+export interface SuccessPlanItemUpdate {
+  phase?: string;
+  title?: string;
+  description?: string;
+  completed?: boolean;
+  notes?: string;
+  sortOrder?: number;
+}
+
 export type ListClientsParams = {
 search?: string;
 status?: string;
@@ -908,5 +1159,24 @@ category?: string;
 export type ListFeedbackParams = {
 type?: string;
 status?: string;
+};
+
+export type ListBonusEntriesParams = {
+category?: string;
+status?: string;
+};
+
+export type ListQualifiersParams = {
+status?: string;
+availability?: string;
+};
+
+export type ListPlacementsParams = {
+stage?: string;
+status?: string;
+};
+
+export type ListSuccessPlanItemsParams = {
+phase?: string;
 };
 

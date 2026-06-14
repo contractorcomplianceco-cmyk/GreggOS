@@ -1208,6 +1208,277 @@ paths:
               schema:
                 $ref: "#/components/schemas/TrainingModule"
 
+  /bonus-entries:
+    get:
+      operationId: listBonusEntries
+      tags: [bonus]
+      summary: List bonus-eligible entries
+      parameters:
+        - { name: category, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Bonus entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BonusEntry"
+    post:
+      operationId: createBonusEntry
+      tags: [bonus]
+      summary: Create a bonus entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BonusEntryInput"
+      responses:
+        "201":
+          description: Created bonus entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BonusEntry"
+  /bonus-entries/{bonusEntryId}:
+    parameters:
+      - { name: bonusEntryId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateBonusEntry
+      tags: [bonus]
+      summary: Update a bonus entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BonusEntryUpdate"
+      responses:
+        "200":
+          description: Updated bonus entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BonusEntry"
+
+  /profit-shares:
+    get:
+      operationId: listProfitShares
+      tags: [profit-share]
+      summary: List profit-sharing projections (awareness only)
+      responses:
+        "200":
+          description: Profit-share projections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProfitShareProjection"
+    post:
+      operationId: createProfitShare
+      tags: [profit-share]
+      summary: Create a profit-sharing projection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfitShareProjectionInput"
+      responses:
+        "201":
+          description: Created projection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfitShareProjection"
+  /profit-shares/{projectionId}:
+    parameters:
+      - { name: projectionId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateProfitShare
+      tags: [profit-share]
+      summary: Update a profit-sharing projection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfitShareProjectionUpdate"
+      responses:
+        "200":
+          description: Updated projection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfitShareProjection"
+
+  /qualifiers:
+    get:
+      operationId: listQualifiers
+      tags: [placement]
+      summary: List licensed qualifiers
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string } }
+        - { name: availability, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Qualifiers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Qualifier"
+    post:
+      operationId: createQualifier
+      tags: [placement]
+      summary: Add a qualifier to the network
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QualifierInput"
+      responses:
+        "201":
+          description: Created qualifier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Qualifier"
+  /qualifiers/{qualifierId}:
+    parameters:
+      - { name: qualifierId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateQualifier
+      tags: [placement]
+      summary: Update a qualifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QualifierUpdate"
+      responses:
+        "200":
+          description: Updated qualifier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Qualifier"
+
+  /placements:
+    get:
+      operationId: listPlacements
+      tags: [placement]
+      summary: List placement engagements
+      parameters:
+        - { name: stage, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Placements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Placement"
+    post:
+      operationId: createPlacement
+      tags: [placement]
+      summary: Create a placement engagement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlacementInput"
+      responses:
+        "201":
+          description: Created placement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Placement"
+  /placements/{placementId}:
+    parameters:
+      - { name: placementId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updatePlacement
+      tags: [placement]
+      summary: Update a placement engagement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlacementUpdate"
+      responses:
+        "200":
+          description: Updated placement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Placement"
+
+  /success-plan-items:
+    get:
+      operationId: listSuccessPlanItems
+      tags: [success-plan]
+      summary: List 90/180-day success plan items
+      parameters:
+        - { name: phase, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Success plan items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SuccessPlanItem"
+    post:
+      operationId: createSuccessPlanItem
+      tags: [success-plan]
+      summary: Create a success plan item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuccessPlanItemInput"
+      responses:
+        "201":
+          description: Created success plan item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessPlanItem"
+  /success-plan-items/{itemId}:
+    parameters:
+      - { name: itemId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateSuccessPlanItem
+      tags: [success-plan]
+      summary: Update a success plan item (completion/notes)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuccessPlanItemUpdate"
+      responses:
+        "200":
+          description: Updated success plan item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessPlanItem"
+
 components:
   schemas:
     HealthStatus:
@@ -2455,3 +2726,274 @@ components:
       type: object
       properties:
         completed: { type: boolean }
+
+    BonusEntry:
+      type: object
+      properties:
+        id: { type: string }
+        category: { type: string }
+        title: { type: string }
+        clientId: { type: string, nullable: true }
+        amount: { type: number }
+        status: { type: string }
+        periodLabel: { type: string }
+        documentation: { type: string }
+        notes: { type: string }
+        occurredOn: { type: string, nullable: true }
+        createdByLabel: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - category
+        - title
+        - amount
+        - status
+        - periodLabel
+        - documentation
+        - notes
+        - createdByLabel
+        - createdAt
+        - updatedAt
+    BonusEntryInput:
+      type: object
+      properties:
+        category: { type: string }
+        title: { type: string }
+        clientId: { type: string, nullable: true }
+        amount: { type: number }
+        status: { type: string }
+        periodLabel: { type: string }
+        documentation: { type: string }
+        notes: { type: string }
+        occurredOn: { type: string, nullable: true }
+      required: [category, title, amount]
+    BonusEntryUpdate:
+      type: object
+      properties:
+        category: { type: string }
+        title: { type: string }
+        clientId: { type: string, nullable: true }
+        amount: { type: number }
+        status:
+          type: string
+          enum: [eligible, pending_approval, approved, paid]
+        periodLabel: { type: string }
+        documentation: { type: string }
+        notes: { type: string }
+        occurredOn: { type: string, nullable: true }
+
+    ProfitShareProjection:
+      type: object
+      properties:
+        id: { type: string }
+        periodLabel: { type: string }
+        basis: { type: string }
+        projectedAmount: { type: number }
+        status: { type: string }
+        notes: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - periodLabel
+        - basis
+        - projectedAmount
+        - status
+        - notes
+        - createdAt
+        - updatedAt
+    ProfitShareProjectionInput:
+      type: object
+      properties:
+        periodLabel: { type: string }
+        basis: { type: string }
+        projectedAmount: { type: number }
+        status: { type: string }
+        notes: { type: string }
+      required: [periodLabel, basis]
+    ProfitShareProjectionUpdate:
+      type: object
+      properties:
+        periodLabel: { type: string }
+        basis: { type: string }
+        projectedAmount: { type: number }
+        status:
+          type: string
+          enum: [illustrative, under_discussion, documented]
+        notes: { type: string }
+
+    Qualifier:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        licenseType: { type: string }
+        state: { type: string }
+        tradeClassification: { type: string }
+        availability: { type: string }
+        status: { type: string }
+        contact: { type: string }
+        notes: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - name
+        - licenseType
+        - state
+        - tradeClassification
+        - availability
+        - status
+        - contact
+        - notes
+        - createdAt
+        - updatedAt
+    QualifierInput:
+      type: object
+      properties:
+        name: { type: string }
+        licenseType: { type: string }
+        state: { type: string }
+        tradeClassification: { type: string }
+        availability: { type: string }
+        status: { type: string }
+        contact: { type: string }
+        notes: { type: string }
+      required: [name]
+    QualifierUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        licenseType: { type: string }
+        state: { type: string }
+        tradeClassification: { type: string }
+        availability:
+          type: string
+          enum: [available, engaged, unavailable]
+        status:
+          type: string
+          enum: [prospect, intake, verified, active, inactive]
+        contact: { type: string }
+        notes: { type: string }
+
+    Placement:
+      type: object
+      properties:
+        id: { type: string }
+        clientId: { type: string, nullable: true }
+        qualifierId: { type: string, nullable: true }
+        title: { type: string }
+        licenseType: { type: string }
+        state: { type: string }
+        tradeClassification: { type: string }
+        stage: { type: string }
+        status: { type: string }
+        timeline: { type: string }
+        budget: { type: string }
+        expectations: { type: string }
+        riskFlags: { type: string }
+        nextStep: { type: string }
+        missingInfo: { type: string }
+        targetDate: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - title
+        - licenseType
+        - state
+        - tradeClassification
+        - stage
+        - status
+        - timeline
+        - budget
+        - expectations
+        - riskFlags
+        - nextStep
+        - missingInfo
+        - createdAt
+        - updatedAt
+    PlacementInput:
+      type: object
+      properties:
+        clientId: { type: string, nullable: true }
+        qualifierId: { type: string, nullable: true }
+        title: { type: string }
+        licenseType: { type: string }
+        state: { type: string }
+        tradeClassification: { type: string }
+        stage: { type: string }
+        status: { type: string }
+        timeline: { type: string }
+        budget: { type: string }
+        expectations: { type: string }
+        riskFlags: { type: string }
+        nextStep: { type: string }
+        missingInfo: { type: string }
+        targetDate: { type: string, nullable: true }
+      required: [title]
+    PlacementUpdate:
+      type: object
+      properties:
+        clientId: { type: string, nullable: true }
+        qualifierId: { type: string, nullable: true }
+        title: { type: string }
+        licenseType: { type: string }
+        state: { type: string }
+        tradeClassification: { type: string }
+        stage:
+          type: string
+          enum: [interest, fit_review, internal_review, placed, renewal, replacement]
+        status:
+          type: string
+          enum: [open, on_hold, placed, closed]
+        timeline: { type: string }
+        budget: { type: string }
+        expectations: { type: string }
+        riskFlags: { type: string }
+        nextStep: { type: string }
+        missingInfo: { type: string }
+        targetDate: { type: string, nullable: true }
+
+    SuccessPlanItem:
+      type: object
+      properties:
+        id: { type: string }
+        phase: { type: string }
+        title: { type: string }
+        description: { type: string }
+        completed: { type: boolean }
+        completedAt: { type: string, nullable: true }
+        notes: { type: string }
+        sortOrder: { type: integer }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - phase
+        - title
+        - description
+        - completed
+        - notes
+        - sortOrder
+        - createdAt
+        - updatedAt
+    SuccessPlanItemInput:
+      type: object
+      properties:
+        phase: { type: string }
+        title: { type: string }
+        description: { type: string }
+        notes: { type: string }
+        sortOrder: { type: integer }
+      required: [phase, title]
+    SuccessPlanItemUpdate:
+      type: object
+      properties:
+        phase: { type: string }
+        title: { type: string }
+        description: { type: string }
+        completed: { type: boolean }
+        notes: { type: string }
+        sortOrder: { type: integer }

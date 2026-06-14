@@ -10,3 +10,7 @@ export * from "./travel";
 export * from "./expenses";
 export * from "./feedback";
 export * from "./training";
+export * from "./bonusEntries";
+export * from "./profitShare";
+export * from "./placement";
+export * from "./successPlan";

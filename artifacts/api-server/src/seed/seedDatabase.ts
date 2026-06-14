@@ -22,6 +22,11 @@ import {
   expensesTable,
   feedbackTable,
   trainingModulesTable,
+  bonusEntriesTable,
+  profitShareProjectionsTable,
+  qualifiersTable,
+  placementsTable,
+  successPlanItemsTable,
   type RiskFactor,
   type AuditScoreItem,
 } from "@workspace/db";
@@ -886,6 +891,345 @@ export async function seedDatabase(): Promise<void> {
         matchMethod: "preconfirmed",
         confirmedByUserId: greggId,
         confirmedAt: new Date(),
+      });
+    }
+
+    const bonusEntries: {
+      category: string;
+      title: string;
+      clientKey: string | null;
+      amount: number;
+      status: string;
+      periodLabel: string;
+      documentation: string;
+    }[] = [
+      {
+        category: "expansion_addon",
+        title: "Add-on services secured (2.5% of retained revenue)",
+        clientKey: "c1",
+        amount: 1250,
+        status: "pending_approval",
+        periodLabel: "June 2026",
+        documentation: "Signed add-on agreement + first collected payment on file.",
+      },
+      {
+        category: "monitoring_conversion",
+        title: "Converted client to ongoing monitoring",
+        clientKey: "c2",
+        amount: 400,
+        status: "eligible",
+        periodLabel: "June 2026",
+        documentation: "Monitoring plan activated; awaiting first billing cycle confirmation.",
+      },
+      {
+        category: "client_save",
+        title: "Retained at-risk account (discretionary save)",
+        clientKey: "c3",
+        amount: 750,
+        status: "approved",
+        periodLabel: "May 2026",
+        documentation: "Save documented in account timeline; leadership approved discretionary award.",
+      },
+      {
+        category: "high_value_stability",
+        title: "High-value account kept stable (monthly)",
+        clientKey: "c1",
+        amount: 500,
+        status: "paid",
+        periodLabel: "May 2026",
+        documentation: "Account remained green for full month; stability criteria met.",
+      },
+      {
+        category: "clean_placement",
+        title: "Clean placement / client success team standard (monthly)",
+        clientKey: null,
+        amount: 350,
+        status: "eligible",
+        periodLabel: "June 2026",
+        documentation: "No escalations or compliance gaps for the period.",
+      },
+    ];
+    for (const b of bonusEntries) {
+      const cid = b.clientKey ? clientIds.get(b.clientKey) ?? null : null;
+      await tx.insert(bonusEntriesTable).values({
+        category: b.category,
+        title: b.title,
+        clientId: cid,
+        amountCents: Math.round(b.amount * 100),
+        status: b.status,
+        periodLabel: b.periodLabel,
+        documentation: b.documentation,
+        createdByUserId: greggId,
+        createdByLabel: "Gregg",
+      });
+    }
+
+    const profitShares: {
+      periodLabel: string;
+      basis: string;
+      amount: number;
+      status: string;
+      notes: string;
+    }[] = [
+      {
+        periodLabel: "2026 (illustrative)",
+        basis: "Illustrative figure based on retained-client revenue contribution. Not a guarantee.",
+        amount: 12000,
+        status: "illustrative",
+        notes:
+          "Awareness only. Any profit participation must be documented separately through company governance — this row does not create an entitlement.",
+      },
+      {
+        periodLabel: "Q2 2026 (illustrative)",
+        basis: "Quarter-scoped projection tied to expansion and monitoring conversions.",
+        amount: 3000,
+        status: "under_discussion",
+        notes: "Discussion-stage projection; subject to leadership review and formal documentation.",
+      },
+    ];
+    for (const p of profitShares) {
+      await tx.insert(profitShareProjectionsTable).values({
+        periodLabel: p.periodLabel,
+        basis: p.basis,
+        projectedAmountCents: Math.round(p.amount * 100),
+        status: p.status,
+        notes: p.notes,
+      });
+    }
+
+    const qualifierSpecs: {
+      name: string;
+      licenseType: string;
+      state: string;
+      tradeClassification: string;
+      availability: string;
+      status: string;
+      contact: string;
+      notes: string;
+    }[] = [
+      {
+        name: "Daniel Reyes",
+        licenseType: "General Contractor (GC)",
+        state: "TX",
+        tradeClassification: "Commercial",
+        availability: "available",
+        status: "verified",
+        contact: "d.reyes@example.com",
+        notes: "Verified license; open to one additional engagement.",
+      },
+      {
+        name: "Sandra Whitfield",
+        licenseType: "Electrical (Master)",
+        state: "FL",
+        tradeClassification: "Electrical",
+        availability: "engaged",
+        status: "active",
+        contact: "s.whitfield@example.com",
+        notes: "Currently engaged on an active placement.",
+      },
+      {
+        name: "Marcus Boateng",
+        licenseType: "Mechanical / HVAC",
+        state: "GA",
+        tradeClassification: "Mechanical",
+        availability: "available",
+        status: "intake",
+        contact: "m.boateng@example.com",
+        notes: "Intake in progress; awaiting license verification documents.",
+      },
+    ];
+    const qualifierIds = new Map<string, string>();
+    for (const q of qualifierSpecs) {
+      const inserted = await tx
+        .insert(qualifiersTable)
+        .values({
+          name: q.name,
+          licenseType: q.licenseType,
+          state: q.state,
+          tradeClassification: q.tradeClassification,
+          availability: q.availability,
+          status: q.status,
+          contact: q.contact,
+          notes: q.notes,
+        })
+        .returning();
+      qualifierIds.set(q.name, inserted[0]!.id);
+    }
+
+    const placementSpecs: {
+      clientKey: string | null;
+      qualifierName: string | null;
+      title: string;
+      licenseType: string;
+      state: string;
+      tradeClassification: string;
+      stage: string;
+      status: string;
+      timeline: string;
+      budget: string;
+      expectations: string;
+      riskFlags: string;
+      nextStep: string;
+      missingInfo: string;
+      targetDate: string | null;
+    }[] = [
+      {
+        clientKey: "c1",
+        qualifierName: "Daniel Reyes",
+        title: "GC qualifier placement — TX commercial",
+        licenseType: "General Contractor (GC)",
+        state: "TX",
+        tradeClassification: "Commercial",
+        stage: "internal_review",
+        status: "open",
+        timeline: "Target placement within 30 days",
+        budget: "$4k–6k / mo",
+        expectations: "On-site availability 2 days/week; commercial project experience required.",
+        riskFlags: "Confirm scope does not require leadership/legal sign-off before commitment.",
+        nextStep: "Route fit summary to leadership for review.",
+        missingInfo: "Awaiting client confirmation on project start date.",
+        targetDate: iso(30),
+      },
+      {
+        clientKey: "c2",
+        qualifierName: "Marcus Boateng",
+        title: "HVAC qualifier intake — GA",
+        licenseType: "Mechanical / HVAC",
+        state: "GA",
+        tradeClassification: "Mechanical",
+        stage: "fit_review",
+        status: "open",
+        timeline: "Exploratory — no firm date",
+        budget: "TBD",
+        expectations: "Residential + light commercial coverage.",
+        riskFlags: "Qualifier license not yet verified.",
+        nextStep: "Complete qualifier intake and verification.",
+        missingInfo: "License verification documents outstanding.",
+        targetDate: null,
+      },
+      {
+        clientKey: "c3",
+        qualifierName: "Sandra Whitfield",
+        title: "Electrical qualifier — FL (placed)",
+        licenseType: "Electrical (Master)",
+        state: "FL",
+        tradeClassification: "Electrical",
+        stage: "placed",
+        status: "placed",
+        timeline: "Placed — renewal review in 6 months",
+        budget: "$3.5k / mo",
+        expectations: "Ongoing oversight; monthly check-ins.",
+        riskFlags: "",
+        nextStep: "Monitor relationship; schedule renewal review.",
+        missingInfo: "",
+        targetDate: iso(150),
+      },
+    ];
+    for (const pl of placementSpecs) {
+      const cid = pl.clientKey ? clientIds.get(pl.clientKey) ?? null : null;
+      const qid = pl.qualifierName
+        ? qualifierIds.get(pl.qualifierName) ?? null
+        : null;
+      await tx.insert(placementsTable).values({
+        clientId: cid,
+        qualifierId: qid,
+        title: pl.title,
+        licenseType: pl.licenseType,
+        state: pl.state,
+        tradeClassification: pl.tradeClassification,
+        stage: pl.stage,
+        status: pl.status,
+        timeline: pl.timeline,
+        budget: pl.budget,
+        expectations: pl.expectations,
+        riskFlags: pl.riskFlags,
+        nextStep: pl.nextStep,
+        missingInfo: pl.missingInfo,
+        targetDate: pl.targetDate,
+      });
+    }
+
+    const successPlanItems: {
+      phase: string;
+      title: string;
+      description: string;
+      completed: boolean;
+      sortOrder: number;
+    }[] = [
+      {
+        phase: "first_90",
+        title: "Map the current-client portfolio",
+        description: "Review every active account, owners, risk level, and cadence.",
+        completed: true,
+        sortOrder: 1,
+      },
+      {
+        phase: "first_90",
+        title: "Stand up the relationship cadence",
+        description: "Establish touch frequency per account and log meaningful contact.",
+        completed: true,
+        sortOrder: 2,
+      },
+      {
+        phase: "first_90",
+        title: "Triage and route open escalations",
+        description: "Clear the escalation backlog and confirm correct ownership.",
+        completed: false,
+        sortOrder: 3,
+      },
+      {
+        phase: "first_90",
+        title: "Build the expansion pipeline baseline",
+        description: "Identify and stage near-term add-on and expansion opportunities.",
+        completed: false,
+        sortOrder: 4,
+      },
+      {
+        phase: "first_90",
+        title: "Establish the qualifier network intake process",
+        description: "Document the placement intake, verification, and routing flow.",
+        completed: false,
+        sortOrder: 5,
+      },
+      {
+        phase: "first_180",
+        title: "Demonstrate measurable retention improvement",
+        description: "Show stabilization of at-risk accounts vs. the 90-day baseline.",
+        completed: false,
+        sortOrder: 6,
+      },
+      {
+        phase: "first_180",
+        title: "Convert qualified expansion opportunities",
+        description: "Move pipeline opportunities to collected, retained revenue.",
+        completed: false,
+        sortOrder: 7,
+      },
+      {
+        phase: "first_180",
+        title: "Operationalize the placement coordination lane",
+        description: "Run repeatable placements through the qualifier network end-to-end.",
+        completed: false,
+        sortOrder: 8,
+      },
+      {
+        phase: "first_180",
+        title: "Establish reporting rhythm with leadership",
+        description: "Deliver consistent KPI reporting across relationships, expansion, and placements.",
+        completed: false,
+        sortOrder: 9,
+      },
+    ];
+    for (const item of successPlanItems) {
+      await tx.insert(successPlanItemsTable).values({
+        phase: item.phase,
+        title: item.title,
+        description: item.description,
+        completed: item.completed,
+        completedAt: item.completed
+          ? new Date(Date.now() - 7 * 86_400_000)
+          : null,
+        sortOrder: item.sortOrder,
       });
     }
   });

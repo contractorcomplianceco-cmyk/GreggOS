@@ -1746,3 +1746,372 @@ export const UpdateTrainingModuleResponse = zod.object({
 })
 
 
+/**
+ * @summary List bonus-eligible entries
+ */
+export const ListBonusEntriesQueryParams = zod.object({
+  "category": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListBonusEntriesResponseItem = zod.object({
+  "id": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "clientId": zod.string().nullish(),
+  "amount": zod.number(),
+  "status": zod.string(),
+  "periodLabel": zod.string(),
+  "documentation": zod.string(),
+  "notes": zod.string(),
+  "occurredOn": zod.string().nullish(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListBonusEntriesResponse = zod.array(ListBonusEntriesResponseItem)
+
+
+/**
+ * @summary Create a bonus entry
+ */
+export const CreateBonusEntryBody = zod.object({
+  "category": zod.string(),
+  "title": zod.string(),
+  "clientId": zod.string().nullish(),
+  "amount": zod.number(),
+  "status": zod.string().optional(),
+  "periodLabel": zod.string().optional(),
+  "documentation": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "occurredOn": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update a bonus entry
+ */
+export const UpdateBonusEntryParams = zod.object({
+  "bonusEntryId": zod.coerce.string()
+})
+
+export const UpdateBonusEntryBody = zod.object({
+  "category": zod.string().optional(),
+  "title": zod.string().optional(),
+  "clientId": zod.string().nullish(),
+  "amount": zod.number().optional(),
+  "status": zod.enum(['eligible', 'pending_approval', 'approved', 'paid']).optional(),
+  "periodLabel": zod.string().optional(),
+  "documentation": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "occurredOn": zod.string().nullish()
+})
+
+export const UpdateBonusEntryResponse = zod.object({
+  "id": zod.string(),
+  "category": zod.string(),
+  "title": zod.string(),
+  "clientId": zod.string().nullish(),
+  "amount": zod.number(),
+  "status": zod.string(),
+  "periodLabel": zod.string(),
+  "documentation": zod.string(),
+  "notes": zod.string(),
+  "occurredOn": zod.string().nullish(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List profit-sharing projections (awareness only)
+ */
+export const ListProfitSharesResponseItem = zod.object({
+  "id": zod.string(),
+  "periodLabel": zod.string(),
+  "basis": zod.string(),
+  "projectedAmount": zod.number(),
+  "status": zod.string(),
+  "notes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListProfitSharesResponse = zod.array(ListProfitSharesResponseItem)
+
+
+/**
+ * @summary Create a profit-sharing projection
+ */
+export const CreateProfitShareBody = zod.object({
+  "periodLabel": zod.string(),
+  "basis": zod.string(),
+  "projectedAmount": zod.number().optional(),
+  "status": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+
+/**
+ * @summary Update a profit-sharing projection
+ */
+export const UpdateProfitShareParams = zod.object({
+  "projectionId": zod.coerce.string()
+})
+
+export const UpdateProfitShareBody = zod.object({
+  "periodLabel": zod.string().optional(),
+  "basis": zod.string().optional(),
+  "projectedAmount": zod.number().optional(),
+  "status": zod.enum(['illustrative', 'under_discussion', 'documented']).optional(),
+  "notes": zod.string().optional()
+})
+
+export const UpdateProfitShareResponse = zod.object({
+  "id": zod.string(),
+  "periodLabel": zod.string(),
+  "basis": zod.string(),
+  "projectedAmount": zod.number(),
+  "status": zod.string(),
+  "notes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List licensed qualifiers
+ */
+export const ListQualifiersQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "availability": zod.coerce.string().optional()
+})
+
+export const ListQualifiersResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "licenseType": zod.string(),
+  "state": zod.string(),
+  "tradeClassification": zod.string(),
+  "availability": zod.string(),
+  "status": zod.string(),
+  "contact": zod.string(),
+  "notes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListQualifiersResponse = zod.array(ListQualifiersResponseItem)
+
+
+/**
+ * @summary Add a qualifier to the network
+ */
+export const CreateQualifierBody = zod.object({
+  "name": zod.string(),
+  "licenseType": zod.string().optional(),
+  "state": zod.string().optional(),
+  "tradeClassification": zod.string().optional(),
+  "availability": zod.string().optional(),
+  "status": zod.string().optional(),
+  "contact": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+
+/**
+ * @summary Update a qualifier
+ */
+export const UpdateQualifierParams = zod.object({
+  "qualifierId": zod.coerce.string()
+})
+
+export const UpdateQualifierBody = zod.object({
+  "name": zod.string().optional(),
+  "licenseType": zod.string().optional(),
+  "state": zod.string().optional(),
+  "tradeClassification": zod.string().optional(),
+  "availability": zod.enum(['available', 'engaged', 'unavailable']).optional(),
+  "status": zod.enum(['prospect', 'intake', 'verified', 'active', 'inactive']).optional(),
+  "contact": zod.string().optional(),
+  "notes": zod.string().optional()
+})
+
+export const UpdateQualifierResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "licenseType": zod.string(),
+  "state": zod.string(),
+  "tradeClassification": zod.string(),
+  "availability": zod.string(),
+  "status": zod.string(),
+  "contact": zod.string(),
+  "notes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List placement engagements
+ */
+export const ListPlacementsQueryParams = zod.object({
+  "stage": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListPlacementsResponseItem = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string().nullish(),
+  "qualifierId": zod.string().nullish(),
+  "title": zod.string(),
+  "licenseType": zod.string(),
+  "state": zod.string(),
+  "tradeClassification": zod.string(),
+  "stage": zod.string(),
+  "status": zod.string(),
+  "timeline": zod.string(),
+  "budget": zod.string(),
+  "expectations": zod.string(),
+  "riskFlags": zod.string(),
+  "nextStep": zod.string(),
+  "missingInfo": zod.string(),
+  "targetDate": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListPlacementsResponse = zod.array(ListPlacementsResponseItem)
+
+
+/**
+ * @summary Create a placement engagement
+ */
+export const CreatePlacementBody = zod.object({
+  "clientId": zod.string().nullish(),
+  "qualifierId": zod.string().nullish(),
+  "title": zod.string(),
+  "licenseType": zod.string().optional(),
+  "state": zod.string().optional(),
+  "tradeClassification": zod.string().optional(),
+  "stage": zod.string().optional(),
+  "status": zod.string().optional(),
+  "timeline": zod.string().optional(),
+  "budget": zod.string().optional(),
+  "expectations": zod.string().optional(),
+  "riskFlags": zod.string().optional(),
+  "nextStep": zod.string().optional(),
+  "missingInfo": zod.string().optional(),
+  "targetDate": zod.string().nullish()
+})
+
+
+/**
+ * @summary Update a placement engagement
+ */
+export const UpdatePlacementParams = zod.object({
+  "placementId": zod.coerce.string()
+})
+
+export const UpdatePlacementBody = zod.object({
+  "clientId": zod.string().nullish(),
+  "qualifierId": zod.string().nullish(),
+  "title": zod.string().optional(),
+  "licenseType": zod.string().optional(),
+  "state": zod.string().optional(),
+  "tradeClassification": zod.string().optional(),
+  "stage": zod.enum(['interest', 'fit_review', 'internal_review', 'placed', 'renewal', 'replacement']).optional(),
+  "status": zod.enum(['open', 'on_hold', 'placed', 'closed']).optional(),
+  "timeline": zod.string().optional(),
+  "budget": zod.string().optional(),
+  "expectations": zod.string().optional(),
+  "riskFlags": zod.string().optional(),
+  "nextStep": zod.string().optional(),
+  "missingInfo": zod.string().optional(),
+  "targetDate": zod.string().nullish()
+})
+
+export const UpdatePlacementResponse = zod.object({
+  "id": zod.string(),
+  "clientId": zod.string().nullish(),
+  "qualifierId": zod.string().nullish(),
+  "title": zod.string(),
+  "licenseType": zod.string(),
+  "state": zod.string(),
+  "tradeClassification": zod.string(),
+  "stage": zod.string(),
+  "status": zod.string(),
+  "timeline": zod.string(),
+  "budget": zod.string(),
+  "expectations": zod.string(),
+  "riskFlags": zod.string(),
+  "nextStep": zod.string(),
+  "missingInfo": zod.string(),
+  "targetDate": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List 90/180-day success plan items
+ */
+export const ListSuccessPlanItemsQueryParams = zod.object({
+  "phase": zod.coerce.string().optional()
+})
+
+export const ListSuccessPlanItemsResponseItem = zod.object({
+  "id": zod.string(),
+  "phase": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "completed": zod.boolean(),
+  "completedAt": zod.string().nullish(),
+  "notes": zod.string(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListSuccessPlanItemsResponse = zod.array(ListSuccessPlanItemsResponseItem)
+
+
+/**
+ * @summary Create a success plan item
+ */
+export const CreateSuccessPlanItemBody = zod.object({
+  "phase": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+
+/**
+ * @summary Update a success plan item (completion/notes)
+ */
+export const UpdateSuccessPlanItemParams = zod.object({
+  "itemId": zod.coerce.string()
+})
+
+export const UpdateSuccessPlanItemBody = zod.object({
+  "phase": zod.string().optional(),
+  "title": zod.string().optional(),
+  "description": zod.string().optional(),
+  "completed": zod.boolean().optional(),
+  "notes": zod.string().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateSuccessPlanItemResponse = zod.object({
+  "id": zod.string(),
+  "phase": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "completed": zod.boolean(),
+  "completedAt": zod.string().nullish(),
+  "notes": zod.string(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+

@@ -21,6 +21,11 @@ import travelRouter from "./travel";
 import expensesRouter from "./expenses";
 import feedbackRouter from "./feedback";
 import trainingRouter from "./training";
+import bonusRouter from "./bonus";
+import profitShareRouter from "./profitShare";
+import qualifiersRouter from "./qualifiers";
+import placementsRouter from "./placements";
+import successPlanRouter from "./successPlan";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -50,5 +55,10 @@ router.use(travelRouter);
 router.use(expensesRouter);
 router.use(feedbackRouter);
 router.use(trainingRouter);
+router.use(bonusRouter);
+router.use(profitShareRouter);
+router.use(qualifiersRouter);
+router.use(placementsRouter);
+router.use(successPlanRouter);
 
 export default router;

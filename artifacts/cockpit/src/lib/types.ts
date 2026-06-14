@@ -408,3 +408,101 @@ export interface TrainingModule {
   completedAt: string | null;
   sortOrder: number;
 }
+
+export type BonusStatus = 'eligible' | 'pending_approval' | 'approved' | 'paid';
+
+export interface BonusEntry {
+  id: string;
+  category: string;
+  title: string;
+  clientId: string | null;
+  amount: number;
+  status: BonusStatus;
+  periodLabel: string;
+  documentation: string;
+  notes: string;
+  occurredOn: string | null;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ProfitShareStatus = 'illustrative' | 'under_discussion' | 'documented';
+
+export interface ProfitShareProjection {
+  id: string;
+  periodLabel: string;
+  basis: string;
+  projectedAmount: number;
+  status: ProfitShareStatus;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type QualifierAvailability = 'available' | 'engaged' | 'unavailable';
+export type QualifierStatus =
+  | 'prospect'
+  | 'intake'
+  | 'verified'
+  | 'active'
+  | 'inactive';
+
+export interface Qualifier {
+  id: string;
+  name: string;
+  licenseType: string;
+  state: string;
+  tradeClassification: string;
+  availability: QualifierAvailability;
+  status: QualifierStatus;
+  contact: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PlacementStage =
+  | 'interest'
+  | 'fit_review'
+  | 'internal_review'
+  | 'placed'
+  | 'renewal'
+  | 'replacement';
+export type PlacementStatus = 'open' | 'on_hold' | 'placed' | 'closed';
+
+export interface Placement {
+  id: string;
+  clientId: string | null;
+  qualifierId: string | null;
+  title: string;
+  licenseType: string;
+  state: string;
+  tradeClassification: string;
+  stage: PlacementStage;
+  status: PlacementStatus;
+  timeline: string;
+  budget: string;
+  expectations: string;
+  riskFlags: string;
+  nextStep: string;
+  missingInfo: string;
+  targetDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type SuccessPlanPhase = 'first_90' | 'first_180';
+
+export interface SuccessPlanItem {
+  id: string;
+  phase: SuccessPlanPhase;
+  title: string;
+  description: string;
+  completed: boolean;
+  completedAt: string | null;
+  notes: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
