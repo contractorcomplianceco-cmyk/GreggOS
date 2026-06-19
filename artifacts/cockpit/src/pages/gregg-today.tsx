@@ -455,7 +455,7 @@ export default function GreggToday() {
               />
               <h1 className="text-lg font-bold tracking-tight text-slate-900">
                 GreggOS{" "}
-                <span className="text-blue-700">Command Center</span>
+                <span className="text-[#0BA3FF]">Command Center</span>
               </h1>
               <span className="hidden sm:inline text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 border border-emerald-200 rounded px-1.5 py-0.5">
                 Operational
@@ -506,7 +506,7 @@ export default function GreggToday() {
                   onClick={() => setFilter(f)}
                   className={`rounded px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors ${
                     filter === f
-                      ? "bg-blue-700 text-white shadow-sm"
+                      ? "bg-[#0BA3FF] text-white shadow-sm"
                       : "border border-blue-100 bg-white text-slate-600 hover:text-slate-900 hover:border-blue-300 shadow-sm"
                   }`}
                   data-testid={`chip-filter-${f}`}
@@ -877,12 +877,12 @@ export default function GreggToday() {
                       <linearGradient id="gCalls" x1="0" y1="0" x2="0" y2="1">
                         <stop
                           offset="0%"
-                          stopColor="#2563eb"
+                          stopColor="#0BA3FF"
                           stopOpacity={0.2}
                         />
                         <stop
                           offset="100%"
-                          stopColor="#2563eb"
+                          stopColor="#0BA3FF"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -929,7 +929,7 @@ export default function GreggToday() {
                       type="monotone"
                       dataKey="calls"
                       name="Calls"
-                      stroke="#2563eb"
+                      stroke="#0BA3FF"
                       fill="url(#gCalls)"
                       strokeWidth={2}
                     />

@@ -134,7 +134,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           />
           <div className="leading-tight min-w-0">
             <p className="text-sm font-bold tracking-tight text-sidebar-foreground">
-              GreggOS <span className="text-blue-700">Command Center</span>
+              GreggOS <span className="text-[#0BA3FF]">Command Center</span>
             </p>
             <p className="text-[10px] uppercase tracking-[0.16em] text-sidebar-foreground/60">
               Current Client Cockpit
@@ -144,7 +144,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <nav className="space-y-1 px-4 overflow-y-auto pb-4">
           <a
             href="/cockpit-walkthrough/"
-            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-blue-700 text-white hover:opacity-90 ring-1 ring-blue-700 shadow-sm"
+            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-[#0BA3FF] text-white hover:opacity-90 ring-1 ring-[#0BA3FF] shadow-sm"
             data-testid="link-start-here"
           >
             <PlayCircle className="w-4 h-4" />
