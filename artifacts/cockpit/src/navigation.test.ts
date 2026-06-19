@@ -19,10 +19,13 @@ function registeredRoutePaths(): string[] {
   return [...matches].map((m) => m[1]);
 }
 
-// Extract every sidebar nav `href` declared in SidebarLayout.tsx. The admin
-// entry is rendered conditionally at runtime but is still present in source.
+// Extract every sidebar nav href declared in SidebarLayout.tsx. Captures both
+// the nav-item object form (`href: "/x"`) and prominent button links written as
+// JSX attributes (`<Link href="/x">`, e.g. the top Welcome Center button).
+// Restricted to internal paths (leading "/") so the admin entry — rendered
+// conditionally at runtime but present in source — is still included.
 function sidebarHrefs(): string[] {
-  const matches = sidebarSource.matchAll(/href:\s*"([^"]+)"/g);
+  const matches = sidebarSource.matchAll(/href[:=]\s*"(\/[^"]*)"/g);
   return [...matches].map((m) => m[1]);
 }
 

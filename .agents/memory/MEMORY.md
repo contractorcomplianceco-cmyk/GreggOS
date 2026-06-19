@@ -7,5 +7,6 @@
 - [OpenAI integration + AI boundary guard](openai-integration-and-ai-boundary-guard.md) — server-only OpenAI lib (gpt-5.4, no temperature, lazy import); AI features MUST have deterministic template fallback + post-gen boundary guard, not prompt-only.
 - [CRM export lifecycle](crm-export-lifecycle.md) — crm_links approve(POST)/push(PATCH) split is server-enforced (export-only); closedAt server-managed, not a writable input.
 - [Prod stale/divergent published build](prod-stale-deployment-divergence.md) — prod behavior current code can't reproduce (per-route 403 split) = stale published snapshot; republish; dev tests default to admin, test coordinator role.
+- [Welcome Center + global motivation popup](welcome-and-motivation.md) — walkthrough is a separate artifact embedded via absolute /cockpit-walkthrough/ iframe; motivation is a global SidebarLayout popup; navigation.test gates new routes.
 - [Cockpit dual test runners](cockpit-test-runners.md) — node:test runs *.test.ts (structural), vitest+jsdom runs *.test.tsx (render); page render smoke tests need clerk mock + providers + fetch/observer stubs.
 - [Cockpit shared layout primitives](cockpit-layout-primitives.md) — reuse PageHeader/StatCard for themed pages; SidebarLayout has desktop+mobile-drawer shell; StatCard accents must be literal map entries (Tailwind purge).

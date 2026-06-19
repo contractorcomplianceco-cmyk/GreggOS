@@ -5,6 +5,7 @@ import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import ccaCrest from "@assets/cca-crest-inset_1781474011676.png";
+import { MotivationPopup } from "@/components/MotivationPopup";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -64,7 +65,7 @@ function useNavigation(): NavSection[] {
         { name: "Training & Leveling", href: "/training", icon: GraduationCap },
         { name: "AI Prompt Library", href: "/prompt-library", icon: Sparkles },
         { name: "Feedback Center", href: "/feedback", icon: MessageSquarePlus },
-        { name: "Walkthrough & Motivation", href: "/motivation", icon: Compass },
+        { name: "Daily Motivation", href: "/motivation", icon: Compass },
       ],
     },
     ...(isAdmin
@@ -79,6 +80,7 @@ function useNavigation(): NavSection[] {
 }
 
 function currentTitle(location: string, navigation: NavSection[]): string {
+  if (location.startsWith("/welcome")) return "Welcome Center";
   if (location.startsWith("/clients/")) return "Client Detail";
   const items = navigation.flatMap((s) => s.items);
   const match = items.find(
@@ -126,30 +128,31 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="bg-sidebar text-sidebar-foreground flex flex-col justify-between h-full">
       <div className="min-h-0 flex flex-col">
-        <div className="px-4 pt-4 pb-3 shrink-0 flex items-center gap-2.5">
+        <div className="px-4 pt-4 pb-4 shrink-0 flex items-center gap-2.5 bg-gradient-to-br from-[#081a33] via-[#0d2c52] to-[#0BA3FF] text-white">
           <img
             src={ccaCrest}
             alt="Contractor Compliance Authority"
             className="h-10 w-auto shrink-0"
           />
           <div className="leading-tight min-w-0">
-            <p className="text-sm font-bold tracking-tight text-sidebar-foreground">
-              GreggOS <span className="text-[#0BA3FF]">Command Center</span>
+            <p className="text-sm font-bold tracking-tight text-white">
+              GreggOS <span className="text-[#7fd0ff]">Command Center</span>
             </p>
-            <p className="text-[10px] uppercase tracking-[0.16em] text-sidebar-foreground/60">
+            <p className="text-[10px] uppercase tracking-[0.16em] text-blue-100/70">
               Current Client Cockpit
             </p>
           </div>
         </div>
-        <nav className="space-y-1 px-4 overflow-y-auto pb-4">
-          <a
-            href="/cockpit-walkthrough/"
-            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-[#0BA3FF] text-white hover:opacity-90 ring-1 ring-[#0BA3FF] shadow-sm"
-            data-testid="link-start-here"
-          >
-            <PlayCircle className="w-4 h-4" />
-            Start Here
-          </a>
+        <nav className="space-y-1 px-4 pt-3 overflow-y-auto pb-4">
+          <Link href="/welcome" onClick={onNavigate}>
+            <div
+              className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-gradient-to-r from-[#0d2c52] to-[#0BA3FF] text-white hover:opacity-90 ring-1 ring-[#0BA3FF]/40 shadow-sm"
+              data-testid="link-welcome-center"
+            >
+              <PlayCircle className="w-4 h-4" />
+              Welcome Center
+            </div>
+          </Link>
           {navigation.map((section) => (
             <div key={section.label} className="mb-3">
               <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -226,6 +229,10 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      {!location.startsWith("/welcome") && !location.startsWith("/motivation") && (
+        <MotivationPopup />
+      )}
     </div>
   );
 }

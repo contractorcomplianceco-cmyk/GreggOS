@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import GreggToday from "@/pages/gregg-today";
+import WelcomeCenter from "@/pages/welcome";
 import Oversight from "@/pages/oversight";
 import Expansion from "@/pages/expansion";
 import Relationships from "@/pages/relationships";
@@ -173,6 +174,7 @@ function ClerkProviderWithRoutes() {
         <TooltipProvider>
           <Switch>
             <Route path="/" component={GreggToday} />
+            <Route path="/welcome" component={WelcomeCenter} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/oversight" component={Oversight} />
