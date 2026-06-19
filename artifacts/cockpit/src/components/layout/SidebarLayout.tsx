@@ -134,7 +134,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           />
           <div className="leading-tight min-w-0">
             <p className="text-sm font-bold tracking-tight text-sidebar-foreground">
-              GreggOS <span className="text-sky-400">Command Center</span>
+              GreggOS <span className="text-blue-700">Command Center</span>
             </p>
             <p className="text-[10px] uppercase tracking-[0.16em] text-sidebar-foreground/60">
               Current Client Cockpit
@@ -144,7 +144,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <nav className="space-y-1 px-4 overflow-y-auto pb-4">
           <a
             href="/cockpit-walkthrough/"
-            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-sidebar-primary text-sidebar-primary-foreground hover:opacity-90 ring-1 ring-sidebar-border"
+            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-blue-700 text-white hover:opacity-90 ring-1 ring-blue-700 shadow-sm"
             data-testid="link-start-here"
           >
             <PlayCircle className="w-4 h-4" />
@@ -152,7 +152,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           </a>
           {navigation.map((section) => (
             <div key={section.label} className="mb-3">
-              <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/45">
+              <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 {section.label}
               </p>
               {section.items.map((item) => {
@@ -178,7 +178,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </div>
       <div className="shrink-0">
         <UserFooter />
-        <div className="p-4 border-t border-sidebar-border/50 text-[10px] text-sidebar-foreground/60 leading-tight">
+        <div className="p-4 border-t border-sidebar-border/50 text-[10px] text-slate-500 leading-tight">
           <p className="mb-2"><strong>Notice:</strong> This cockpit organizes relationship follow-through.</p>
           <p>It does not approve pricing, refunds, legal advice, compliance opinions, qualifier placements, or final client commitments.</p>
         </div>

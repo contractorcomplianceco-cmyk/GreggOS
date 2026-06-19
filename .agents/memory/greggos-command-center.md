@@ -7,7 +7,7 @@ description: Durable design constraints for the gregg-today.tsx executive dashbo
 
 The dashboard is a high-density, Bloomberg/control-room style executive surface. Constraints worth keeping consistent:
 
-- **Self-contained dark styling.** The page renders dark (`bg-[#0B1220]`, panels `#0e1729`, borders `#1c2942`) using explicit Tailwind arbitrary colors, NOT the app theme tokens — the rest of the cockpit runs in light mode. Don't swap to theme tokens unless the whole app goes dark. Accent = sky-400/sky-500; alert = red-500 with glow (`shadow-[0_0_14px_rgba(...)]`); amber/emerald for warn/healthy.
+- **Light executive styling (self-contained classes, not theme tokens).** The page now renders LIGHT (`bg-slate-50`, white panels, `border-blue-100`, navy headings/`text-slate-700/800`, muted `text-slate-500`, hover `bg-blue-50`) using explicit Tailwind classes rather than the app theme tokens. It was reskinned from a former dark-navy (`#0B1220`) layout to match a white + baby-blue + navy-accent direction. Keep status colors meaningful but tuned for light: red for alert/critical, amber/orange for warn, emerald-600 for healthy. Recharts gradients/axes use the brand blues. When editing, do NOT leave dark-on-light residue (`bg-white/5`, `text-slate-300`, `*-400` icons on white) — those go invisible/low-contrast on the light panels.
 
 - **All panels are real/derived data — NO mocked streams.** Every metric is computed from real server-backed datasets (clients/tasks/escalations/signals/callNotes via `useStore()`, plus `useListRelationships`/`useListExpansionPipeline`/report hooks). When adding panels, derive from real data and label derived signals honestly.
 
