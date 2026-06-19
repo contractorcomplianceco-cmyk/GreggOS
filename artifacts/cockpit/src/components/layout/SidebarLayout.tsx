@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle, Menu, Network, IdCard, UserCog, Gift, Award, DollarSign, ListChecks } from "lucide-react";
+import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle, Menu, Network, IdCard, UserCog, Gift, Award, DollarSign, ListChecks, Bot, Mail, Inbox, UsersRound } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -19,7 +19,10 @@ function useNavigation(): NavSection[] {
   return [
     {
       label: "Command Center",
-      items: [{ name: "Gregg Today", href: "/", icon: LayoutDashboard }],
+      items: [
+        { name: "Gregg Today", href: "/", icon: LayoutDashboard },
+        { name: "Staff Overview", href: "/staff", icon: UsersRound },
+      ],
     },
     {
       label: "Clients & Accounts",
@@ -55,11 +58,15 @@ function useNavigation(): NavSection[] {
         { name: "Bonus Tracker", href: "/bonus-tracker", icon: Award },
         { name: "Profit Sharing", href: "/profit-sharing", icon: DollarSign },
         { name: "90 / 180-Day Success Plan", href: "/success-plan", icon: ListChecks },
+        { name: "My Requests", href: "/my-requests", icon: Inbox },
       ],
     },
     {
       label: "Tools & Resources",
       items: [
+        { name: "RoseOS Assistant", href: "/roseos", icon: Bot },
+        { name: "Email Builder", href: "/email-builder", icon: Mail },
+        { name: "Requests Hub", href: "/requests", icon: Inbox },
         { name: "Travel Planner", href: "/travel", icon: Plane },
         { name: "Expense Tracker", href: "/expenses", icon: Receipt },
         { name: "Training & Leveling", href: "/training", icon: GraduationCap },

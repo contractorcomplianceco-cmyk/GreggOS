@@ -506,3 +506,119 @@ export interface SuccessPlanItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export type RoseChatMode =
+  | 'brainstorm'
+  | 'help_with_client'
+  | 'how_to'
+  | 'general';
+
+export interface RoseChatSession {
+  id: string;
+  title: string;
+  mode: RoseChatMode;
+  clientId: string | null;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RoseChatMessage {
+  id: string;
+  sessionId: string;
+  role: 'user' | 'assistant';
+  content: string;
+  source: string;
+  createdAt: string;
+}
+
+export interface RoseChatSessionDetail extends RoseChatSession {
+  messages: RoseChatMessage[];
+}
+
+export type EmailDraftStatus = 'draft' | 'edited' | 'used' | 'discarded';
+
+export interface EmailDraft {
+  id: string;
+  purpose: string;
+  audience: string;
+  tone: string;
+  keyPoints: string;
+  subject: string;
+  body: string;
+  source: string;
+  status: EmailDraftStatus;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StaffMember {
+  name: string;
+  title: string;
+  focusArea: string;
+  weeklyCapacityHours: number;
+  active: boolean;
+  clientsOwned: number;
+  openTasks: number;
+  overdueTasks: number;
+  completedTasks: number;
+  openEscalations: number;
+  touchesDue: number;
+  stalledExpansions: number;
+  recentActivity: number;
+  productivityScore: number;
+  stuckScore: number;
+  burnoutScore: number;
+  status: string;
+  signals: string[];
+}
+
+export interface StaffOverview {
+  windowDays: number;
+  generatedAt: string;
+  staff: StaffMember[];
+}
+
+export interface StaffProfile {
+  id: string;
+  name: string;
+  title: string;
+  focusArea: string;
+  weeklyCapacityHours: number;
+  active: boolean;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type RequestType =
+  | 'purchase'
+  | 'travel'
+  | 'help'
+  | 'equipment'
+  | 'other';
+export type RequestStatus =
+  | 'submitted'
+  | 'in_review'
+  | 'approved'
+  | 'denied'
+  | 'fulfilled'
+  | 'cancelled';
+
+export interface RequestItem {
+  id: string;
+  type: RequestType;
+  title: string;
+  description: string;
+  status: RequestStatus;
+  priority: string;
+  amount: number | null;
+  clientId: string | null;
+  neededBy: string;
+  requestedByLabel: string;
+  assignedToLabel: string;
+  resolutionNotes: string;
+  createdAt: string;
+  updatedAt: string;
+}

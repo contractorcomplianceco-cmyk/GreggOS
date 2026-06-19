@@ -1479,6 +1479,336 @@ paths:
               schema:
                 $ref: "#/components/schemas/SuccessPlanItem"
 
+  /rose-chat-sessions:
+    get:
+      operationId: listRoseChatSessions
+      tags: [roseChat]
+      summary: List saved RoseOS assistant chat sessions
+      parameters:
+        - { name: mode, in: query, required: false, schema: { type: string } }
+        - { name: clientId, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Chat sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoseChatSession"
+    post:
+      operationId: createRoseChatSession
+      tags: [roseChat]
+      summary: Start a RoseOS chat session (optionally with a first message that gets an AI reply)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoseChatSessionInput"
+      responses:
+        "201":
+          description: Created session with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoseChatSessionDetail"
+  /rose-chat-sessions/{sessionId}:
+    parameters:
+      - { name: sessionId, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getRoseChatSession
+      tags: [roseChat]
+      summary: Get a chat session with its messages
+      responses:
+        "200":
+          description: Session with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoseChatSessionDetail"
+    patch:
+      operationId: updateRoseChatSession
+      tags: [roseChat]
+      summary: Rename or retarget a chat session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoseChatSessionUpdate"
+      responses:
+        "200":
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoseChatSession"
+    delete:
+      operationId: deleteRoseChatSession
+      tags: [roseChat]
+      summary: Delete a chat session and its messages
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+  /rose-chat-sessions/{sessionId}/messages:
+    parameters:
+      - { name: sessionId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: sendRoseChatMessage
+      tags: [roseChat]
+      summary: Send a user message and get an AI reply (template fallback + boundary guard)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoseChatMessageInput"
+      responses:
+        "201":
+          description: Session with the new messages appended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoseChatSessionDetail"
+
+  /email-drafts:
+    get:
+      operationId: listEmailDrafts
+      tags: [emailDrafts]
+      summary: List saved email drafts
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Email drafts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailDraft"
+  /email-drafts/generate:
+    post:
+      operationId: generateEmailDraft
+      tags: [emailDrafts]
+      summary: Generate a standalone email draft (AI with template fallback). Draft-only; nothing is sent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailDraftGenerateInput"
+      responses:
+        "201":
+          description: Generated and saved email draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailDraft"
+  /email-drafts/{draftId}:
+    parameters:
+      - { name: draftId, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getEmailDraft
+      tags: [emailDrafts]
+      summary: Get an email draft
+      responses:
+        "200":
+          description: Email draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailDraft"
+    patch:
+      operationId: updateEmailDraft
+      tags: [emailDrafts]
+      summary: Edit an email draft (subject/body/status)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailDraftUpdate"
+      responses:
+        "200":
+          description: Updated email draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailDraft"
+    delete:
+      operationId: deleteEmailDraft
+      tags: [emailDrafts]
+      summary: Delete an email draft
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
+  /staff-overview:
+    get:
+      operationId: getStaffOverview
+      tags: [staff]
+      summary: Staff productivity / stuck / burnout overview derived from real work data
+      parameters:
+        - { name: windowDays, in: query, required: false, schema: { type: integer } }
+      responses:
+        "200":
+          description: Staff overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffOverview"
+  /staff-profiles:
+    get:
+      operationId: listStaffProfiles
+      tags: [staff]
+      summary: List editable staff profiles
+      responses:
+        "200":
+          description: Staff profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StaffProfile"
+    post:
+      operationId: createStaffProfile
+      tags: [staff]
+      summary: Create a staff profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StaffProfileInput"
+      responses:
+        "201":
+          description: Created staff profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffProfile"
+  /staff-profiles/{profileId}:
+    parameters:
+      - { name: profileId, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateStaffProfile
+      tags: [staff]
+      summary: Update a staff profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StaffProfileUpdate"
+      responses:
+        "200":
+          description: Updated staff profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffProfile"
+    delete:
+      operationId: deleteStaffProfile
+      tags: [staff]
+      summary: Delete a staff profile
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
+  /requests:
+    get:
+      operationId: listRequests
+      tags: [requests]
+      summary: List operational requests
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string } }
+        - { name: type, in: query, required: false, schema: { type: string } }
+        - { name: requestedBy, in: query, required: false, schema: { type: string } }
+        - { name: clientId, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RequestItem"
+    post:
+      operationId: createRequest
+      tags: [requests]
+      summary: Submit a request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestInput"
+      responses:
+        "201":
+          description: Created request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestItem"
+  /requests/{requestId}:
+    parameters:
+      - { name: requestId, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getRequest
+      tags: [requests]
+      summary: Get a request
+      responses:
+        "200":
+          description: Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestItem"
+    patch:
+      operationId: updateRequest
+      tags: [requests]
+      summary: Update a request (status lifecycle, assignment, details)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestUpdate"
+      responses:
+        "200":
+          description: Updated request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestItem"
+    delete:
+      operationId: deleteRequest
+      tags: [requests]
+      summary: Delete a request
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutationResult"
+
 components:
   schemas:
     HealthStatus:
@@ -2997,3 +3327,281 @@ components:
         completed: { type: boolean }
         notes: { type: string }
         sortOrder: { type: integer }
+
+    RoseChatMessage:
+      type: object
+      properties:
+        id: { type: string }
+        sessionId: { type: string }
+        role: { type: string }
+        content: { type: string }
+        source: { type: string }
+        createdAt: { type: string }
+      required:
+        - id
+        - sessionId
+        - role
+        - content
+        - source
+        - createdAt
+    RoseChatSession:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        mode: { type: string }
+        clientId: { type: string, nullable: true }
+        createdByLabel: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - title
+        - mode
+        - createdByLabel
+        - createdAt
+        - updatedAt
+    RoseChatSessionDetail:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        mode: { type: string }
+        clientId: { type: string, nullable: true }
+        createdByLabel: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoseChatMessage"
+      required:
+        - id
+        - title
+        - mode
+        - createdByLabel
+        - createdAt
+        - updatedAt
+        - messages
+    RoseChatSessionInput:
+      type: object
+      properties:
+        mode: { type: string }
+        title: { type: string }
+        clientId: { type: string, nullable: true }
+        message: { type: string }
+      required: [mode]
+    RoseChatSessionUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        mode: { type: string }
+        clientId: { type: string, nullable: true }
+    RoseChatMessageInput:
+      type: object
+      properties:
+        content: { type: string }
+      required: [content]
+
+    EmailDraft:
+      type: object
+      properties:
+        id: { type: string }
+        purpose: { type: string }
+        audience: { type: string }
+        tone: { type: string }
+        keyPoints: { type: string }
+        subject: { type: string }
+        body: { type: string }
+        source: { type: string }
+        status: { type: string }
+        createdByLabel: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - purpose
+        - audience
+        - tone
+        - keyPoints
+        - subject
+        - body
+        - source
+        - status
+        - createdByLabel
+        - createdAt
+        - updatedAt
+    EmailDraftGenerateInput:
+      type: object
+      properties:
+        purpose: { type: string }
+        audience: { type: string }
+        tone: { type: string }
+        keyPoints: { type: string }
+      required: [purpose]
+    EmailDraftUpdate:
+      type: object
+      properties:
+        subject: { type: string }
+        body: { type: string }
+        purpose: { type: string }
+        audience: { type: string }
+        tone: { type: string }
+        keyPoints: { type: string }
+        status:
+          type: string
+          description: Draft-lifecycle status only. There is no send path.
+          enum: [draft, edited, used, discarded]
+
+    StaffProfile:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        title: { type: string }
+        focusArea: { type: string }
+        weeklyCapacityHours: { type: integer }
+        active: { type: boolean }
+        notes: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - name
+        - title
+        - focusArea
+        - weeklyCapacityHours
+        - active
+        - notes
+        - createdAt
+        - updatedAt
+    StaffProfileInput:
+      type: object
+      properties:
+        name: { type: string }
+        title: { type: string }
+        focusArea: { type: string }
+        weeklyCapacityHours: { type: integer }
+        active: { type: boolean }
+        notes: { type: string }
+      required: [name]
+    StaffProfileUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        title: { type: string }
+        focusArea: { type: string }
+        weeklyCapacityHours: { type: integer }
+        active: { type: boolean }
+        notes: { type: string }
+    StaffMember:
+      type: object
+      properties:
+        name: { type: string }
+        title: { type: string }
+        focusArea: { type: string }
+        weeklyCapacityHours: { type: integer }
+        active: { type: boolean }
+        clientsOwned: { type: integer }
+        openTasks: { type: integer }
+        overdueTasks: { type: integer }
+        completedTasks: { type: integer }
+        openEscalations: { type: integer }
+        touchesDue: { type: integer }
+        stalledExpansions: { type: integer }
+        recentActivity: { type: integer }
+        productivityScore: { type: integer }
+        stuckScore: { type: integer }
+        burnoutScore: { type: integer }
+        status: { type: string }
+        signals:
+          type: array
+          items: { type: string }
+      required:
+        - name
+        - title
+        - focusArea
+        - weeklyCapacityHours
+        - active
+        - clientsOwned
+        - openTasks
+        - overdueTasks
+        - completedTasks
+        - openEscalations
+        - touchesDue
+        - stalledExpansions
+        - recentActivity
+        - productivityScore
+        - stuckScore
+        - burnoutScore
+        - status
+        - signals
+    StaffOverview:
+      type: object
+      properties:
+        windowDays: { type: integer }
+        generatedAt: { type: string }
+        staff:
+          type: array
+          items:
+            $ref: "#/components/schemas/StaffMember"
+      required:
+        - windowDays
+        - generatedAt
+        - staff
+
+    RequestItem:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string }
+        title: { type: string }
+        description: { type: string }
+        status: { type: string }
+        priority: { type: string }
+        amount: { type: number, nullable: true }
+        clientId: { type: string, nullable: true }
+        neededBy: { type: string }
+        requestedByLabel: { type: string }
+        assignedToLabel: { type: string }
+        resolutionNotes: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required:
+        - id
+        - type
+        - title
+        - description
+        - status
+        - priority
+        - neededBy
+        - requestedByLabel
+        - assignedToLabel
+        - resolutionNotes
+        - createdAt
+        - updatedAt
+    RequestInput:
+      type: object
+      properties:
+        type: { type: string }
+        title: { type: string }
+        description: { type: string }
+        priority: { type: string }
+        amount: { type: number, nullable: true }
+        clientId: { type: string, nullable: true }
+        neededBy: { type: string }
+        assignedToLabel: { type: string }
+      required: [type, title]
+    RequestUpdate:
+      type: object
+      properties:
+        type: { type: string }
+        title: { type: string }
+        description: { type: string }
+        status: { type: string }
+        priority: { type: string }
+        amount: { type: number, nullable: true }
+        clientId: { type: string, nullable: true }
+        neededBy: { type: string }
+        assignedToLabel: { type: string }
+        resolutionNotes: { type: string }

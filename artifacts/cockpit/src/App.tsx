@@ -14,6 +14,11 @@ import Expansion from "@/pages/expansion";
 import Relationships from "@/pages/relationships";
 import Reporting from "@/pages/reporting";
 import Communications from "@/pages/communications";
+import RoseOS from "@/pages/roseos";
+import EmailBuilder from "@/pages/email-builder";
+import StaffOverviewPage from "@/pages/staff";
+import RequestsHub from "@/pages/requests";
+import MyRequests from "@/pages/my-requests";
 import TravelPlanner from "@/pages/travel-planner";
 import ExpensesPage from "@/pages/expenses";
 import Training from "@/pages/training";
@@ -182,6 +187,11 @@ function ClerkProviderWithRoutes() {
             <Route path="/relationships" component={Relationships} />
             <Route path="/reporting" component={Reporting} />
             <Route path="/communications" component={Communications} />
+            <Route path="/roseos" component={RoseOS} />
+            <Route path="/email-builder" component={EmailBuilder} />
+            <Route path="/staff" component={StaffOverviewPage} />
+            <Route path="/requests" component={RequestsHub} />
+            <Route path="/my-requests" component={MyRequests} />
             <Route path="/travel" component={TravelPlanner} />
             <Route path="/expenses" component={ExpensesPage} />
             <Route path="/training" component={Training} />

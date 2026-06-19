@@ -27,6 +27,8 @@ import {
   qualifiersTable,
   placementsTable,
   successPlanItemsTable,
+  staffProfilesTable,
+  requestsTable,
   type RiskFactor,
   type AuditScoreItem,
 } from "@workspace/db";
@@ -272,6 +274,8 @@ async function upsertSeedUser(
 export async function seedDatabase(): Promise<void> {
   await db.transaction(async (tx) => {
     await tx.delete(activityLogTable);
+    await tx.delete(requestsTable);
+    await tx.delete(staffProfilesTable);
     await tx.delete(clientsTable);
 
     const greggId = await upsertSeedUser(
@@ -1230,6 +1234,315 @@ export async function seedDatabase(): Promise<void> {
           ? new Date(Date.now() - 7 * 86_400_000)
           : null,
         sortOrder: item.sortOrder,
+      });
+    }
+
+    // --- Staff Overview ---------------------------------------------------
+    // Sample staff so the (read-time-derived) productivity / stuck / burnout
+    // signals have real owned work to aggregate. Deliberately EXCLUDES anyone
+    // named Rose or Tony per the product requirement; the staff route also
+    // filters those names defensively.
+    const staffSpecs: {
+      externalId: string;
+      email: string;
+      name: string;
+      role: string;
+      title: string;
+      focusArea: string;
+      weeklyCapacityHours: number;
+      active: boolean;
+      notes: string;
+    }[] = [
+      {
+        externalId: "seed:priya",
+        email: "priya@contractorcompliance.example",
+        name: "Priya Nair",
+        role: "coordinator",
+        title: "Client Success Specialist",
+        focusArea: "Relationship cadence & retention",
+        weeklyCapacityHours: 40,
+        active: true,
+        notes: "Steady performer; owns mid-tier accounts.",
+      },
+      {
+        externalId: "seed:marcus",
+        email: "marcus@contractorcompliance.example",
+        name: "Marcus Hill",
+        role: "coordinator",
+        title: "Account Coordinator",
+        focusArea: "Escalation triage & follow-through",
+        weeklyCapacityHours: 40,
+        active: true,
+        notes: "Carrying a heavy escalation + overdue load this window.",
+      },
+      {
+        externalId: "seed:elena",
+        email: "elena@contractorcompliance.example",
+        name: "Elena Cruz",
+        role: "coordinator",
+        title: "Relationship Manager",
+        focusArea: "High-touch accounts & expansion",
+        weeklyCapacityHours: 30,
+        active: true,
+        notes: "Reduced capacity; watch open load relative to hours.",
+      },
+      {
+        externalId: "seed:david",
+        email: "david@contractorcompliance.example",
+        name: "David Okafor",
+        role: "coordinator",
+        title: "Onboarding Associate",
+        focusArea: "New-client onboarding",
+        weeklyCapacityHours: 40,
+        active: true,
+        notes: "Light, steady onboarding load.",
+      },
+    ];
+    const staffUserIds = new Map<string, string>();
+    for (const s of staffSpecs) {
+      const uid = await upsertSeedUser(
+        tx,
+        s.externalId,
+        s.email,
+        s.name,
+        s.role,
+      );
+      staffUserIds.set(s.name, uid);
+      await tx.insert(staffProfilesTable).values({
+        name: s.name,
+        userId: uid,
+        title: s.title,
+        focusArea: s.focusArea,
+        weeklyCapacityHours: s.weeklyCapacityHours,
+        active: s.active,
+        notes: s.notes,
+      });
+    }
+
+    // Owned work for the sample staff so the derived metrics differ per person.
+    // Marcus is intentionally loaded with overdue tasks + escalations (stuck),
+    // Elena carries heavy open load on reduced capacity (burnout watch),
+    // Priya has completed throughput (productive/steady), David is light.
+    const staffTasks: {
+      clientKey: string;
+      owner: string;
+      title: string;
+      dueDaysFromNow: number;
+      priority: string;
+      status: string;
+      escalationFlag: boolean;
+      notes: string;
+    }[] = [
+      // Priya — completed throughput + a couple open, on time.
+      { clientKey: "c1", owner: "Priya Nair", title: "Confirm quarterly compliance docs received", dueDaysFromNow: 5, priority: "Medium", status: "open", escalationFlag: false, notes: "" },
+      { clientKey: "c5", owner: "Priya Nair", title: "Log monitoring check-in summary", dueDaysFromNow: -1, priority: "Low", status: "done", escalationFlag: false, notes: "Completed." },
+      { clientKey: "c3", owner: "Priya Nair", title: "Send renewal confirmation packet", dueDaysFromNow: -3, priority: "Medium", status: "done", escalationFlag: false, notes: "Completed." },
+      { clientKey: "c5", owner: "Priya Nair", title: "Schedule next cadence touch", dueDaysFromNow: 7, priority: "Low", status: "open", escalationFlag: false, notes: "" },
+      // Marcus — overdue heavy + escalation-flagged (stuck).
+      { clientKey: "c2", owner: "Marcus Hill", title: "Resolve pricing exception follow-up", dueDaysFromNow: -6, priority: "High", status: "open", escalationFlag: true, notes: "Past due." },
+      { clientKey: "c2", owner: "Marcus Hill", title: "Return refund-request documentation", dueDaysFromNow: -4, priority: "High", status: "open", escalationFlag: true, notes: "Past due." },
+      { clientKey: "c6", owner: "Marcus Hill", title: "Route legal-sensitive question to leadership", dueDaysFromNow: -2, priority: "Urgent", status: "open", escalationFlag: true, notes: "Past due." },
+      { clientKey: "c4", owner: "Marcus Hill", title: "Follow up on qualifier requirements", dueDaysFromNow: 2, priority: "Medium", status: "open", escalationFlag: false, notes: "" },
+      // Elena — heavy open load on reduced capacity (burnout watch).
+      { clientKey: "c1", owner: "Elena Cruz", title: "Prep expansion proposal review", dueDaysFromNow: 1, priority: "High", status: "open", escalationFlag: false, notes: "" },
+      { clientKey: "c2", owner: "Elena Cruz", title: "Draft add-on services summary", dueDaysFromNow: 3, priority: "Medium", status: "open", escalationFlag: false, notes: "" },
+      { clientKey: "c3", owner: "Elena Cruz", title: "Coordinate monitoring expansion", dueDaysFromNow: 4, priority: "Medium", status: "open", escalationFlag: false, notes: "" },
+      { clientKey: "c5", owner: "Elena Cruz", title: "Capture referral opportunity details", dueDaysFromNow: -1, priority: "Medium", status: "open", escalationFlag: false, notes: "Past due." },
+      { clientKey: "c1", owner: "Elena Cruz", title: "Update relationship cadence plan", dueDaysFromNow: 6, priority: "Low", status: "open", escalationFlag: false, notes: "" },
+      // David — light.
+      { clientKey: "c6", owner: "David Okafor", title: "Complete onboarding checklist", dueDaysFromNow: 8, priority: "Medium", status: "open", escalationFlag: false, notes: "" },
+      { clientKey: "c6", owner: "David Okafor", title: "Send welcome packet", dueDaysFromNow: -2, priority: "Low", status: "done", escalationFlag: false, notes: "Completed." },
+    ];
+    for (const t of staffTasks) {
+      await tx.insert(tasksTable).values({
+        clientId: clientIds.get(t.clientKey)!,
+        sourceCallNoteId: null,
+        title: t.title,
+        ownerLabel: t.owner,
+        ownerUserId: staffUserIds.get(t.owner) ?? null,
+        dueDate: iso(t.dueDaysFromNow),
+        priority: t.priority,
+        status: t.status,
+        escalationFlag: t.escalationFlag,
+        notes: t.notes,
+        createdByUserId: greggId,
+      });
+    }
+
+    // A couple of open escalations routed to Marcus to push his stuck signal.
+    const staffEscalations: {
+      clientKey: string;
+      routedTo: string;
+      reason: string;
+      riskLevel: string;
+      decisionNeeded: string;
+      deadlineDays: number;
+      status: string;
+    }[] = [
+      { clientKey: "c2", routedTo: "Marcus Hill", reason: "Repeated pricing-exception requests", riskLevel: "High", decisionNeeded: "Leadership ruling on pricing exception", deadlineDays: 2, status: "open" },
+      { clientKey: "c6", routedTo: "Marcus Hill", reason: "Legal-sensitive onboarding question", riskLevel: "High", decisionNeeded: "Route to legal for guidance", deadlineDays: 1, status: "under review" },
+    ];
+    for (const e of staffEscalations) {
+      await tx.insert(escalationsTable).values({
+        clientId: clientIds.get(e.clientKey)!,
+        sourceCallNoteId: null,
+        reason: e.reason,
+        riskLevel: e.riskLevel,
+        routedToLabel: e.routedTo,
+        routedToUserId: staffUserIds.get(e.routedTo) ?? null,
+        decisionNeeded: e.decisionNeeded,
+        deadline: iso(e.deadlineDays),
+        status: e.status,
+        createdByUserId: greggId,
+      });
+    }
+
+    // Recent activity (within the default 14-day window) so productivity has
+    // throughput to count. Priya logs the most; Marcus none (low throughput
+    // against high load = nudges burnout/stuck).
+    const staffActivity: {
+      actor: string;
+      action: string;
+      entityType: string;
+      clientKey: string;
+      summary: string;
+      daysAgo: number;
+    }[] = [
+      { actor: "Priya Nair", action: "touch", entityType: "client", clientKey: "c5", summary: "Logged monitoring check-in.", daysAgo: 1 },
+      { actor: "Priya Nair", action: "touch", entityType: "client", clientKey: "c1", summary: "Confirmed compliance docs.", daysAgo: 2 },
+      { actor: "Priya Nair", action: "task_completed", entityType: "task", clientKey: "c3", summary: "Closed renewal confirmation task.", daysAgo: 3 },
+      { actor: "Elena Cruz", action: "touch", entityType: "client", clientKey: "c2", summary: "Discussed add-on services.", daysAgo: 2 },
+      { actor: "David Okafor", action: "touch", entityType: "client", clientKey: "c6", summary: "Kicked off onboarding.", daysAgo: 4 },
+    ];
+    for (const a of staffActivity) {
+      await tx.insert(activityLogTable).values({
+        actorUserId: staffUserIds.get(a.actor) ?? null,
+        actorLabel: a.actor,
+        action: a.action,
+        entityType: a.entityType,
+        clientId: clientIds.get(a.clientKey) ?? null,
+        summary: a.summary,
+        createdAt: new Date(Date.now() - a.daysAgo * 86_400_000),
+      });
+    }
+
+    // --- Requests Hub -----------------------------------------------------
+    // Sample internal operational requests across types and lifecycle states.
+    // Tracking + routing only: "approved" records leadership sign-off, it does
+    // not itself authorize spend.
+    const requestSpecs: {
+      type: string;
+      title: string;
+      description: string;
+      status: string;
+      priority: string;
+      amount: number | null;
+      clientKey: string | null;
+      neededByDays: number | null;
+      requestedBy: string;
+      assignedTo: string;
+      resolutionNotes: string;
+    }[] = [
+      {
+        type: "purchase",
+        title: "Upgrade RingCentral analytics seat",
+        description: "Add the analytics add-on so call insights can be pulled into weekly review.",
+        status: "in_review",
+        priority: "Medium",
+        amount: 480,
+        clientKey: null,
+        neededByDays: 21,
+        requestedBy: "Gregg",
+        assignedTo: "Landon",
+        resolutionNotes: "",
+      },
+      {
+        type: "travel",
+        title: "On-site visit — ABC Construction",
+        description: "Travel to client site to stabilize the at-risk relationship and review compliance docs in person.",
+        status: "submitted",
+        priority: "High",
+        amount: 1200,
+        clientKey: "c1",
+        neededByDays: 14,
+        requestedBy: "Gregg",
+        assignedTo: "",
+        resolutionNotes: "",
+      },
+      {
+        type: "help",
+        title: "Coverage on escalation backlog",
+        description: "Need a second coordinator to help clear the pricing-exception escalation backlog this week.",
+        status: "approved",
+        priority: "Urgent",
+        amount: null,
+        clientKey: "c2",
+        neededByDays: 3,
+        requestedBy: "Marcus Hill",
+        assignedTo: "Gregg",
+        resolutionNotes: "Approved — Priya to assist for the week.",
+      },
+      {
+        type: "equipment",
+        title: "Replacement laptop",
+        description: "Current laptop battery no longer holds a charge for client calls.",
+        status: "fulfilled",
+        priority: "Medium",
+        amount: 1450,
+        clientKey: null,
+        neededByDays: -5,
+        requestedBy: "Elena Cruz",
+        assignedTo: "Landon",
+        resolutionNotes: "Delivered and set up.",
+      },
+      {
+        type: "other",
+        title: "Access to Zoho Deals reporting",
+        description: "Request read access to the Zoho Deals reporting view for expansion reconciliation.",
+        status: "denied",
+        priority: "Low",
+        amount: null,
+        clientKey: null,
+        neededByDays: null,
+        requestedBy: "David Okafor",
+        assignedTo: "Gregg",
+        resolutionNotes: "Denied for now — not required for onboarding role.",
+      },
+      {
+        type: "purchase",
+        title: "Client appreciation gift basket",
+        description: "Send a thank-you basket to a renewed monitoring client.",
+        status: "submitted",
+        priority: "Low",
+        amount: 150,
+        clientKey: "c3",
+        neededByDays: 10,
+        requestedBy: "Priya Nair",
+        assignedTo: "",
+        resolutionNotes: "",
+      },
+    ];
+    for (const r of requestSpecs) {
+      const cid = r.clientKey ? clientIds.get(r.clientKey) ?? null : null;
+      const requesterId =
+        r.requestedBy === "Gregg"
+          ? greggId
+          : r.requestedBy === "Landon"
+            ? landonId
+            : staffUserIds.get(r.requestedBy) ?? null;
+      await tx.insert(requestsTable).values({
+        type: r.type,
+        title: r.title,
+        description: r.description,
+        status: r.status,
+        priority: r.priority,
+        amountCents: r.amount == null ? null : Math.round(r.amount * 100),
+        clientId: cid,
+        neededBy: r.neededByDays == null ? null : iso(r.neededByDays),
+        requestedByUserId: requesterId,
+        requestedByLabel: r.requestedBy,
+        assignedToLabel: r.assignedTo,
+        resolutionNotes: r.resolutionNotes,
       });
     }
   });

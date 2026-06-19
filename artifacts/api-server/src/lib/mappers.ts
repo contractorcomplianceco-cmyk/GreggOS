@@ -25,6 +25,11 @@ import type {
   Qualifier as DbQualifier,
   Placement as DbPlacement,
   SuccessPlanItem as DbSuccessPlanItem,
+  RoseChatSession as DbRoseChatSession,
+  RoseChatMessage as DbRoseChatMessage,
+  EmailDraft as DbEmailDraft,
+  StaffProfile as DbStaffProfile,
+  Request as DbRequest,
 } from "@workspace/db";
 import type {
   Client,
@@ -53,6 +58,12 @@ import type {
   Qualifier,
   Placement,
   SuccessPlanItem,
+  RoseChatSession,
+  RoseChatMessage,
+  RoseChatSessionDetail,
+  EmailDraft,
+  StaffProfile,
+  RequestItem,
 } from "@workspace/api-zod";
 
 const s = (v: string | null | undefined): string => v ?? "";
@@ -466,6 +477,89 @@ export function toSuccessPlanItem(row: DbSuccessPlanItem): SuccessPlanItem {
     completedAt: row.completedAt ? row.completedAt.toISOString() : null,
     notes: row.notes,
     sortOrder: row.sortOrder,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toRoseSession(row: DbRoseChatSession): RoseChatSession {
+  return {
+    id: row.id,
+    title: row.title,
+    mode: row.mode,
+    clientId: row.clientId ?? null,
+    createdByLabel: row.createdByLabel,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toRoseMessage(row: DbRoseChatMessage): RoseChatMessage {
+  return {
+    id: row.id,
+    sessionId: row.sessionId,
+    role: row.role,
+    content: row.content,
+    source: row.source,
+    createdAt: iso(row.createdAt),
+  };
+}
+
+export function toRoseSessionDetail(
+  row: DbRoseChatSession,
+  messages: DbRoseChatMessage[],
+): RoseChatSessionDetail {
+  return {
+    ...toRoseSession(row),
+    messages: messages.map(toRoseMessage),
+  };
+}
+
+export function toEmailDraft(row: DbEmailDraft): EmailDraft {
+  return {
+    id: row.id,
+    purpose: row.purpose,
+    audience: row.audience,
+    tone: row.tone,
+    keyPoints: row.keyPoints,
+    subject: row.subject,
+    body: row.body,
+    source: row.source,
+    status: row.status,
+    createdByLabel: row.createdByLabel,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toStaffProfile(row: DbStaffProfile): StaffProfile {
+  return {
+    id: row.id,
+    name: row.name,
+    title: row.title,
+    focusArea: row.focusArea,
+    weeklyCapacityHours: row.weeklyCapacityHours,
+    active: row.active,
+    notes: row.notes,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+  };
+}
+
+export function toRequest(row: DbRequest): RequestItem {
+  return {
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    description: row.description,
+    status: row.status,
+    priority: row.priority,
+    amount: row.amountCents !== null ? row.amountCents / 100 : null,
+    clientId: row.clientId ?? null,
+    neededBy: s(row.neededBy),
+    requestedByLabel: row.requestedByLabel,
+    assignedToLabel: row.assignedToLabel,
+    resolutionNotes: row.resolutionNotes,
     createdAt: iso(row.createdAt),
     updatedAt: iso(row.updatedAt),
   };

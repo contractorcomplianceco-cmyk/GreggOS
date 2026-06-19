@@ -2115,3 +2115,438 @@ export const UpdateSuccessPlanItemResponse = zod.object({
 })
 
 
+/**
+ * @summary List saved RoseOS assistant chat sessions
+ */
+export const ListRoseChatSessionsQueryParams = zod.object({
+  "mode": zod.coerce.string().optional(),
+  "clientId": zod.coerce.string().optional()
+})
+
+export const ListRoseChatSessionsResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "mode": zod.string(),
+  "clientId": zod.string().nullish(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListRoseChatSessionsResponse = zod.array(ListRoseChatSessionsResponseItem)
+
+
+/**
+ * @summary Start a RoseOS chat session (optionally with a first message that gets an AI reply)
+ */
+export const CreateRoseChatSessionBody = zod.object({
+  "mode": zod.string(),
+  "title": zod.string().optional(),
+  "clientId": zod.string().nullish(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Get a chat session with its messages
+ */
+export const GetRoseChatSessionParams = zod.object({
+  "sessionId": zod.coerce.string()
+})
+
+export const GetRoseChatSessionResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "mode": zod.string(),
+  "clientId": zod.string().nullish(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "messages": zod.array(zod.object({
+  "id": zod.string(),
+  "sessionId": zod.string(),
+  "role": zod.string(),
+  "content": zod.string(),
+  "source": zod.string(),
+  "createdAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Rename or retarget a chat session
+ */
+export const UpdateRoseChatSessionParams = zod.object({
+  "sessionId": zod.coerce.string()
+})
+
+export const UpdateRoseChatSessionBody = zod.object({
+  "title": zod.string().optional(),
+  "mode": zod.string().optional(),
+  "clientId": zod.string().nullish()
+})
+
+export const UpdateRoseChatSessionResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "mode": zod.string(),
+  "clientId": zod.string().nullish(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a chat session and its messages
+ */
+export const DeleteRoseChatSessionParams = zod.object({
+  "sessionId": zod.coerce.string()
+})
+
+export const DeleteRoseChatSessionResponse = zod.object({
+  "ok": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Send a user message and get an AI reply (template fallback + boundary guard)
+ */
+export const SendRoseChatMessageParams = zod.object({
+  "sessionId": zod.coerce.string()
+})
+
+export const SendRoseChatMessageBody = zod.object({
+  "content": zod.string()
+})
+
+
+/**
+ * @summary List saved email drafts
+ */
+export const ListEmailDraftsQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const ListEmailDraftsResponseItem = zod.object({
+  "id": zod.string(),
+  "purpose": zod.string(),
+  "audience": zod.string(),
+  "tone": zod.string(),
+  "keyPoints": zod.string(),
+  "subject": zod.string(),
+  "body": zod.string(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListEmailDraftsResponse = zod.array(ListEmailDraftsResponseItem)
+
+
+/**
+ * @summary Generate a standalone email draft (AI with template fallback). Draft-only; nothing is sent.
+ */
+export const GenerateEmailDraftBody = zod.object({
+  "purpose": zod.string(),
+  "audience": zod.string().optional(),
+  "tone": zod.string().optional(),
+  "keyPoints": zod.string().optional()
+})
+
+
+/**
+ * @summary Get an email draft
+ */
+export const GetEmailDraftParams = zod.object({
+  "draftId": zod.coerce.string()
+})
+
+export const GetEmailDraftResponse = zod.object({
+  "id": zod.string(),
+  "purpose": zod.string(),
+  "audience": zod.string(),
+  "tone": zod.string(),
+  "keyPoints": zod.string(),
+  "subject": zod.string(),
+  "body": zod.string(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Edit an email draft (subject/body/status)
+ */
+export const UpdateEmailDraftParams = zod.object({
+  "draftId": zod.coerce.string()
+})
+
+export const UpdateEmailDraftBody = zod.object({
+  "subject": zod.string().optional(),
+  "body": zod.string().optional(),
+  "purpose": zod.string().optional(),
+  "audience": zod.string().optional(),
+  "tone": zod.string().optional(),
+  "keyPoints": zod.string().optional(),
+  "status": zod.enum(['draft', 'edited', 'used', 'discarded']).optional().describe('Draft-lifecycle status only. There is no send path.')
+})
+
+export const UpdateEmailDraftResponse = zod.object({
+  "id": zod.string(),
+  "purpose": zod.string(),
+  "audience": zod.string(),
+  "tone": zod.string(),
+  "keyPoints": zod.string(),
+  "subject": zod.string(),
+  "body": zod.string(),
+  "source": zod.string(),
+  "status": zod.string(),
+  "createdByLabel": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete an email draft
+ */
+export const DeleteEmailDraftParams = zod.object({
+  "draftId": zod.coerce.string()
+})
+
+export const DeleteEmailDraftResponse = zod.object({
+  "ok": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Staff productivity / stuck / burnout overview derived from real work data
+ */
+export const GetStaffOverviewQueryParams = zod.object({
+  "windowDays": zod.coerce.number().optional()
+})
+
+export const GetStaffOverviewResponse = zod.object({
+  "windowDays": zod.number(),
+  "generatedAt": zod.string(),
+  "staff": zod.array(zod.object({
+  "name": zod.string(),
+  "title": zod.string(),
+  "focusArea": zod.string(),
+  "weeklyCapacityHours": zod.number(),
+  "active": zod.boolean(),
+  "clientsOwned": zod.number(),
+  "openTasks": zod.number(),
+  "overdueTasks": zod.number(),
+  "completedTasks": zod.number(),
+  "openEscalations": zod.number(),
+  "touchesDue": zod.number(),
+  "stalledExpansions": zod.number(),
+  "recentActivity": zod.number(),
+  "productivityScore": zod.number(),
+  "stuckScore": zod.number(),
+  "burnoutScore": zod.number(),
+  "status": zod.string(),
+  "signals": zod.array(zod.string())
+}))
+})
+
+
+/**
+ * @summary List editable staff profiles
+ */
+export const ListStaffProfilesResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "title": zod.string(),
+  "focusArea": zod.string(),
+  "weeklyCapacityHours": zod.number(),
+  "active": zod.boolean(),
+  "notes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListStaffProfilesResponse = zod.array(ListStaffProfilesResponseItem)
+
+
+/**
+ * @summary Create a staff profile
+ */
+export const CreateStaffProfileBody = zod.object({
+  "name": zod.string(),
+  "title": zod.string().optional(),
+  "focusArea": zod.string().optional(),
+  "weeklyCapacityHours": zod.number().optional(),
+  "active": zod.boolean().optional(),
+  "notes": zod.string().optional()
+})
+
+
+/**
+ * @summary Update a staff profile
+ */
+export const UpdateStaffProfileParams = zod.object({
+  "profileId": zod.coerce.string()
+})
+
+export const UpdateStaffProfileBody = zod.object({
+  "name": zod.string().optional(),
+  "title": zod.string().optional(),
+  "focusArea": zod.string().optional(),
+  "weeklyCapacityHours": zod.number().optional(),
+  "active": zod.boolean().optional(),
+  "notes": zod.string().optional()
+})
+
+export const UpdateStaffProfileResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "title": zod.string(),
+  "focusArea": zod.string(),
+  "weeklyCapacityHours": zod.number(),
+  "active": zod.boolean(),
+  "notes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a staff profile
+ */
+export const DeleteStaffProfileParams = zod.object({
+  "profileId": zod.coerce.string()
+})
+
+export const DeleteStaffProfileResponse = zod.object({
+  "ok": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary List operational requests
+ */
+export const ListRequestsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "type": zod.coerce.string().optional(),
+  "requestedBy": zod.coerce.string().optional(),
+  "clientId": zod.coerce.string().optional()
+})
+
+export const ListRequestsResponseItem = zod.object({
+  "id": zod.string(),
+  "type": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "priority": zod.string(),
+  "amount": zod.number().nullish(),
+  "clientId": zod.string().nullish(),
+  "neededBy": zod.string(),
+  "requestedByLabel": zod.string(),
+  "assignedToLabel": zod.string(),
+  "resolutionNotes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListRequestsResponse = zod.array(ListRequestsResponseItem)
+
+
+/**
+ * @summary Submit a request
+ */
+export const CreateRequestBody = zod.object({
+  "type": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().optional(),
+  "priority": zod.string().optional(),
+  "amount": zod.number().nullish(),
+  "clientId": zod.string().nullish(),
+  "neededBy": zod.string().optional(),
+  "assignedToLabel": zod.string().optional()
+})
+
+
+/**
+ * @summary Get a request
+ */
+export const GetRequestParams = zod.object({
+  "requestId": zod.coerce.string()
+})
+
+export const GetRequestResponse = zod.object({
+  "id": zod.string(),
+  "type": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "priority": zod.string(),
+  "amount": zod.number().nullish(),
+  "clientId": zod.string().nullish(),
+  "neededBy": zod.string(),
+  "requestedByLabel": zod.string(),
+  "assignedToLabel": zod.string(),
+  "resolutionNotes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update a request (status lifecycle, assignment, details)
+ */
+export const UpdateRequestParams = zod.object({
+  "requestId": zod.coerce.string()
+})
+
+export const UpdateRequestBody = zod.object({
+  "type": zod.string().optional(),
+  "title": zod.string().optional(),
+  "description": zod.string().optional(),
+  "status": zod.string().optional(),
+  "priority": zod.string().optional(),
+  "amount": zod.number().nullish(),
+  "clientId": zod.string().nullish(),
+  "neededBy": zod.string().optional(),
+  "assignedToLabel": zod.string().optional(),
+  "resolutionNotes": zod.string().optional()
+})
+
+export const UpdateRequestResponse = zod.object({
+  "id": zod.string(),
+  "type": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "priority": zod.string(),
+  "amount": zod.number().nullish(),
+  "clientId": zod.string().nullish(),
+  "neededBy": zod.string(),
+  "requestedByLabel": zod.string(),
+  "assignedToLabel": zod.string(),
+  "resolutionNotes": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a request
+ */
+export const DeleteRequestParams = zod.object({
+  "requestId": zod.coerce.string()
+})
+
+export const DeleteRequestResponse = zod.object({
+  "ok": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+

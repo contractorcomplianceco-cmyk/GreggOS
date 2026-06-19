@@ -10,3 +10,4 @@
 - [Welcome Center + global motivation popup](welcome-and-motivation.md) — walkthrough is a separate artifact embedded via absolute /cockpit-walkthrough/ iframe; motivation is a global SidebarLayout popup; navigation.test gates new routes.
 - [Cockpit dual test runners](cockpit-test-runners.md) — node:test runs *.test.ts (structural), vitest+jsdom runs *.test.tsx (render); page render smoke tests need clerk mock + providers + fetch/observer stubs.
 - [Cockpit shared layout primitives](cockpit-layout-primitives.md) — reuse PageHeader/StatCard for themed pages; SidebarLayout has desktop+mobile-drawer shell; StatCard accents must be literal map entries (Tailwind purge).
+- [Cockpit seed idempotency](seed-idempotency.md) — seed only cascade-clears via clients delete; tables with no/ set-null client FK (requests, staff_profiles) must be explicitly deleted or reseeds duplicate.

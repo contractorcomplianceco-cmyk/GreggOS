@@ -26,6 +26,10 @@ import profitShareRouter from "./profitShare";
 import qualifiersRouter from "./qualifiers";
 import placementsRouter from "./placements";
 import successPlanRouter from "./successPlan";
+import roseChatRouter from "./roseChat";
+import emailRouter from "./email";
+import staffRouter from "./staff";
+import requestsRouter from "./requests";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -60,5 +64,9 @@ router.use(profitShareRouter);
 router.use(qualifiersRouter);
 router.use(placementsRouter);
 router.use(successPlanRouter);
+router.use(roseChatRouter);
+router.use(emailRouter);
+router.use(staffRouter);
+router.use(requestsRouter);
 
 export default router;

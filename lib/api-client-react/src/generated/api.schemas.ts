@@ -1071,6 +1071,197 @@ export interface SuccessPlanItemUpdate {
   sortOrder?: number;
 }
 
+export interface RoseChatMessage {
+  id: string;
+  sessionId: string;
+  role: string;
+  content: string;
+  source: string;
+  createdAt: string;
+}
+
+export interface RoseChatSession {
+  id: string;
+  title: string;
+  mode: string;
+  clientId?: string | null;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RoseChatSessionDetail {
+  id: string;
+  title: string;
+  mode: string;
+  clientId?: string | null;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: RoseChatMessage[];
+}
+
+export interface RoseChatSessionInput {
+  mode: string;
+  title?: string;
+  clientId?: string | null;
+  message?: string;
+}
+
+export interface RoseChatSessionUpdate {
+  title?: string;
+  mode?: string;
+  clientId?: string | null;
+}
+
+export interface RoseChatMessageInput {
+  content: string;
+}
+
+export interface EmailDraft {
+  id: string;
+  purpose: string;
+  audience: string;
+  tone: string;
+  keyPoints: string;
+  subject: string;
+  body: string;
+  source: string;
+  status: string;
+  createdByLabel: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EmailDraftGenerateInput {
+  purpose: string;
+  audience?: string;
+  tone?: string;
+  keyPoints?: string;
+}
+
+/**
+ * Draft-lifecycle status only. There is no send path.
+ */
+export type EmailDraftUpdateStatus = typeof EmailDraftUpdateStatus[keyof typeof EmailDraftUpdateStatus];
+
+
+export const EmailDraftUpdateStatus = {
+  draft: 'draft',
+  edited: 'edited',
+  used: 'used',
+  discarded: 'discarded',
+} as const;
+
+export interface EmailDraftUpdate {
+  subject?: string;
+  body?: string;
+  purpose?: string;
+  audience?: string;
+  tone?: string;
+  keyPoints?: string;
+  /** Draft-lifecycle status only. There is no send path. */
+  status?: EmailDraftUpdateStatus;
+}
+
+export interface StaffProfile {
+  id: string;
+  name: string;
+  title: string;
+  focusArea: string;
+  weeklyCapacityHours: number;
+  active: boolean;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StaffProfileInput {
+  name: string;
+  title?: string;
+  focusArea?: string;
+  weeklyCapacityHours?: number;
+  active?: boolean;
+  notes?: string;
+}
+
+export interface StaffProfileUpdate {
+  name?: string;
+  title?: string;
+  focusArea?: string;
+  weeklyCapacityHours?: number;
+  active?: boolean;
+  notes?: string;
+}
+
+export interface StaffMember {
+  name: string;
+  title: string;
+  focusArea: string;
+  weeklyCapacityHours: number;
+  active: boolean;
+  clientsOwned: number;
+  openTasks: number;
+  overdueTasks: number;
+  completedTasks: number;
+  openEscalations: number;
+  touchesDue: number;
+  stalledExpansions: number;
+  recentActivity: number;
+  productivityScore: number;
+  stuckScore: number;
+  burnoutScore: number;
+  status: string;
+  signals: string[];
+}
+
+export interface StaffOverview {
+  windowDays: number;
+  generatedAt: string;
+  staff: StaffMember[];
+}
+
+export interface RequestItem {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  amount?: number | null;
+  clientId?: string | null;
+  neededBy: string;
+  requestedByLabel: string;
+  assignedToLabel: string;
+  resolutionNotes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RequestInput {
+  type: string;
+  title: string;
+  description?: string;
+  priority?: string;
+  amount?: number | null;
+  clientId?: string | null;
+  neededBy?: string;
+  assignedToLabel?: string;
+}
+
+export interface RequestUpdate {
+  type?: string;
+  title?: string;
+  description?: string;
+  status?: string;
+  priority?: string;
+  amount?: number | null;
+  clientId?: string | null;
+  neededBy?: string;
+  assignedToLabel?: string;
+  resolutionNotes?: string;
+}
+
 export type ListClientsParams = {
 search?: string;
 status?: string;
@@ -1178,5 +1369,25 @@ status?: string;
 
 export type ListSuccessPlanItemsParams = {
 phase?: string;
+};
+
+export type ListRoseChatSessionsParams = {
+mode?: string;
+clientId?: string;
+};
+
+export type ListEmailDraftsParams = {
+status?: string;
+};
+
+export type GetStaffOverviewParams = {
+windowDays?: number;
+};
+
+export type ListRequestsParams = {
+status?: string;
+type?: string;
+requestedBy?: string;
+clientId?: string;
 };
 
