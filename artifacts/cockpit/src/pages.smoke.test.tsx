@@ -8,8 +8,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 // Eagerly collect every top-level page module so a page that throws on mount
 // (bad import, runtime crash) fails this smoke test instead of silently
 // shipping a blank screen to users.
+// Exclude *.test.tsx so colocated page tests (e.g. admin.test.tsx) are not
+// treated as pages. Importing them here would execute their top-level
+// vi.mock() calls, polluting this suite's module registry with partial mocks.
 const pageModules = import.meta.glob<{ default: React.ComponentType }>(
-  "./pages/*.tsx",
+  ["./pages/*.tsx", "!./pages/*.test.tsx"],
   { eager: true },
 );
 
