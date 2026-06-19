@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Switch, Route, Redirect, Link, useLocation, Router as WouterRouter } from "wouter";
-import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
+import { Switch, Route, useLocation, Router as WouterRouter } from "wouter";
+import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -33,7 +33,6 @@ import Processor from "@/pages/processor";
 import WeeklyReview from "@/pages/weekly-review";
 import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
-import ccaLogo from "@assets/CCA_horizontal_logo_with_transparent_background_1780935000951.png";
 
 const queryClient = new QueryClient();
 
@@ -109,13 +108,13 @@ const clerkLocalization = {
   signIn: {
     start: {
       title: "Current Client Cockpit",
-      subtitle: "Sign in to access the cockpit",
+      subtitle: "Optional sign-in — the cockpit is open without an account",
     },
   },
   signUp: {
     start: {
-      title: "Request access",
-      subtitle: "Create your cockpit account",
+      title: "Create an account",
+      subtitle: "Optional — the cockpit is open without an account",
     },
   },
 };
@@ -133,66 +132,6 @@ function SignUpPage() {
     <div className="flex min-h-[100dvh] items-center justify-center bg-slate-100 px-4">
       <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
     </div>
-  );
-}
-
-function Landing() {
-  return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[#0a1a2f] px-6 text-center">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 px-8 py-10 backdrop-blur">
-        <img src={ccaLogo} alt="Contractor Compliance Authority" className="mx-auto h-12 w-auto" />
-        <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-blue-300/80">
-          Current Client Cockpit
-        </p>
-        <h1 className="mt-3 text-xl font-semibold text-white">
-          Internal operations workspace
-        </h1>
-        <p className="mt-2 text-sm text-slate-300">
-          Triage priorities, process call notes, and run the weekly review for
-          current-client relationships. Authorized staff only.
-        </p>
-        <Link
-          href="/sign-in"
-          className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-          data-testid="link-signin"
-        >
-          Sign In
-        </Link>
-        <p className="mt-6 text-[10px] leading-tight text-slate-400">
-          This cockpit organizes relationship follow-through. It does not approve
-          pricing, refunds, legal advice, compliance opinions, qualifier
-          placements, or final client commitments.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function guarded(Component: React.ComponentType) {
-  return function Guarded() {
-    return (
-      <>
-        <Show when="signed-in">
-          <Component />
-        </Show>
-        <Show when="signed-out">
-          <Redirect to="/" />
-        </Show>
-      </>
-    );
-  };
-}
-
-function HomeRedirect() {
-  return (
-    <>
-      <Show when="signed-in">
-        <GreggToday />
-      </Show>
-      <Show when="signed-out">
-        <Landing />
-      </Show>
-    </>
   );
 }
 
@@ -233,33 +172,33 @@ function ClerkProviderWithRoutes() {
         <ClerkQueryClientCacheInvalidator />
         <TooltipProvider>
           <Switch>
-            <Route path="/" component={HomeRedirect} />
+            <Route path="/" component={GreggToday} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
-            <Route path="/oversight" component={guarded(Oversight)} />
-            <Route path="/expansion" component={guarded(Expansion)} />
-            <Route path="/relationships" component={guarded(Relationships)} />
-            <Route path="/reporting" component={guarded(Reporting)} />
-            <Route path="/communications" component={guarded(Communications)} />
-            <Route path="/travel" component={guarded(TravelPlanner)} />
-            <Route path="/expenses" component={guarded(ExpensesPage)} />
-            <Route path="/training" component={guarded(Training)} />
-            <Route path="/prompt-library" component={guarded(PromptLibrary)} />
-            <Route path="/motivation" component={guarded(Motivation)} />
-            <Route path="/feedback" component={guarded(FeedbackCenter)} />
-            <Route path="/placement" component={guarded(PlacementNetwork)} />
-            <Route path="/bonus-tracker" component={guarded(BonusTracker)} />
-            <Route path="/profit-sharing" component={guarded(ProfitSharing)} />
-            <Route path="/success-plan" component={guarded(SuccessPlan)} />
-            <Route path="/my-account" component={guarded(MyAccount)} />
-            <Route path="/my-benefits" component={guarded(MyBenefits)} />
-            <Route path="/executive-profile" component={guarded(ExecutiveProfile)} />
-            <Route path="/clients" component={guarded(Clients)} />
-            <Route path="/clients/:id" component={guarded(ClientDetail)} />
-            <Route path="/audit-risk" component={guarded(AuditRisk)} />
-            <Route path="/processor" component={guarded(Processor)} />
-            <Route path="/weekly-review" component={guarded(WeeklyReview)} />
-            <Route path="/admin" component={guarded(Admin)} />
+            <Route path="/oversight" component={Oversight} />
+            <Route path="/expansion" component={Expansion} />
+            <Route path="/relationships" component={Relationships} />
+            <Route path="/reporting" component={Reporting} />
+            <Route path="/communications" component={Communications} />
+            <Route path="/travel" component={TravelPlanner} />
+            <Route path="/expenses" component={ExpensesPage} />
+            <Route path="/training" component={Training} />
+            <Route path="/prompt-library" component={PromptLibrary} />
+            <Route path="/motivation" component={Motivation} />
+            <Route path="/feedback" component={FeedbackCenter} />
+            <Route path="/placement" component={PlacementNetwork} />
+            <Route path="/bonus-tracker" component={BonusTracker} />
+            <Route path="/profit-sharing" component={ProfitSharing} />
+            <Route path="/success-plan" component={SuccessPlan} />
+            <Route path="/my-account" component={MyAccount} />
+            <Route path="/my-benefits" component={MyBenefits} />
+            <Route path="/executive-profile" component={ExecutiveProfile} />
+            <Route path="/clients" component={Clients} />
+            <Route path="/clients/:id" component={ClientDetail} />
+            <Route path="/audit-risk" component={AuditRisk} />
+            <Route path="/processor" component={Processor} />
+            <Route path="/weekly-review" component={WeeklyReview} />
+            <Route path="/admin" component={Admin} />
             <Route component={NotFound} />
           </Switch>
           <Toaster />

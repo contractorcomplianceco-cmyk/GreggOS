@@ -88,8 +88,13 @@ function currentTitle(location: string, navigation: NavSection[]): string {
 }
 
 function UserFooter() {
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const { signOut } = useClerk();
+
+  // Sign-in wall removed: only show the account/log-out footer when someone
+  // has optionally signed in, so a signed-out session isn't mislabeled.
+  if (!isSignedIn) return null;
+
   const label =
     user?.primaryEmailAddress?.emailAddress ??
     user?.fullName ??

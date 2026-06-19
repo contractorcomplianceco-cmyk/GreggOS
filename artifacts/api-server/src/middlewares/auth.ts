@@ -62,6 +62,39 @@ async function getOrCreateUser(externalId: string): Promise<User | null> {
   return again[0] ?? null;
 }
 
+const PUBLIC_EXTERNAL_ID = "public-access";
+
+// Sign-in wall removed: requests without a Clerk session resolve to a shared
+// default user so the cockpit is usable without logging in. A real Clerk
+// session still resolves to that user's own record (see getOrCreateUser).
+async function getOrCreateDefaultUser(): Promise<User | null> {
+  const existing = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.externalId, PUBLIC_EXTERNAL_ID))
+    .limit(1);
+  if (existing[0]) return existing[0];
+
+  const inserted = await db
+    .insert(usersTable)
+    .values({
+      externalId: PUBLIC_EXTERNAL_ID,
+      email: "cockpit@local",
+      displayName: "Cockpit User",
+      role: "admin",
+    })
+    .onConflictDoNothing({ target: usersTable.externalId })
+    .returning();
+  if (inserted[0]) return inserted[0];
+
+  const again = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.externalId, PUBLIC_EXTERNAL_ID))
+    .limit(1);
+  return again[0] ?? null;
+}
+
 export async function requireAuth(
   req: Request,
   res: Response,
@@ -69,12 +102,10 @@ export async function requireAuth(
 ): Promise<void> {
   const auth = getAuth(req);
   const externalId = auth?.userId;
-  if (!externalId) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
   try {
-    const user = await getOrCreateUser(externalId);
+    const user = externalId
+      ? await getOrCreateUser(externalId)
+      : await getOrCreateDefaultUser();
     if (!user || !user.active) {
       res.status(403).json({ error: "Forbidden" });
       return;
