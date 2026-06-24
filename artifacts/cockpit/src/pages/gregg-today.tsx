@@ -32,6 +32,7 @@ import {
   Zap,
   ShieldAlert,
   CircleDot,
+  Fish,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -453,9 +454,10 @@ export default function GreggToday() {
               <div
                 className={`h-2.5 w-2.5 rounded-full ${pulse.tone} ${pulse.ring}`}
               />
-              <h1 className="text-lg font-bold tracking-tight text-slate-900">
+              <h1 className="font-display text-lg font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
                 GreggOS{" "}
-                <span className="text-[#0BA3FF]">Command Center</span>
+                <span className="text-[#15a3b0]">Coastal Command</span>
+                <Fish className="h-4 w-4 text-[#15a3b0]" />
               </h1>
               <span className="hidden sm:inline text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 border border-emerald-200 rounded px-1.5 py-0.5">
                 Operational
@@ -506,7 +508,7 @@ export default function GreggToday() {
                   onClick={() => setFilter(f)}
                   className={`rounded px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors ${
                     filter === f
-                      ? "bg-[#0BA3FF] text-white shadow-sm"
+                      ? "bg-[#15a3b0] text-white shadow-sm"
                       : "border border-blue-100 bg-white text-slate-600 hover:text-slate-900 hover:border-blue-300 shadow-sm"
                   }`}
                   data-testid={`chip-filter-${f}`}
@@ -877,12 +879,12 @@ export default function GreggToday() {
                       <linearGradient id="gCalls" x1="0" y1="0" x2="0" y2="1">
                         <stop
                           offset="0%"
-                          stopColor="#0BA3FF"
+                          stopColor="#15a3b0"
                           stopOpacity={0.2}
                         />
                         <stop
                           offset="100%"
-                          stopColor="#0BA3FF"
+                          stopColor="#15a3b0"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -929,7 +931,7 @@ export default function GreggToday() {
                       type="monotone"
                       dataKey="calls"
                       name="Calls"
-                      stroke="#0BA3FF"
+                      stroke="#15a3b0"
                       fill="url(#gCalls)"
                       strokeWidth={2}
                     />

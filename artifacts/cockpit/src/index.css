@@ -51,7 +51,8 @@
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "General Sans", "Inter", system-ui, sans-serif;
+  --font-display: "Cabinet Grotesk", "General Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -61,73 +62,83 @@
 }
 
 :root {
-  --background: 210 33% 99%;
-  --foreground: 214 60% 16%;
+  /* Coastal / saltwater modern
+     sand-foam surfaces, deep harbor ink text, seafoam-teal primary,
+     sun-warmed coral as the contrast accent, dock-rope tan + sea-grass green */
+  --background: 196 38% 97%;          /* sea-foam mist */
+  --foreground: 202 45% 14%;          /* deep harbor ink */
   --card: 0 0% 100%;
-  --card-foreground: 214 60% 16%;
+  --card-foreground: 202 45% 14%;
   --popover: 0 0% 100%;
-  --popover-foreground: 214 60% 16%;
-  --primary: 214 60% 21%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 208 80% 95%;
-  --secondary-foreground: 214 60% 21%;
-  --muted: 210 20% 96%;
-  --muted-foreground: 215 15% 45%;
-  --accent: 208 80% 95%;
-  --accent-foreground: 214 60% 21%;
-  --destructive: 0 70% 50%;
+  --popover-foreground: 202 45% 14%;
+  --primary: 188 64% 32%;             /* saltwater teal */
+  --primary-foreground: 180 40% 98%;
+  --secondary: 192 44% 92%;           /* shallow-water tint */
+  --secondary-foreground: 197 50% 20%;
+  --muted: 195 30% 94%;
+  --muted-foreground: 200 18% 42%;
+  --accent: 14 88% 60%;               /* sunset coral */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 8 72% 52%;
   --destructive-foreground: 210 20% 98%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 203 100% 52%;
-  
-  --sidebar: 0 0% 100%;
-  --sidebar-foreground: 214 60% 16%;
-  --sidebar-primary: 214 60% 21%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 208 80% 95%;
-  --sidebar-accent-foreground: 214 60% 21%;
-  --sidebar-border: 214 32% 91%;
-  --sidebar-ring: 203 100% 52%;
+  --border: 195 28% 88%;
+  --input: 195 28% 88%;
+  --ring: 188 70% 42%;
 
-  --chart-1: 214 60% 25%;
-  --chart-2: 203 100% 52%;
-  --chart-3: 140 55% 40%;
-  --chart-4: 0 70% 50%;
-  --chart-5: 190 70% 42%;
-  
-  --radius: 0.35rem;
+  --sidebar: 201 60% 12%;             /* deep-sea sidebar (dark on light app) */
+  --sidebar-foreground: 190 30% 90%;
+  --sidebar-primary: 184 80% 55%;     /* bright aqua */
+  --sidebar-primary-foreground: 201 60% 12%;
+  --sidebar-accent: 192 48% 22%;
+  --sidebar-accent-foreground: 184 90% 80%;
+  --sidebar-border: 200 45% 20%;
+  --sidebar-ring: 184 80% 55%;
+
+  --chart-1: 188 64% 32%;             /* teal */
+  --chart-2: 14 88% 60%;              /* coral */
+  --chart-3: 152 42% 42%;             /* sea grass */
+  --chart-4: 38 78% 55%;             /* dock-rope gold */
+  --chart-5: 205 70% 48%;             /* open-water blue */
+
+  --radius: 0.6rem;                   /* softer, wave-worn corners */
 }
 
 .dark {
-  --background: 220 30% 10%;
-  --foreground: 215 20% 95%;
-  --card: 220 30% 13%;
-  --card-foreground: 215 20% 95%;
-  --popover: 220 30% 13%;
-  --popover-foreground: 215 20% 95%;
-  --primary: 208 88% 55%;
-  --primary-foreground: 210 20% 98%;
-  --secondary: 220 20% 20%;
-  --secondary-foreground: 215 20% 95%;
-  --muted: 220 20% 20%;
-  --muted-foreground: 215 15% 65%;
-  --accent: 208 88% 55%;
+  /* Coastal night — moonlit harbor */
+  --background: 202 52% 8%;
+  --foreground: 190 30% 92%;
+  --card: 201 46% 12%;
+  --card-foreground: 190 30% 92%;
+  --popover: 201 46% 12%;
+  --popover-foreground: 190 30% 92%;
+  --primary: 184 76% 50%;             /* bright aqua */
+  --primary-foreground: 201 60% 10%;
+  --secondary: 200 35% 18%;
+  --secondary-foreground: 190 30% 92%;
+  --muted: 200 35% 18%;
+  --muted-foreground: 195 18% 65%;
+  --accent: 14 86% 62%;               /* sunset coral */
   --accent-foreground: 0 0% 100%;
-  --destructive: 0 60% 50%;
+  --destructive: 8 65% 52%;
   --destructive-foreground: 210 20% 98%;
-  --border: 220 20% 25%;
-  --input: 220 20% 25%;
-  --ring: 208 88% 55%;
+  --border: 200 35% 22%;
+  --input: 200 35% 22%;
+  --ring: 184 76% 50%;
 
-  --sidebar: 214 55% 9%;
-  --sidebar-foreground: 215 20% 95%;
-  --sidebar-primary: 208 90% 62%;
-  --sidebar-primary-foreground: 220 30% 10%;
-  --sidebar-accent: 212 50% 20%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 214 40% 16%;
-  --sidebar-ring: 208 90% 62%;
+  --sidebar: 203 60% 7%;
+  --sidebar-foreground: 190 30% 90%;
+  --sidebar-primary: 184 80% 55%;
+  --sidebar-primary-foreground: 203 60% 7%;
+  --sidebar-accent: 192 48% 20%;
+  --sidebar-accent-foreground: 184 90% 80%;
+  --sidebar-border: 200 45% 16%;
+  --sidebar-ring: 184 80% 55%;
+
+  --chart-1: 184 76% 50%;
+  --chart-2: 14 86% 62%;
+  --chart-3: 152 50% 52%;
+  --chart-4: 38 82% 60%;
+  --chart-5: 205 75% 58%;
 }
 
 @layer base {
@@ -136,5 +147,34 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    /* faint sea-foam horizon wash behind the whole app */
+    background-image:
+      radial-gradient(120% 80% at 50% -20%, hsl(188 64% 32% / 0.06), transparent 60%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  /* Layered wave crest used at the foot of the sidebar / hero panels */
+  .coastal-waves {
+    background-image:
+      radial-gradient(circle at 20% 100%, hsl(184 80% 55% / 0.18) 0 14px, transparent 15px),
+      radial-gradient(circle at 50% 100%, hsl(184 80% 55% / 0.14) 0 18px, transparent 19px),
+      radial-gradient(circle at 80% 100%, hsl(184 80% 55% / 0.18) 0 14px, transparent 15px);
+    background-repeat: repeat-x;
+    background-size: 64px 28px;
+    background-position: bottom;
+  }
+  /* Subtle horizontal “current line” divider */
+  .coastal-rule {
+    background-image: repeating-linear-gradient(
+      90deg,
+      hsl(var(--accent)) 0 10px,
+      transparent 10px 20px
+    );
   }
 }

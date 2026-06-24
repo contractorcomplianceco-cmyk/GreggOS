@@ -49,8 +49,8 @@ export function MotivationPopup() {
 
   return (
     <div className="pointer-events-none fixed bottom-5 right-5 z-50 w-[min(22rem,calc(100vw-2.5rem))] animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="pointer-events-auto relative overflow-hidden rounded-xl bg-gradient-to-br from-[#0a1f3c] via-[#0d2c52] to-[#0BA3FF] p-5 text-white shadow-2xl ring-1 ring-[#0BA3FF]/40">
-        <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#0BA3FF]/30 blur-2xl" />
+      <div className="pointer-events-auto relative overflow-hidden rounded-xl bg-gradient-to-br from-[#072a33] via-[#0d4a57] to-[#15a3b0] p-5 text-white shadow-2xl ring-1 ring-[#15a3b0]/40">
+        <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#15a3b0]/30 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
         <button
           type="button"
@@ -63,7 +63,7 @@ export function MotivationPopup() {
         </button>
         <div className="relative">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#7fd0ff]" />
+            <Sparkles className="h-4 w-4 text-[#5fe7e7]" />
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9fd8ff]">
               {slot.greeting} &middot; Daily Drive
             </p>

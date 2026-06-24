@@ -31,8 +31,8 @@ export default function WelcomeCenter() {
     <SidebarLayout>
       <div className="p-6 md:p-8 max-w-5xl mx-auto">
         {/* HERO — deeper navy → azure for dimension */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#081a33] via-[#0d2c52] to-[#0BA3FF] p-8 text-white shadow-xl ring-1 ring-[#0BA3FF]/30 mb-8">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#0BA3FF]/30 blur-3xl" />
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#072a33] via-[#0d4a57] to-[#15a3b0] p-8 text-white shadow-xl ring-1 ring-[#15a3b0]/30 mb-8">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#15a3b0]/30 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 left-10 h-48 w-48 rounded-full bg-white/5 blur-3xl" />
           <div className="relative">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#9fd8ff]">
@@ -57,8 +57,8 @@ export default function WelcomeCenter() {
         {/* EMBEDDED WALKTHROUGH VIDEO */}
         <Card className="mb-8 overflow-hidden shadow-md ring-1 ring-slate-200">
           <CardContent className="p-0">
-            <div className="flex items-center gap-2 bg-gradient-to-r from-[#081a33] to-[#0d2c52] px-6 py-4 text-white">
-              <PlayCircle className="h-5 w-5 text-[#0BA3FF]" />
+            <div className="flex items-center gap-2 bg-gradient-to-r from-[#072a33] to-[#0d4a57] px-6 py-4 text-white">
+              <PlayCircle className="h-5 w-5 text-[#15a3b0]" />
               <h2 className="font-semibold">Executive walkthrough</h2>
             </div>
             <div className="aspect-video w-full bg-slate-950">
@@ -76,7 +76,7 @@ export default function WelcomeCenter() {
         {/* STEP-BY-STEP */}
         <div className="mb-8">
           <div className="mb-4 flex items-center gap-2">
-            <Compass className="h-5 w-5 text-[#0BA3FF]" />
+            <Compass className="h-5 w-5 text-[#15a3b0]" />
             <h2 className="font-semibold text-foreground">
               Step-by-step system explanation
             </h2>
@@ -85,7 +85,7 @@ export default function WelcomeCenter() {
             {WALKTHROUGH_STEPS.map((step, i) => (
               <Card key={step.title} className="shadow-sm ring-1 ring-slate-200/70">
                 <CardContent className="flex items-start gap-4 p-5">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0d2c52] to-[#0BA3FF] font-semibold tabular-nums text-white shadow-sm">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0d4a57] to-[#15a3b0] font-semibold tabular-nums text-white shadow-sm">
                     {i + 1}
                   </div>
                   <div>
@@ -102,7 +102,7 @@ export default function WelcomeCenter() {
         <Card className="shadow-sm ring-1 ring-slate-200/70">
           <CardContent className="p-6">
             <div className="mb-3 flex items-center gap-2">
-              <Target className="h-5 w-5 text-[#0BA3FF]" />
+              <Target className="h-5 w-5 text-[#15a3b0]" />
               <h2 className="font-semibold text-foreground">Why this matters</h2>
             </div>
             <p className="text-sm leading-relaxed text-muted-foreground">

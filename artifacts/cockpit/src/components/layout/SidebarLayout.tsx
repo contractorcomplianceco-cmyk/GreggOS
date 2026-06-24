@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle, Menu, Network, IdCard, UserCog, Gift, Award, DollarSign, ListChecks, Bot, Mail, Inbox, UsersRound } from "lucide-react";
+import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle, Menu, Network, IdCard, UserCog, Gift, Award, DollarSign, ListChecks, Bot, Mail, Inbox, UsersRound, Fish, Anchor } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
 import { useGetCurrentUser } from "@workspace/api-client-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -135,17 +135,20 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="bg-sidebar text-sidebar-foreground flex flex-col justify-between h-full">
       <div className="min-h-0 flex flex-col">
-        <div className="px-4 pt-4 pb-4 shrink-0 flex items-center gap-2.5 bg-gradient-to-br from-[#081a33] via-[#0d2c52] to-[#0BA3FF] text-white">
-          <img
-            src={ccaCrest}
-            alt="Contractor Compliance Authority"
-            className="h-10 w-auto shrink-0"
-          />
+        <div className="relative px-4 pt-4 pb-6 shrink-0 flex items-center gap-2.5 bg-gradient-to-br from-[#072a33] via-[#0d4a57] to-[#15a3b0] text-white coastal-waves overflow-hidden">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-[#3FE0E0]/40">
+            <img
+              src={ccaCrest}
+              alt="Contractor Compliance Authority"
+              className="h-8 w-auto"
+            />
+          </div>
           <div className="leading-tight min-w-0">
-            <p className="text-sm font-bold tracking-tight text-white">
-              GreggOS <span className="text-[#7fd0ff]">Command Center</span>
+            <p className="font-display text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+              GreggOS <span className="text-[#5fe7e7]">Coastal Command</span>
+              <Fish className="w-4 h-4 text-[#5fe7e7]" />
             </p>
-            <p className="text-[10px] uppercase tracking-[0.16em] text-blue-100/70">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-cyan-100/70">
               Current Client Cockpit
             </p>
           </div>
@@ -153,16 +156,16 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <nav className="space-y-1 px-4 pt-3 overflow-y-auto pb-4">
           <Link href="/welcome" onClick={onNavigate}>
             <div
-              className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-gradient-to-r from-[#0d2c52] to-[#0BA3FF] text-white hover:opacity-90 ring-1 ring-[#0BA3FF]/40 shadow-sm"
+              className="flex items-center gap-3 px-3 py-2 mb-2 rounded-md text-sm font-semibold cursor-pointer transition-colors bg-gradient-to-r from-[#0d4a57] to-[#15a3b0] text-white hover:opacity-90 ring-1 ring-[#3FE0E0]/40 shadow-sm"
               data-testid="link-welcome-center"
             >
-              <PlayCircle className="w-4 h-4" />
-              Welcome Center
+              <Anchor className="w-4 h-4" />
+              Welcome Aboard
             </div>
           </Link>
           {navigation.map((section) => (
             <div key={section.label} className="mb-3">
-              <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/55">
                 {section.label}
               </p>
               {section.items.map((item) => {
@@ -188,7 +191,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </div>
       <div className="shrink-0">
         <UserFooter />
-        <div className="p-4 border-t border-sidebar-border/50 text-[10px] text-slate-500 leading-tight">
+        <div className="p-4 border-t border-sidebar-border/50 text-[10px] text-sidebar-foreground/55 leading-tight">
           <p className="mb-2"><strong>Notice:</strong> This cockpit organizes relationship follow-through.</p>
           <p>It does not approve pricing, refunds, legal advice, compliance opinions, qualifier placements, or final client commitments.</p>
         </div>

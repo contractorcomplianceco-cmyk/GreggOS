@@ -1,3 +1,15 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+  <defs>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#15788A"/>
+      <stop offset="1" stop-color="#0B3A47"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="url(#sea)"/>
+  <!-- bright aqua fish -->
+  <path d="M44 92c14-22 44-30 64-26 8 2 14 6 19 13 6-6 14-9 21-9-3 9-3 17 0 26-7 0-15-3-21-9-5 7-11 11-19 13-20 4-50-4-64-26z" fill="#3FE0E0"/>
+  <!-- coral eye -->
+  <circle cx="66" cy="86" r="5.5" fill="#F4623A"/>
+  <!-- sunset coral wave crest -->
+  <path d="M30 130c12 0 12-9 24-9s12 9 24 9 12-9 24-9 12 9 24 9" stroke="#F4623A" stroke-width="7" stroke-linecap="round" fill="none"/>
 </svg>
