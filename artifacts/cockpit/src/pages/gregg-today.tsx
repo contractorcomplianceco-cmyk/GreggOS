@@ -448,8 +448,15 @@ export default function GreggToday() {
     <SidebarLayout>
       <div className="min-h-full bg-[#eef6f7] text-slate-900 font-sans">
         {/* HEADER BAR */}
-        <header className="sticky top-0 z-20 border-b border-[#cfe6e9] bg-white/95 backdrop-blur px-5 py-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <header className="sticky top-0 z-20 border-b border-[#cfe6e9] bg-white/95 backdrop-blur px-5 py-3 relative overflow-hidden">
+          {/* school of fish drifting across the header */}
+          <img
+            src="/img-sidebar-ocean.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 h-full w-1/2 object-cover opacity-[0.12] [mask-image:linear-gradient(to_right,transparent,black)]"
+          />
+          <div className="relative flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div
                 className={`h-2.5 w-2.5 rounded-full ${pulse.tone} ${pulse.ring}`}
@@ -472,7 +479,7 @@ export default function GreggToday() {
                   {clock} local
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded border border-blue-100 bg-white shadow-sm px-2.5 py-1.5">
+              <div className="flex items-center gap-2 rounded border border-[#cfe6e9] bg-white shadow-sm px-2.5 py-1.5">
                 <span className="text-[9px] uppercase tracking-[0.16em] text-slate-500">
                   Risk Pulse
                 </span>
@@ -496,7 +503,7 @@ export default function GreggToday() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search accounts…"
-                className="w-full rounded border border-blue-100 bg-white shadow-sm py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-300 focus:ring-1 focus:ring-blue-300 focus:outline-none"
+                className="w-full rounded border border-[#cfe6e9] bg-white shadow-sm py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#5fc6d0] focus:ring-1 focus:ring-[#5fc6d0] focus:outline-none"
                 data-testid="input-search-clients"
               />
             </div>
@@ -509,7 +516,7 @@ export default function GreggToday() {
                   className={`rounded px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors ${
                     filter === f
                       ? "bg-[#15a3b0] text-white shadow-sm"
-                      : "border border-blue-100 bg-white text-slate-600 hover:text-slate-900 hover:border-blue-300 shadow-sm"
+                      : "border border-[#cfe6e9] bg-white text-slate-600 hover:text-slate-900 hover:border-[#5fc6d0] shadow-sm"
                   }`}
                   data-testid={`chip-filter-${f}`}
                 >
@@ -548,7 +555,7 @@ export default function GreggToday() {
               <div className="space-y-1.5">
                 {anomalyList.map((a) => (
                   <Link key={a.id} href={`/clients/${a.clientId}`}>
-                    <div className="group flex items-start gap-2 rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+                    <div className="group flex items-start gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
                       <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
                       <div className="min-w-0">
                         <p className="truncate text-[11px] text-slate-700 leading-snug font-medium">
@@ -577,7 +584,7 @@ export default function GreggToday() {
               <div className="space-y-1">
                 {visibleClients.slice(0, 7).map((c) => (
                   <Link key={c.id} href={`/clients/${c.id}`}>
-                    <div className="group grid grid-cols-[1fr_auto] items-center gap-2 rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+                    <div className="group grid grid-cols-[1fr_auto] items-center gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
                       <div className="min-w-0">
                         <p className="truncate text-[11px] font-medium text-slate-800">
                           {c.clientName}
@@ -618,7 +625,7 @@ export default function GreggToday() {
                     key={o.milestone.id}
                     href={`/clients/${o.milestone.clientId}`}
                   >
-                    <div className="group flex items-center justify-between gap-2 rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+                    <div className="group flex items-center justify-between gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
                       <div className="min-w-0">
                         <p className="truncate text-[11px] font-medium text-slate-800">
                           {o.clientName}
@@ -627,7 +634,7 @@ export default function GreggToday() {
                           {o.milestone.title}
                         </p>
                       </div>
-                      <span className="shrink-0 rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-blue-700">
+                      <span className="shrink-0 rounded bg-[#dbf0f2] px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-[#0d6473]">
                         {o.priorityScore}
                       </span>
                     </div>
@@ -635,7 +642,7 @@ export default function GreggToday() {
                 ))}
                 {openSignals.slice(0, 3).map((s) => (
                   <Link key={s.id} href={`/clients/${s.clientId}`}>
-                    <div className="group flex items-center gap-2 rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+                    <div className="group flex items-center gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
                       <CircleDot className="h-3 w-3 shrink-0 text-emerald-600" />
                       <p className="truncate text-[11px] text-slate-700">
                         {clientName(s.clientId)}: {s.type}
@@ -662,7 +669,7 @@ export default function GreggToday() {
               <div className="space-y-1.5">
                 {execPriorities.map((c) => (
                   <Link key={c.id} href={`/clients/${c.id}`}>
-                    <div className="group rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+                    <div className="group rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
                       <div className="flex items-center justify-between gap-2">
                         <p className="truncate text-[11px] font-medium text-slate-800">
                           {c.clientName}
@@ -671,7 +678,7 @@ export default function GreggToday() {
                           className={`shrink-0 text-[9px] font-bold uppercase tracking-[0.1em] ${
                             c.greggPriority === "Urgent"
                               ? "text-red-500"
-                              : "text-blue-600"
+                              : "text-[#15a3b0]"
                           }`}
                         >
                           {c.greggPriority}
@@ -735,7 +742,7 @@ export default function GreggToday() {
               <div className="space-y-1.5">
                 {touchesDue.slice(0, 4).map((r) => (
                   <Link key={`td-${r.clientId}`} href={`/clients/${r.clientId}`}>
-                    <div className="group flex items-center justify-between gap-2 rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+                    <div className="group flex items-center justify-between gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
                       <p className="truncate text-[11px] font-medium text-slate-800">
                         {r.clientName}
                       </p>
@@ -747,11 +754,11 @@ export default function GreggToday() {
                 ))}
                 {goingCold.slice(0, 3).map((r) => (
                   <Link key={`gc-${r.clientId}`} href={`/clients/${r.clientId}`}>
-                    <div className="group flex items-center justify-between gap-2 rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+                    <div className="group flex items-center justify-between gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
                       <p className="truncate text-[11px] font-medium text-slate-800">
                         {r.clientName}
                       </p>
-                      <span className="shrink-0 rounded bg-blue-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-blue-700">
+                      <span className="shrink-0 rounded bg-[#dbf0f2] px-1.5 py-0.5 text-[9px] font-semibold uppercase text-[#0d6473]">
                         Cold {r.daysSinceTouch ?? "—"}d
                       </span>
                     </div>
@@ -769,7 +776,7 @@ export default function GreggToday() {
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {timeline.map((t) => (
                   <Link key={t.id} href={`/clients/${t.clientId}`}>
-                    <div className="group w-32 shrink-0 rounded border border-slate-200 bg-white shadow-sm p-2 hover:border-blue-300 cursor-pointer">
+                    <div className="group w-32 shrink-0 rounded border border-slate-200 bg-white shadow-sm p-2 hover:border-[#5fc6d0] cursor-pointer">
                       <div className="flex items-center gap-1.5">
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
@@ -777,7 +784,7 @@ export default function GreggToday() {
                               ? "bg-red-500"
                               : t.tone === "amber"
                                 ? "bg-amber-400"
-                                : "bg-blue-500"
+                                : "bg-[#15a3b0]"
                           }`}
                         />
                         <span className="text-[9px] tabular-nums text-slate-500">
@@ -811,10 +818,10 @@ export default function GreggToday() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
               {insightFeed.map((n) => (
                 <Link key={n.id} href={`/clients/${n.clientId}`}>
-                  <div className="group h-full rounded border border-slate-200 bg-white shadow-sm p-2.5 hover:border-blue-300 cursor-pointer">
+                  <div className="group h-full rounded border border-slate-200 bg-white shadow-sm p-2.5 hover:border-[#5fc6d0] cursor-pointer">
                     <div className="flex items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700">
-                        <Phone className="h-3 w-3 text-blue-600" />
+                        <Phone className="h-3 w-3 text-[#15a3b0]" />
                         {n.callType}
                       </span>
                       <span className="text-[9px] tabular-nums text-slate-500">
@@ -1025,7 +1032,7 @@ export default function GreggToday() {
                       <Fragment key={c.id}>
                         <tr
                           onClick={() => setExpanded(isOpen ? null : c.id)}
-                          className={`cursor-pointer border-b border-slate-100 hover:bg-blue-50/50 transition-colors ${isOpen ? 'bg-blue-50' : ''}`}
+                          className={`cursor-pointer border-b border-slate-100 hover:bg-[#e7f5f6]/50 transition-colors ${isOpen ? 'bg-[#e7f5f6]' : ''}`}
                           data-testid={`row-client-${c.id}`}
                         >
                           <td className="px-2 py-1.5">
@@ -1078,13 +1085,13 @@ export default function GreggToday() {
                           <td className="px-2 py-1.5 text-right">
                             <ChevronRight
                               className={`inline h-3.5 w-3.5 text-slate-400 transition-transform ${
-                                isOpen ? "rotate-90 text-blue-600" : ""
+                                isOpen ? "rotate-90 text-[#15a3b0]" : ""
                               }`}
                             />
                           </td>
                         </tr>
                         {isOpen && (
-                          <tr className="bg-blue-50/50">
+                          <tr className="bg-[#e7f5f6]">
                             <td colSpan={7} className="px-3 py-2.5">
                               <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 md:grid-cols-4">
                                 <Detail label="Status" value={c.clientStatus} />
@@ -1126,7 +1133,7 @@ export default function GreggToday() {
                                 )}
                               </div>
                               <Link href={`/clients/${c.id}`}>
-                                <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-blue-600 hover:underline cursor-pointer">
+                                <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#15a3b0] hover:underline cursor-pointer">
                                   Open account <ChevronRight className="h-3 w-3" />
                                 </span>
                               </Link>
@@ -1161,9 +1168,9 @@ export default function GreggToday() {
                 const Icon = m.icon;
                 return (
                   <Link key={m.name} href={m.href}>
-                    <div className="group flex flex-col items-center justify-center gap-1.5 rounded border border-slate-200 bg-white py-3 shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-pointer">
-                      <Icon className="h-4 w-4 text-slate-400 group-hover:text-blue-600" />
-                      <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-slate-500 group-hover:text-blue-700">
+                    <div className="group flex flex-col items-center justify-center gap-1.5 rounded border border-slate-200 bg-white py-3 shadow-sm hover:border-[#5fc6d0] hover:bg-[#e7f5f6] cursor-pointer">
+                      <Icon className="h-4 w-4 text-slate-400 group-hover:text-[#15a3b0]" />
+                      <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-slate-500 group-hover:text-[#0d6473]">
                         {m.name}
                       </span>
                     </div>
@@ -1198,18 +1205,25 @@ function Panel({
   const isRed = tone === "red";
   return (
     <section
-      className={`rounded-lg border bg-white shadow-sm ${
-        isRed ? "border-red-200" : "border-blue-100"
+      className={`group relative overflow-hidden rounded-lg border bg-white shadow-sm ${
+        isRed ? "border-red-200" : "border-[#cfe6e9]"
       }`}
     >
+      {/* faint game fish gliding in the corner of every panel */}
+      <img
+        src="/img-fish-mark.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-3 -bottom-2 w-20 opacity-[0.07] transition-all duration-300 group-hover:opacity-[0.16] group-hover:-translate-x-1"
+      />
       <div
-        className={`flex items-center justify-between border-b px-3 py-2 ${
-          isRed ? "border-red-100" : "border-slate-100"
+        className={`relative flex items-center justify-between border-b px-3 py-2 ${
+          isRed ? "border-red-100" : "border-[#e0eff1]"
         }`}
       >
         <div className="flex items-center gap-2">
           <Icon
-            className={`h-3.5 w-3.5 ${isRed ? "text-red-500" : "text-blue-600"}`}
+            className={`h-3.5 w-3.5 ${isRed ? "text-red-500" : "text-[#15a3b0]"}`}
           />
           <h2 className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">
             {title}
@@ -1220,14 +1234,14 @@ function Panel({
             className={`rounded px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
               isRed
                 ? "bg-red-100 text-red-700"
-                : "bg-blue-50 text-blue-700"
+                : "bg-[#dbf0f2] text-[#0d6473]"
             }`}
           >
             {count}
           </span>
         )}
       </div>
-      <div className="p-2.5">{children}</div>
+      <div className="relative p-2.5">{children}</div>
     </section>
   );
 }
@@ -1246,15 +1260,25 @@ function FeedList({
   empty: string;
 }) {
   if (items.length === 0)
-    return <p className="px-1.5 text-[11px] text-slate-500">{empty}</p>;
+    return (
+      <div className="flex items-center gap-2 px-1.5 py-1">
+        <img
+          src="/img-fish-mark.png"
+          alt=""
+          aria-hidden="true"
+          className="h-4 w-auto opacity-30"
+        />
+        <p className="text-[11px] text-slate-500">{empty}</p>
+      </div>
+    );
   return (
     <div className="space-y-1.5">
       {items.map((it) => (
         <Link key={it.id} href={`/clients/${it.clientId}`}>
-          <div className="group flex items-start gap-2 rounded px-1.5 py-1 hover:bg-blue-50 cursor-pointer">
+          <div className="group flex items-start gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
             <span
               className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${
-                it.tone === "red" ? "bg-red-500" : "bg-blue-600"
+                it.tone === "red" ? "bg-red-500" : "bg-[#15a3b0]"
               }`}
             />
             <div className="min-w-0">
