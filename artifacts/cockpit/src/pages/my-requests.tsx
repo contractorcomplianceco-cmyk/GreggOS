@@ -161,7 +161,7 @@ export default function MyRequests() {
     <SidebarLayout>
       <div className="p-8 max-w-5xl mx-auto">
         <PageHeader
-          tag="My Executive Office"
+          tag="Captain's Quarters"
           title="My Requests"
           subtitle="Your own submitted requests and their current status. Submitting a request routes it for review — it does not approve spend or commitments."
           action={

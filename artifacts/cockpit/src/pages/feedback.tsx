@@ -169,7 +169,7 @@ export default function FeedbackCenter() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Internal Signals"
+          tag="Sonar"
           title="Feedback Center"
           subtitle="Capture client issues, risk-pattern observations, opportunities, and system-improvement ideas. This is an internal log for review — it does not commit the team to any action."
           action={

@@ -46,8 +46,8 @@ export default function ExecutiveProfile() {
     <SidebarLayout>
       <div className="p-8 max-w-4xl mx-auto">
         <PageHeader
-          tag="My Executive Office"
-          title="Executive Profile"
+          tag="Captain's Quarters"
+          title="Captain's Card"
           subtitle="The mandate, role, and operating lanes for the executive client-relations and placement leadership position."
         />
 

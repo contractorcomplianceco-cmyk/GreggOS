@@ -174,8 +174,8 @@ export default function BonusTracker() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="My Executive Office"
-          title="Bonus Tracker"
+          tag="Captain's Quarters"
+          title="Trophy Wall — Bonus Tracker"
           subtitle="Track performance-based bonus events across placement, expansion, monitoring conversions, saves, and stability. This is an internal record for documentation and review — it does not authorize payment. Awards follow company approval and governance."
           action={
             <Button

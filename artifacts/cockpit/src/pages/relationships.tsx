@@ -86,7 +86,7 @@ export default function Relationships() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Relationship Radar"
+          tag="Tending the Lines"
           title="Relationships"
           subtitle="Track relationship warmth and contact cadence across the portfolio. Log touches as they happen and plan the next visit or call before an account goes cold."
         />

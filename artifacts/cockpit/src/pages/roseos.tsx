@@ -213,7 +213,7 @@ export default function RoseOS() {
         <div className="flex-1 flex flex-col min-w-0">
           <div className="px-8 pt-8">
             <PageHeader
-              tag="RoseOS Assistant"
+              tag="First Mate"
               title="RoseOS"
               subtitle="Your executive thinking partner for brainstorming, working through a client, and how-to guidance grounded in your account context. RoseOS drafts and organizes ideas — it does not approve pricing, refunds, legal, compliance, or qualifier-placement decisions."
             />

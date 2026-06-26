@@ -298,7 +298,7 @@ export default function PlacementNetwork() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Growth & Placement"
+          tag="Casting & Nets"
           title="Placement / Qualifier Network"
           subtitle="Coordinate licensed-qualifier placements: track candidate qualifiers and route client placement opportunities through fit and review. This tool organizes and prepares placements; it does not approve or finalize any qualifier placement, which requires leadership and compliance sign-off."
         />

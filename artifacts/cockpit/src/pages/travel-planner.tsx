@@ -193,7 +193,7 @@ export default function TravelPlanner() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Executive Travel"
+          tag="Charting a Course"
           title="Travel Planner"
           subtitle="Plan strategic in-person client visits with an explicit ROI justification. This board organizes proposed travel for review — it does not approve travel spend or budgets."
           action={

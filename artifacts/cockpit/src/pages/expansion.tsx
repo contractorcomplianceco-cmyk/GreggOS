@@ -140,8 +140,8 @@ export default function Expansion() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Portfolio Growth"
-          title="Expansion Pipeline"
+          tag="Casting the Net"
+          title="The Net — Expansion Pipeline"
           subtitle="Every open expansion opportunity across the portfolio, auto-prioritized by value, stage, target date, relationship warmth, and risk. Pin or boost items to override the ranking."
           action={<CreateMilestoneDialog onCreated={invalidate} />}
         />

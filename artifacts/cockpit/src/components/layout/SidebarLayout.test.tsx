@@ -34,10 +34,10 @@ function mount(ui: ReactNode, location = "/") {
 }
 
 const STANDARD_NAV_ITEMS = [
-  "Gregg Today",
-  "Current Clients",
-  "Expansion Pipeline",
-  "Call Note Processor",
+  "Today's Catch",
+  "Current Catch",
+  "The Net (Pipeline)",
+  "Reel In Call Notes",
 ];
 
 describe("SidebarLayout role-gated navigation", () => {

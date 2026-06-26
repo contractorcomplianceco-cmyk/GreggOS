@@ -99,7 +99,7 @@ export default function StaffOverviewPage() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Command Center"
+          tag="The Bridge"
           title="Staff Overview"
           subtitle="Team workload signals derived from live account, task, escalation, and activity data. Productivity, stuck, and burnout scores are advisory indicators to guide conversations — they are not performance ratings or HR decisions."
         />

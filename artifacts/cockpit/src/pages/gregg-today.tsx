@@ -446,9 +446,9 @@ export default function GreggToday() {
 
   return (
     <SidebarLayout>
-      <div className="min-h-full bg-slate-50 text-slate-900 font-sans">
+      <div className="min-h-full bg-[#eef6f7] text-slate-900 font-sans">
         {/* HEADER BAR */}
-        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur px-5 py-3">
+        <header className="sticky top-0 z-20 border-b border-[#cfe6e9] bg-white/95 backdrop-blur px-5 py-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div
@@ -456,11 +456,11 @@ export default function GreggToday() {
               />
               <h1 className="font-display text-lg font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
                 GreggOS{" "}
-                <span className="text-[#15a3b0]">Coastal Command</span>
+                <span className="text-[#15a3b0]">Today's Catch</span>
                 <Fish className="h-4 w-4 text-[#15a3b0]" />
               </h1>
               <span className="hidden sm:inline text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 border border-emerald-200 rounded px-1.5 py-0.5">
-                Operational
+                Lines in the Water
               </span>
             </div>
             <div className="flex items-center gap-4">
@@ -524,7 +524,7 @@ export default function GreggToday() {
             <Panel
               tone="red"
               icon={Flag}
-              title="Red Flags"
+              title="Tangled Lines"
               count={redFlags.length}
             >
               <FeedList
@@ -542,7 +542,7 @@ export default function GreggToday() {
             <Panel
               tone="red"
               icon={Zap}
-              title="Anomaly Detection"
+              title="Choppy Water"
               count={anomalyList.length}
             >
               <div className="space-y-1.5">
@@ -571,7 +571,7 @@ export default function GreggToday() {
 
             <Panel
               icon={Activity}
-              title="Client Health Map"
+              title="Catch Health Map"
               count={visibleClients.length}
             >
               <div className="space-y-1">
@@ -609,7 +609,7 @@ export default function GreggToday() {
 
             <Panel
               icon={Radar}
-              title="Opportunity Radar"
+              title="Fish Finder"
               count={openSignals.length + topExpansion.length}
             >
               <div className="space-y-1.5">
@@ -656,7 +656,7 @@ export default function GreggToday() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
             <Panel
               icon={Flag}
-              title="Today's Executive Priorities"
+              title="Today's Catch List"
               count={execPriorities.length}
             >
               <div className="space-y-1.5">
@@ -694,7 +694,7 @@ export default function GreggToday() {
             <Panel
               tone="red"
               icon={ShieldAlert}
-              title="Escalation Stream"
+              title="Storm Warnings"
               count={openEscalations.length}
             >
               <div className="space-y-1.5">
@@ -729,7 +729,7 @@ export default function GreggToday() {
 
             <Panel
               icon={Snowflake}
-              title="Nurturing Signal Feed"
+              title="Tending the Lines"
               count={touchesDue.length + goingCold.length}
             >
               <div className="space-y-1.5">
@@ -765,7 +765,7 @@ export default function GreggToday() {
               </div>
             </Panel>
 
-            <Panel icon={ListChecks} title="Risk Timeline" count={timeline.length}>
+            <Panel icon={ListChecks} title="Tide Chart" count={timeline.length}>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {timeline.map((t) => (
                   <Link key={t.id} href={`/clients/${t.clientId}`}>
@@ -805,7 +805,7 @@ export default function GreggToday() {
           {/* ROW 3 — SYSTEM INTELLIGENCE LAYER */}
           <Panel
             icon={Radio}
-            title="RingCentral Insight Feed"
+            title="Sonar — RingCentral Feed"
             count={insightFeed.length}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
@@ -845,7 +845,7 @@ export default function GreggToday() {
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-3">
             <div className="xl:col-span-2">
-              <Panel icon={TrendingUp} title="Weekly Trend Analytics">
+              <Panel icon={TrendingUp} title="Weekly Current Report">
                 <div className="mb-2 flex gap-4">
                   <Stat
                     label="Calls (7d)"
@@ -948,7 +948,7 @@ export default function GreggToday() {
               </Panel>
             </div>
 
-            <Panel icon={TrendingUp} title="Top Client Movement">
+            <Panel icon={TrendingUp} title="Biggest Catches on the Move">
               <div className="space-y-2">
                 <div>
                   <p className="mb-1 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-emerald-600">

@@ -74,7 +74,7 @@ export default function SuccessPlan() {
     <SidebarLayout>
       <div className="p-8 max-w-5xl mx-auto">
         <PageHeader
-          tag="My Executive Office"
+          tag="Captain's Quarters"
           title="90 / 180-Day Success Plan"
           subtitle="The onboarding and ramp checklist for the executive client-relations and placement mandate. Track progress against the measures defined for the first 90 and 180 days."
         />

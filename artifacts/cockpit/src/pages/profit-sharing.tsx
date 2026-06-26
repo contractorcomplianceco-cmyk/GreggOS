@@ -140,7 +140,7 @@ export default function ProfitSharing() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="My Executive Office"
+          tag="Captain's Quarters"
           title="Profit Sharing"
           subtitle="Awareness and projection view of potential profit participation tied to retained-client contribution."
         />

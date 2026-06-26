@@ -228,7 +228,7 @@ export default function RequestsHub() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Operations"
+          tag="On Deck"
           title="Requests Hub"
           subtitle="Every operational request across the team — purchases, travel, equipment, and help. This board routes and tracks requests for review; it does not approve spend or commitments."
           action={

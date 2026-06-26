@@ -18,67 +18,67 @@ function useNavigation(): NavSection[] {
 
   return [
     {
-      label: "Command Center",
+      label: "The Bridge",
       items: [
-        { name: "Gregg Today", href: "/", icon: LayoutDashboard },
-        { name: "Staff Overview", href: "/staff", icon: UsersRound },
+        { name: "Today's Catch", href: "/", icon: Fish },
+        { name: "Crew Overview", href: "/staff", icon: UsersRound },
       ],
     },
     {
-      label: "Clients & Accounts",
+      label: "The Fleet",
       items: [
-        { name: "Current Clients", href: "/clients", icon: Users },
-        { name: "Account Oversight", href: "/oversight", icon: BarChart3 },
-        { name: "Audit Risk", href: "/audit-risk", icon: ShieldAlert },
+        { name: "Current Catch", href: "/clients", icon: Users },
+        { name: "Depth Sounder", href: "/oversight", icon: BarChart3 },
+        { name: "Storm Watch", href: "/audit-risk", icon: ShieldAlert },
       ],
     },
     {
-      label: "Growth & Placement",
+      label: "Casting & Nets",
       items: [
-        { name: "Expansion Pipeline", href: "/expansion", icon: TrendingUp },
-        { name: "Relationships", href: "/relationships", icon: HeartHandshake },
-        { name: "Placement / Qualifier Network", href: "/placement", icon: Network },
-        { name: "Reporting & CRM", href: "/reporting", icon: PieChart },
+        { name: "The Net (Pipeline)", href: "/expansion", icon: TrendingUp },
+        { name: "Deckhands & Allies", href: "/relationships", icon: HeartHandshake },
+        { name: "Fishing Grounds (Qualifiers)", href: "/placement", icon: Network },
+        { name: "The Logbook (CRM)", href: "/reporting", icon: PieChart },
       ],
     },
     {
-      label: "Daily Work",
+      label: "On the Water",
       items: [
-        { name: "Call Note Processor", href: "/processor", icon: Briefcase },
-        { name: "Communication Drafts", href: "/communications", icon: MessageSquareText },
-        { name: "Weekly Review", href: "/weekly-review", icon: Calendar },
+        { name: "Reel In Call Notes", href: "/processor", icon: Anchor },
+        { name: "Message in a Bottle", href: "/communications", icon: MessageSquareText },
+        { name: "Weekly Haul", href: "/weekly-review", icon: Calendar },
       ],
     },
     {
-      label: "My Executive Office",
+      label: "Captain's Quarters",
       items: [
-        { name: "Executive Profile", href: "/executive-profile", icon: IdCard },
+        { name: "Captain's Card", href: "/executive-profile", icon: IdCard },
         { name: "My Account", href: "/my-account", icon: UserCog },
-        { name: "My Benefits", href: "/my-benefits", icon: Gift },
-        { name: "Bonus Tracker", href: "/bonus-tracker", icon: Award },
-        { name: "Profit Sharing", href: "/profit-sharing", icon: DollarSign },
-        { name: "90 / 180-Day Success Plan", href: "/success-plan", icon: ListChecks },
+        { name: "Ship's Perks", href: "/my-benefits", icon: Gift },
+        { name: "Trophy Wall", href: "/bonus-tracker", icon: Award },
+        { name: "Splitting the Haul", href: "/profit-sharing", icon: DollarSign },
+        { name: "90 / 180-Day Voyage Plan", href: "/success-plan", icon: ListChecks },
         { name: "My Requests", href: "/my-requests", icon: Inbox },
       ],
     },
     {
-      label: "Tools & Resources",
+      label: "Tackle Box",
       items: [
-        { name: "RoseOS Assistant", href: "/roseos", icon: Bot },
+        { name: "RoseOS First Mate", href: "/roseos", icon: Bot },
         { name: "Email Builder", href: "/email-builder", icon: Mail },
         { name: "Requests Hub", href: "/requests", icon: Inbox },
-        { name: "Travel Planner", href: "/travel", icon: Plane },
+        { name: "Charting a Course", href: "/travel", icon: Plane },
         { name: "Expense Tracker", href: "/expenses", icon: Receipt },
-        { name: "Training & Leveling", href: "/training", icon: GraduationCap },
-        { name: "AI Prompt Library", href: "/prompt-library", icon: Sparkles },
+        { name: "Leveling the Lines", href: "/training", icon: GraduationCap },
+        { name: "AI Tackle Library", href: "/prompt-library", icon: Sparkles },
         { name: "Feedback Center", href: "/feedback", icon: MessageSquarePlus },
-        { name: "Daily Motivation", href: "/motivation", icon: Compass },
+        { name: "Daily Tide Wisdom", href: "/motivation", icon: Compass },
       ],
     },
     ...(isAdmin
       ? [
           {
-            label: "Administration",
+            label: "Engine Room",
             items: [{ name: "Admin / Setup", href: "/admin", icon: Settings }],
           },
         ]
@@ -135,21 +135,29 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="bg-sidebar text-sidebar-foreground flex flex-col justify-between h-full">
       <div className="min-h-0 flex flex-col">
-        <div className="relative px-4 pt-4 pb-6 shrink-0 flex items-center gap-2.5 bg-gradient-to-br from-[#072a33] via-[#0d4a57] to-[#15a3b0] text-white coastal-waves overflow-hidden">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-[#3FE0E0]/40">
+        <div className="relative px-4 pt-5 pb-7 shrink-0 flex items-center gap-2.5 text-white overflow-hidden">
+          {/* live underwater scene behind the brand */}
+          <img
+            src="/img-sidebar-ocean.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#062029]/90 via-[#06212a]/65 to-[#0d4a57]/25" />
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-[#3FE0E0]/50 backdrop-blur-sm">
             <img
               src={ccaCrest}
               alt="Contractor Compliance Authority"
               className="h-8 w-auto"
             />
           </div>
-          <div className="leading-tight min-w-0">
-            <p className="font-display text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+          <div className="relative leading-tight min-w-0">
+            <p className="font-display text-base font-bold tracking-tight text-white flex items-center gap-1.5 drop-shadow">
               GreggOS <span className="text-[#5fe7e7]">Coastal Command</span>
               <Fish className="w-4 h-4 text-[#5fe7e7]" />
             </p>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-cyan-100/70">
-              Current Client Cockpit
+            <p className="text-[10px] uppercase tracking-[0.18em] text-cyan-100/90 drop-shadow">
+              Reeling In Your Client Relationships
             </p>
           </div>
         </div>
@@ -192,7 +200,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="shrink-0">
         <UserFooter />
         <div className="p-4 border-t border-sidebar-border/50 text-[10px] text-sidebar-foreground/55 leading-tight">
-          <p className="mb-2"><strong>Notice:</strong> This cockpit organizes relationship follow-through.</p>
+          <p className="mb-2"><strong>Notice:</strong> This deck keeps your client lines tight and your follow-through afloat.</p>
           <p>It does not approve pricing, refunds, legal advice, compliance opinions, qualifier placements, or final client commitments.</p>
         </div>
       </div>

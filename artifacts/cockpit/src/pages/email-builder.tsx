@@ -170,7 +170,7 @@ export default function EmailBuilder() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Tools & Resources"
+          tag="Tackle Box"
           title="Email Builder"
           subtitle="Generate a clean, professional email draft from a short brief. Drafts are for you to review, edit, and send yourself — nothing is sent from this app, and it does not commit to pricing, refunds, legal, or compliance positions."
         />

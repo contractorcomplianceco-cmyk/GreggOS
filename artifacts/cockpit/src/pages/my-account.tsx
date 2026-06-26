@@ -29,7 +29,7 @@ export default function MyAccount() {
     <SidebarLayout>
       <div className="p-8 max-w-3xl mx-auto">
         <PageHeader
-          tag="My Executive Office"
+          tag="Captain's Quarters"
           title="My Account"
           subtitle="Your cockpit profile and access details. Account identity is managed through secure sign-in; role and access are set by an administrator."
         />

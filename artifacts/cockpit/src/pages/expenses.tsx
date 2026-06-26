@@ -181,7 +181,7 @@ export default function Expenses() {
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <PageHeader
-          tag="Executive Activity"
+          tag="Ship's Ledger"
           title="Expense Tracker"
           subtitle="Track travel, client-visit, relationship-building and event costs. This log organizes spend for review — it does not approve reimbursements or budgets."
           action={

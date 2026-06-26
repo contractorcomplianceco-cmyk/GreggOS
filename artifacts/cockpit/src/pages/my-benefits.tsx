@@ -77,7 +77,7 @@ export default function MyBenefits() {
     <SidebarLayout>
       <div className="p-8 max-w-4xl mx-auto">
         <PageHeader
-          tag="My Executive Office"
+          tag="Captain's Quarters"
           title="My Benefits"
           subtitle="An overview of the compensation, tools, and recognition associated with the executive client-relations and placement role."
         />
