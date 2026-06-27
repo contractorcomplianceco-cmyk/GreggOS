@@ -1,6 +1,7 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
 import { TideChart } from "@/components/dashboard/TideChart";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { TideGauge, Waves } from "@/components/icons/CoastalIcons";
 import { Fragment, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
@@ -438,6 +439,17 @@ export default function GreggToday() {
     minute: "2-digit",
   });
 
+  // time-of-day greeting + at-a-glance hero stats
+  const hour = today.getHours();
+  const timeGreeting =
+    hour < 12 ? "Good morning, Captain" : hour < 18 ? "Good afternoon, Captain" : "Good evening, Captain";
+  const heroStats: { label: string; value: number | string; tone?: "default" | "alert" }[] = [
+    { label: "Tangled Lines", value: redFlags.length, tone: redFlags.length ? "alert" : "default" },
+    { label: "Storm Warnings", value: openEscalations.length, tone: openEscalations.length ? "alert" : "default" },
+    { label: "On the Catch List", value: execPriorities.length },
+    { label: "Lines to Tend", value: touchesDue.length + goingCold.length },
+  ];
+
   const modules = [
     { name: "Travel", href: "/travel", icon: Plane },
     { name: "Expenses", href: "/expenses", icon: Receipt },
@@ -498,7 +510,14 @@ export default function GreggToday() {
           </div>
         </header>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-6">
+          {/* ANIMATED WATER HERO */}
+          <DashboardHero
+            greeting={timeGreeting}
+            subtitle="Here's what's biting today — your critical lines, the tide, and the accounts worth chasing before the water turns."
+            stats={heroStats}
+          />
+
           {/* GLOBAL CONTROLS */}
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative flex-1 min-w-[200px] max-w-sm">
@@ -530,7 +549,8 @@ export default function GreggToday() {
             </div>
           </div>
 
-          {/* ROW 1 — CRITICAL SIGNALS (RED ZONE) */}
+          {/* ON THE RADAR — critical signals */}
+          <SectionHeading icon={ShieldAlert} title="On the Radar" hint="what needs you first" />
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
             <Panel
               tone="red"
@@ -663,7 +683,26 @@ export default function GreggToday() {
             </Panel>
           </div>
 
-          {/* ROW 2 — EXECUTIVE ACTION LAYER */}
+          {/* TIDE & CONDITIONS */}
+          <SectionHeading icon={TideGauge} title="Tide & Conditions" hint="live from the water" />
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-3">
+            <Panel icon={TideGauge} title="Tide Chart — Live">
+              <TideChart />
+            </Panel>
+            <div className="xl:col-span-2">
+              <Panel icon={Waves} title="Fishing Conditions">
+                <p className="px-1 text-[11px] text-slate-500">
+                  Live water levels are pulled from the NOAA tide station nearest
+                  the dock. Rising water on a moving tide is prime time — watch the
+                  coral now-line on the chart and plan your casts around the next
+                  high or low.
+                </p>
+              </Panel>
+            </div>
+          </div>
+
+          {/* TAKE ACTION TODAY — executive action layer */}
+          <SectionHeading icon={Flag} title="Take Action Today" hint="work the catch list" />
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
             <Panel
               icon={Flag}
@@ -813,24 +852,8 @@ export default function GreggToday() {
             </Panel>
           </div>
 
-          {/* LIVE TIDE CHART + conditions */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-3">
-            <Panel icon={TideGauge} title="Tide Chart — Live">
-              <TideChart />
-            </Panel>
-            <div className="xl:col-span-2">
-              <Panel icon={Waves} title="Fishing Conditions">
-                <p className="px-1 text-[11px] text-slate-500">
-                  Live water levels are pulled from the NOAA tide station nearest
-                  the dock. Rising water on a moving tide is prime time — watch the
-                  coral now-line on the chart and plan your casts around the next
-                  high or low.
-                </p>
-              </Panel>
-            </div>
-          </div>
-
           {/* ROW 3 — SYSTEM INTELLIGENCE LAYER */}
+          <SectionHeading icon={Radio} title="Intelligence" hint="signals & trends" />
           <Panel
             icon={Radio}
             title="Sonar — RingCentral Feed"
@@ -1022,7 +1045,8 @@ export default function GreggToday() {
             </Panel>
           </div>
 
-          {/* CLIENT NURTURING CENTER — data-heavy table */}
+          {/* CREW & ACCOUNTS — nurturing table */}
+          <SectionHeading icon={Activity} title="Crew & Accounts" hint="tend the relationships" />
           <Panel
             icon={Activity}
             title="Client Nurturing Center"
@@ -1209,6 +1233,29 @@ export default function GreggToday() {
 // ---------------------------------------------------------------------------
 // Panel + small primitives
 // ---------------------------------------------------------------------------
+
+function SectionHeading({
+  icon: Icon,
+  title,
+  hint,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 pt-1">
+      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#dbf0f2] text-[#0d6473]">
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <h2 className="font-display text-sm font-bold uppercase tracking-[0.14em] text-slate-700">
+        {title}
+      </h2>
+      {hint && <span className="text-[11px] text-slate-400">{hint}</span>}
+      <span className="ml-2 h-px flex-1 bg-gradient-to-r from-[#cfe6e9] to-transparent" />
+    </div>
+  );
+}
 
 function Panel({
   title,

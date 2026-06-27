@@ -263,10 +263,52 @@
     100% { transform: translate3d(8px, -120px, 0) scale(1.1); opacity: 0; }
   }
 
+  /* --- Animated water hero --- */
+  /* layered SVG-ish wave bands that slide horizontally at different speeds */
+  .hero-wave {
+    position: absolute;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background-repeat: repeat-x;
+    will-change: transform;
+  }
+  .hero-wave-1 { animation: hero-wave-move 14s linear infinite; }
+  .hero-wave-2 { animation: hero-wave-move 22s linear infinite reverse; }
+  .hero-wave-3 { animation: hero-wave-move 30s linear infinite; }
+  @keyframes hero-wave-move {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+
+  /* soft caustic light shimmer that breathes */
+  .hero-caustics {
+    animation: hero-shimmer 7s ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+  @keyframes hero-shimmer {
+    0%, 100% { opacity: 0.35; transform: translateY(0) scale(1); }
+    50%      { opacity: 0.6;  transform: translateY(-4px) scale(1.03); }
+  }
+
+  /* a big hero fish that swims across slowly and bobs */
+  .hero-fish {
+    animation: hero-fish-swim 22s linear infinite;
+    will-change: transform;
+  }
+  .hero-fish-2 { animation: hero-fish-swim 30s linear infinite; animation-delay: -8s; }
+  @keyframes hero-fish-swim {
+    0%   { transform: translate3d(-15%, 0, 0) scaleX(-1); }
+    50%  { transform: translate3d(55%, 14px, 0) scaleX(-1); }
+    100% { transform: translate3d(120%, 0, 0) scaleX(-1); }
+  }
+
   /* honor reduced-motion: freeze all coastal animation */
   @media (prefers-reduced-motion: reduce) {
     .fs-line, .fs-fish, .fs-bubble,
-    .school-drift, .school-drift-slow, .lone-fish, .bubble {
+    .school-drift, .school-drift-slow, .lone-fish, .bubble,
+    .hero-wave-1, .hero-wave-2, .hero-wave-3, .hero-caustics,
+    .hero-fish, .hero-fish-2 {
       animation: none !important;
     }
   }
