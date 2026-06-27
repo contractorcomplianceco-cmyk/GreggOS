@@ -1,5 +1,6 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { StatCard } from "@/components/layout/StatCard";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -140,12 +141,16 @@ export default function Expansion() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <PageHeader
-          tag="Casting the Net"
-          title="The Net — Expansion Pipeline"
-          subtitle="Every open expansion opportunity across the portfolio, auto-prioritized by value, stage, target date, relationship warmth, and risk. Pin or boost items to override the ranking."
-          action={<CreateMilestoneDialog onCreated={invalidate} />}
-        />
+        <div className="mb-6">
+          <DashboardHero
+            eyebrow="Casting the Net"
+            greeting="The Net — Expansion Pipeline"
+            subtitle="Every open expansion opportunity across the portfolio, auto-prioritized by value, stage, target date, relationship warmth, and risk. Pin or boost items to override the ranking."
+          />
+        </div>
+        <div className="mb-8 flex justify-end">
+          <CreateMilestoneDialog onCreated={invalidate} />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatCard label="Open Opportunities" value={opportunities.length} accent="primary" />

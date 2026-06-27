@@ -1,4 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
@@ -84,34 +85,26 @@ export default function Reporting() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            Operations &amp; Leadership
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-3 mt-2">
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground">
-              Reporting &amp; CRM
-            </h1>
-            <div className="flex items-center gap-1">
-              {WINDOWS.map((w) => (
-                <Button
-                  key={w.value}
-                  variant={windowDays === w.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setWindowDays(w.value)}
-                  data-testid={`window-${w.value}`}
-                >
-                  {w.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            Portfolio health for Gregg&apos;s operations and leadership review,
-            plus the CRM export queue. Nothing is pushed automatically — every
-            record is human-reviewed and exported on demand.
-          </p>
-        </header>
+        <div className="mb-6">
+          <DashboardHero
+            eyebrow="The Logbook"
+            greeting="The Logbook — Reporting & CRM"
+            subtitle="Portfolio health for operations and leadership review, plus the CRM export queue. Nothing is pushed automatically — every record is human-reviewed and exported on demand."
+          />
+        </div>
+        <div className="mb-8 flex flex-wrap items-center justify-end gap-1">
+          {WINDOWS.map((w) => (
+            <Button
+              key={w.value}
+              variant={windowDays === w.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => setWindowDays(w.value)}
+              data-testid={`window-${w.value}`}
+            >
+              {w.label}
+            </Button>
+          ))}
+        </div>
 
         <section className="mb-10">
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-foreground/70 mb-3">
