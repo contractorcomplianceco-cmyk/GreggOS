@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Play,
-  Pause,
   Pin,
   PinOff,
   Anchor,
@@ -100,12 +99,14 @@ function loadPins(): string[] {
   }
 }
 
-// ---- Dockside Player ------------------------------------------------------
-type Track = { id: string; title: string; mood: string; src: string };
-const TRACKS: Track[] = [
-  { id: "calm", title: "Calm Seas", mood: "Slow & dreamy", src: "/tune-calm-seas.mp3" },
-  { id: "reel", title: "Reel It In", mood: "Upbeat dockside", src: "/tune-reel-it-in.mp3" },
-  { id: "sunset", title: "Sunset Dock", mood: "Warm & easy", src: "/tune-sunset-dock.mp3" },
+// ---- Dockside Player (Spotify) -------------------------------------------
+// Official Spotify embed playlists — play right in the browser (full tracks
+// for logged-in Spotify users, 30s previews otherwise). No API key needed.
+type Station = { id: string; title: string; mood: string; playlist: string };
+const STATIONS: Station[] = [
+  { id: "guitar", title: "Dockside Acoustic", mood: "Easy coastal guitar", playlist: "37i9dQZF1DX0jgyAiPl8Af" },
+  { id: "chill", title: "Chill Hits", mood: "Sunny & easy", playlist: "37i9dQZF1DX4WYpdgoIcn6" },
+  { id: "lofi", title: "Calm Waters", mood: "Wind-down lo-fi", playlist: "37i9dQZF1DWWQRwui0ExPn" },
 ];
 
 export default function TheDock() {
@@ -132,32 +133,8 @@ export default function TheDock() {
     });
   };
 
-  // player state
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [current, setCurrent] = useState<string | null>(null);
-  const [playing, setPlaying] = useState(false);
-
-  const play = (t: Track) => {
-    if (!audioRef.current) return;
-    if (current === t.id && playing) {
-      audioRef.current.pause();
-      setPlaying(false);
-      return;
-    }
-    if (current !== t.id) {
-      audioRef.current.src = t.src;
-      setCurrent(t.id);
-    }
-    audioRef.current.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
-  };
-
-  useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    const onEnd = () => setPlaying(false);
-    a.addEventListener("ended", onEnd);
-    return () => a.removeEventListener("ended", onEnd);
-  }, []);
+  // Spotify station state
+  const [station, setStation] = useState<Station>(STATIONS[0]);
 
   return (
     <SidebarLayout>
@@ -169,8 +146,6 @@ export default function TheDock() {
             subtitle="Your off-the-clock corner of GreggOS. Dream up your next boat, pin the trips and catches you're chasing, and put on something easy while you do it."
           />
 
-          {/* hidden audio element shared by the player */}
-          <audio ref={audioRef} preload="none" />
 
           {/* DREAM BOAT FINDER */}
           <section>
@@ -323,55 +298,68 @@ export default function TheDock() {
             </p>
           </section>
 
-          {/* DOCKSIDE PLAYER */}
+          {/* DOCKSIDE PLAYER — Spotify */}
           <section>
-            <div className="mb-4 flex items-center gap-2">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dbf0f2] text-[#0d6473]">
                 <Music2 className="h-5 w-5" />
               </span>
               <h2 className="font-display text-xl font-bold text-slate-800">
-                Dockside Tunes
+                Dockside Radio
               </h2>
-              <span className="text-sm text-slate-400">easy originals, royalty-free</span>
+              <span className="text-sm text-slate-400">powered by Spotify</span>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              {TRACKS.map((t) => {
-                const active = current === t.id && playing;
+            {/* station tabs */}
+            <div className="mb-3 flex flex-wrap gap-2">
+              {STATIONS.map((s) => {
+                const active = station.id === s.id;
                 return (
                   <button
-                    key={t.id}
-                    onClick={() => play(t)}
-                    className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+                    key={s.id}
+                    onClick={() => setStation(s)}
+                    className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-left transition-all ${
                       active
                         ? "border-[#15a3b0] bg-gradient-to-br from-[#dff3f5] to-white shadow-md"
                         : "border-[#cfe6e9] bg-white hover:border-[#5fc6d0] hover:shadow-sm"
                     }`}
                   >
                     <span
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
                         active ? "bg-[#15a3b0] text-white" : "bg-[#dbf0f2] text-[#0d6473]"
                       }`}
                     >
-                      {active ? (
-                        <Pause className="h-5 w-5" />
-                      ) : (
-                        <Play className="h-5 w-5 translate-x-0.5" />
-                      )}
+                      {active ? <Play className="h-4 w-4 translate-x-0.5" /> : <Music2 className="h-4 w-4" />}
                     </span>
                     <div className="min-w-0">
-                      <p className="font-display text-sm font-bold text-slate-800">
-                        {t.title}
-                      </p>
+                      <p className="font-display text-sm font-bold text-slate-800">{s.title}</p>
                       <p className="flex items-center gap-1 text-xs text-slate-500">
                         <Waves className="h-3 w-3 text-[#15a3b0]" />
-                        {t.mood}
+                        {s.mood}
                       </p>
                     </div>
                   </button>
                 );
               })}
             </div>
+
+            {/* Spotify embed player */}
+            <div className="overflow-hidden rounded-xl border border-[#cfe6e9] shadow-sm">
+              <iframe
+                key={station.id}
+                title={`Spotify — ${station.title}`}
+                src={`https://open.spotify.com/embed/playlist/${station.playlist}?utm_source=greggos`}
+                width="100%"
+                height="352"
+                frameBorder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                className="block w-full"
+              />
+            </div>
+            <p className="mt-2 text-xs text-slate-400">
+              Sign in to Spotify in your browser for full-length tracks; otherwise you'll hear 30-second previews.
+            </p>
           </section>
 
           <div className="flex items-center justify-center gap-2 pt-2 text-xs text-slate-400">
