@@ -1,5 +1,7 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
+import { TideChart } from "@/components/dashboard/TideChart";
+import { TideGauge, Waves } from "@/components/icons/CoastalIcons";
 import { Fragment, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import {
@@ -774,7 +776,7 @@ export default function GreggToday() {
               </div>
             </Panel>
 
-            <Panel icon={ListChecks} title="Tide Chart" count={timeline.length}>
+            <Panel icon={ListChecks} title="Risk Timeline" count={timeline.length}>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {timeline.map((t) => (
                   <Link key={t.id} href={`/clients/${t.clientId}`}>
@@ -809,6 +811,23 @@ export default function GreggToday() {
                 )}
               </div>
             </Panel>
+          </div>
+
+          {/* LIVE TIDE CHART + conditions */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-3">
+            <Panel icon={TideGauge} title="Tide Chart — Live">
+              <TideChart />
+            </Panel>
+            <div className="xl:col-span-2">
+              <Panel icon={Waves} title="Fishing Conditions">
+                <p className="px-1 text-[11px] text-slate-500">
+                  Live water levels are pulled from the NOAA tide station nearest
+                  the dock. Rising water on a moving tide is prime time — watch the
+                  coral now-line on the chart and plan your casts around the next
+                  high or low.
+                </p>
+              </Panel>
+            </div>
           </div>
 
           {/* ROW 3 — SYSTEM INTELLIGENCE LAYER */}

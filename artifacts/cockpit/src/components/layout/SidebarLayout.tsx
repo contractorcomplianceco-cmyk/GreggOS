@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { Link, useLocation } from "wouter";
 import { Briefcase, Calendar, Settings, Users, LayoutDashboard, BarChart3, ShieldAlert, LogOut, TrendingUp, HeartHandshake, PieChart, MessageSquareText, Plane, Receipt, GraduationCap, Sparkles, Compass, MessageSquarePlus, PlayCircle, Menu, Network, IdCard, UserCog, Gift, Award, DollarSign, ListChecks, Bot, Mail, Inbox, UsersRound, Fish, Anchor } from "lucide-react";
 import { useUser, useClerk } from "@clerk/react";
@@ -7,10 +7,12 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import ccaCrest from "@assets/cca-crest-inset_1781474011676.png";
 import { MotivationPopup } from "@/components/MotivationPopup";
 import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
+import { Mahi, Hook, AnchorMark, Boat, Net, TideGauge, CompassRose, Lighthouse } from "@/components/icons/CoastalIcons";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-type NavItem = { name: string; href: string; icon: typeof LayoutDashboard };
+type IconComponent = ComponentType<{ className?: string }>;
+type NavItem = { name: string; href: string; icon: IconComponent };
 type NavSection = { label: string; items: NavItem[] };
 
 function useNavigation(): NavSection[] {
@@ -21,7 +23,7 @@ function useNavigation(): NavSection[] {
     {
       label: "The Bridge",
       items: [
-        { name: "Today's Catch", href: "/", icon: Fish },
+        { name: "Today's Catch", href: "/", icon: Mahi },
         { name: "Crew Overview", href: "/staff", icon: UsersRound },
       ],
     },
@@ -29,14 +31,14 @@ function useNavigation(): NavSection[] {
       label: "The Fleet",
       items: [
         { name: "Current Catch", href: "/clients", icon: Users },
-        { name: "Depth Sounder", href: "/oversight", icon: BarChart3 },
+        { name: "Depth Sounder", href: "/oversight", icon: TideGauge },
         { name: "Storm Watch", href: "/audit-risk", icon: ShieldAlert },
       ],
     },
     {
       label: "Casting & Nets",
       items: [
-        { name: "The Net (Pipeline)", href: "/expansion", icon: TrendingUp },
+        { name: "The Net (Pipeline)", href: "/expansion", icon: Net },
         { name: "Deckhands & Allies", href: "/relationships", icon: HeartHandshake },
         { name: "Fishing Grounds (Qualifiers)", href: "/placement", icon: Network },
         { name: "The Logbook (CRM)", href: "/reporting", icon: PieChart },
@@ -45,7 +47,7 @@ function useNavigation(): NavSection[] {
     {
       label: "On the Water",
       items: [
-        { name: "Reel In Call Notes", href: "/processor", icon: Anchor },
+        { name: "Reel In Call Notes", href: "/processor", icon: Hook },
         { name: "Message in a Bottle", href: "/communications", icon: MessageSquareText },
         { name: "Weekly Haul", href: "/weekly-review", icon: Calendar },
       ],
@@ -53,7 +55,7 @@ function useNavigation(): NavSection[] {
     {
       label: "Captain's Quarters",
       items: [
-        { name: "Captain's Card", href: "/executive-profile", icon: IdCard },
+        { name: "Captain's Card", href: "/executive-profile", icon: AnchorMark },
         { name: "My Account", href: "/my-account", icon: UserCog },
         { name: "Ship's Perks", href: "/my-benefits", icon: Gift },
         { name: "Trophy Wall", href: "/bonus-tracker", icon: Award },
@@ -68,19 +70,19 @@ function useNavigation(): NavSection[] {
         { name: "RoseOS First Mate", href: "/roseos", icon: Bot },
         { name: "Email Builder", href: "/email-builder", icon: Mail },
         { name: "Requests Hub", href: "/requests", icon: Inbox },
-        { name: "Charting a Course", href: "/travel", icon: Plane },
+        { name: "Charting a Course", href: "/travel", icon: Boat },
         { name: "Expense Tracker", href: "/expenses", icon: Receipt },
         { name: "Leveling the Lines", href: "/training", icon: GraduationCap },
         { name: "AI Tackle Library", href: "/prompt-library", icon: Sparkles },
         { name: "Feedback Center", href: "/feedback", icon: MessageSquarePlus },
-        { name: "Daily Tide Wisdom", href: "/motivation", icon: Compass },
+        { name: "Daily Tide Wisdom", href: "/motivation", icon: Lighthouse },
       ],
     },
     ...(isAdmin
       ? [
           {
             label: "Engine Room",
-            items: [{ name: "Admin / Setup", href: "/admin", icon: Settings }],
+            items: [{ name: "Admin / Setup", href: "/admin", icon: CompassRose }],
           },
         ]
       : []),
