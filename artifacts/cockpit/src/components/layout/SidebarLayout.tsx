@@ -24,6 +24,7 @@ function useNavigation(): NavSection[] {
       label: "The Bridge",
       items: [
         { name: "Today's Catch", href: "/", icon: Mahi },
+        { name: "Captain's Bridge", href: "/captains-bridge", icon: CompassRose },
         { name: "Crew Overview", href: "/staff", icon: UsersRound },
       ],
     },
