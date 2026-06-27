@@ -146,6 +146,7 @@ export default function Expansion() {
             eyebrow="Casting the Net"
             greeting="The Net — Expansion Pipeline"
             subtitle="Every open expansion opportunity across the portfolio, auto-prioritized by value, stage, target date, relationship warmth, and risk. Pin or boost items to override the ranking."
+            photo="/dock-reef-school.jpg"
           />
         </div>
         <div className="mb-8 flex justify-end">

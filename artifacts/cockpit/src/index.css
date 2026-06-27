@@ -311,6 +311,16 @@
     50%      { opacity: 0.6;  transform: translateY(-4px) scale(1.03); }
   }
 
+  /* real-photo backdrop: a very slow Ken Burns drift so the hero feels alive */
+  .hero-photo {
+    animation: hero-photo-pan 38s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  @keyframes hero-photo-pan {
+    0%   { transform: scale(1.08) translate3d(0, 0, 0); }
+    100% { transform: scale(1.14) translate3d(-2%, -2%, 0); }
+  }
+
   /* a big hero fish that swims across slowly and bobs */
   .hero-fish {
     animation: hero-fish-swim 22s linear infinite;
@@ -401,7 +411,7 @@
     .fs-line, .fs-fish, .fs-bubble,
     .school-drift, .school-drift-slow, .lone-fish, .bubble,
     .hero-wave-1, .hero-wave-2, .hero-wave-3, .hero-caustics,
-    .hero-fish, .hero-fish-2, .hero-boat,
+    .hero-fish, .hero-fish-2, .hero-boat, .hero-photo,
     .hero-chip-fish, .hero-chip-fish-alert, .trophy-pop {
       animation: none !important;
     }

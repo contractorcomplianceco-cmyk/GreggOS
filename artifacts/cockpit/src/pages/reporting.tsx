@@ -90,6 +90,7 @@ export default function Reporting() {
             eyebrow="The Logbook"
             greeting="The Logbook — Reporting & CRM"
             subtitle="Portfolio health for operations and leadership review, plus the CRM export queue. Nothing is pushed automatically — every record is human-reviewed and exported on demand."
+            photo="/dock-angler-fight.jpg"
           />
         </div>
         <div className="mb-8 flex flex-wrap items-center justify-end gap-1">

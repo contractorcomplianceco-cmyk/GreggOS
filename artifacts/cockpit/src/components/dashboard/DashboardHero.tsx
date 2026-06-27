@@ -75,6 +75,8 @@ export function DashboardHero({
   size = "full",
   /** optional right-aligned action (button/dialog) for section headers */
   action,
+  /** optional real photo backdrop shown behind the animated water/fish/boat */
+  photo,
 }: {
   eyebrow?: string;
   greeting: string;
@@ -84,6 +86,7 @@ export function DashboardHero({
   goalMet?: boolean;
   size?: "full" | "compact";
   action?: ReactNode;
+  photo?: string;
 }) {
   const compact = size === "compact";
   const isAlert = (s: HeroStat) => {
@@ -94,9 +97,19 @@ export function DashboardHero({
 
   return (
     <section className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-[#15a3b0]/30">
-      {/* seasonal deep-sea base */}
+      {/* optional real-photo backdrop (bottom-most layer) */}
+      {photo && (
+        <img
+          src={photo}
+          alt=""
+          aria-hidden="true"
+          className="hero-photo absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+      {/* seasonal deep-sea base — semi-transparent over a photo so it tints,
+          fully opaque otherwise */}
       <div
-        className="absolute inset-0"
+        className={`absolute inset-0 ${photo ? "opacity-60 mix-blend-multiply" : ""}`}
         style={{
           background:
             "linear-gradient(to bottom, var(--hero-base-1), var(--hero-base-2), var(--hero-base-3))",
@@ -147,8 +160,15 @@ export function DashboardHero({
       {/* schools + rising bubbles */}
       <CoastalHeaderFX variant="dark" />
 
-      {/* readability scrim behind the text column; thin bottom shade for chips */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#062029]/85 via-[#062029]/35 to-transparent md:to-[#062029]/0" />
+      {/* readability scrim behind the text column; thin bottom shade for chips.
+          Stronger when a photo is present so the white text always stays legible. */}
+      <div
+        className={`absolute inset-0 bg-gradient-to-r ${
+          photo
+            ? "from-[#062029]/90 via-[#062029]/55 to-[#062029]/20"
+            : "from-[#062029]/85 via-[#062029]/35 to-transparent md:to-[#062029]/0"
+        }`}
+      />
       <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#062029]/55 to-transparent" />
 
       {/* content — sizes bumped up for easier reading */}

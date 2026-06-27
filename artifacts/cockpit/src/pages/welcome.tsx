@@ -69,6 +69,7 @@ export default function WelcomeCenter() {
             <DashboardHero
               eyebrow="Welcome Aboard"
               greeting="Welcome aboard the GreggOS deck"
+              photo="/dock-sunset-canoe.jpg"
               subtitle="Grab your gear. Watch the walkthrough, learn the waters, and take the helm of the cockpit built to keep every client on the line and every dollar in the boat."
               action={
                 <Link href="/">

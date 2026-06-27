@@ -523,6 +523,7 @@ export default function GreggToday() {
             stats={heroStats}
             goalLabel="Clean Board"
             goalMet={dailyGoalMet}
+            photo="/dock-sportfisher-run.jpg"
           />
 
           {/* GLOBAL CONTROLS */}
