@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -35,7 +36,7 @@ export default function MyAccount() {
         />
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading account…</p>
+          <LoadingState message="Reeling in your account…" />
         ) : (
           <div className="space-y-6">
             <Card className="shadow-sm">

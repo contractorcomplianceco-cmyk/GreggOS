@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, AlertTriangle } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const PLACEMENT_STAGES: PlacementStage[] = [
   "interest",
@@ -382,9 +383,7 @@ export default function PlacementNetwork() {
             </div>
 
             {placementsLoading ? (
-              <p className="text-sm text-muted-foreground">
-                Loading placements…
-              </p>
+              <LoadingState message="Charting the fishing grounds…" />
             ) : placements.length === 0 ? (
               <Card className="shadow-sm">
                 <CardContent className="p-10 text-center text-sm text-muted-foreground">
@@ -533,9 +532,7 @@ export default function PlacementNetwork() {
               </Button>
             </div>
             {qualifiersLoading ? (
-              <p className="text-sm text-muted-foreground">
-                Loading qualifiers…
-              </p>
+              <LoadingState message="Scouting the qualifiers…" />
             ) : qualifiers.length === 0 ? (
               <Card className="shadow-sm">
                 <CardContent className="p-10 text-center text-sm text-muted-foreground">

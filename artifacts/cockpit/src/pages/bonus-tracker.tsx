@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const CATEGORIES: { value: string; label: string }[] = [
   { value: "placement_coordination", label: "Placement coordination" },
@@ -237,7 +238,7 @@ export default function BonusTracker() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading bonus entries…</p>
+          <LoadingState message="Tallying the trophy haul…" />
         ) : items.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

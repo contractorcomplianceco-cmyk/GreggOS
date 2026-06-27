@@ -1,4 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
 import { Fragment, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import {
@@ -449,13 +450,14 @@ export default function GreggToday() {
       <div className="min-h-full bg-[#eef6f7] text-slate-900 font-sans">
         {/* HEADER BAR */}
         <header className="sticky top-0 z-20 border-b border-[#cfe6e9] bg-white/95 backdrop-blur px-5 py-3 relative overflow-hidden">
-          {/* school of fish drifting across the header */}
+          {/* faded underwater backdrop + animated schools/bubbles */}
           <img
             src="/img-sidebar-ocean.png"
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute right-0 top-0 h-full w-1/2 object-cover opacity-[0.12] [mask-image:linear-gradient(to_right,transparent,black)]"
+            className="pointer-events-none absolute right-0 top-0 h-full w-1/2 object-cover opacity-[0.10] [mask-image:linear-gradient(to_right,transparent,black)]"
           />
+          <CoastalHeaderFX variant="light" />
           <div className="relative flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div

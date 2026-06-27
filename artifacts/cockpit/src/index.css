@@ -178,3 +178,96 @@
     );
   }
 }
+
+/* ============================================================
+   Coastal motion — all animations use transform/opacity only
+   (GPU-compositable, no layout/paint thrash, scroll-safe)
+   ============================================================ */
+@layer utilities {
+  /* --- Hooked-fish loading spinner --- */
+  .fishing-spinner {
+    will-change: transform;
+  }
+  /* the line + hook gently casts up and down */
+  .fs-line {
+    transform-origin: top center;
+    animation: fs-cast 1.6s ease-in-out infinite;
+  }
+  /* the hooked fish wiggles as it fights the line */
+  .fs-fish {
+    transform-origin: left center;
+    animation: fs-wiggle 0.6s ease-in-out infinite;
+  }
+  /* tiny bubbles escaping the struggling fish */
+  .fs-bubble {
+    animation: fs-bubble-rise 1.8s ease-in infinite;
+  }
+  .fs-bubble-2 { animation-delay: 0.6s; }
+  .fs-bubble-3 { animation-delay: 1.1s; }
+
+  @keyframes fs-cast {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(3px) rotate(2.5deg); }
+  }
+  @keyframes fs-wiggle {
+    0%, 100% { transform: rotate(-9deg); }
+    50%      { transform: rotate(9deg); }
+  }
+  @keyframes fs-bubble-rise {
+    0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+    25%  { opacity: 0.9; }
+    100% { transform: translateY(-18px) scale(1); opacity: 0; }
+  }
+
+  /* --- Living coastal header --- */
+  /* a school layer drifts slowly sideways and loops seamlessly */
+  .school-drift {
+    animation: school-swim 26s linear infinite;
+    will-change: transform;
+  }
+  .school-drift-slow {
+    animation: school-swim 40s linear infinite;
+    will-change: transform;
+  }
+  @keyframes school-swim {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+
+  /* a single accent fish glides across and resets */
+  .lone-fish {
+    animation: lone-fish-swim 18s linear infinite;
+    will-change: transform;
+  }
+  @keyframes lone-fish-swim {
+    0%   { transform: translate3d(-12%, 0, 0) scaleX(-1); opacity: 0; }
+    8%   { opacity: 0.9; }
+    92%  { opacity: 0.9; }
+    100% { transform: translate3d(112%, -6px, 0) scaleX(-1); opacity: 0; }
+  }
+
+  /* rising bubbles in the header */
+  .bubble {
+    position: absolute;
+    bottom: -8px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(180,240,255,0.25));
+    animation: bubble-up var(--bub-dur, 7s) ease-in infinite;
+    animation-delay: var(--bub-delay, 0s);
+    will-change: transform, opacity;
+  }
+  @keyframes bubble-up {
+    0%   { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
+    12%  { opacity: 0.7; }
+    70%  { opacity: 0.5; }
+    100% { transform: translate3d(8px, -120px, 0) scale(1.1); opacity: 0; }
+  }
+
+  /* honor reduced-motion: freeze all coastal animation */
+  @media (prefers-reduced-motion: reduce) {
+    .fs-line, .fs-fish, .fs-bubble,
+    .school-drift, .school-drift-slow, .lone-fish, .bubble {
+      animation: none !important;
+    }
+  }
+}

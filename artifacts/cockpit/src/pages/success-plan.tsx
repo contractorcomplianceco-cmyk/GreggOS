@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const PHASES: { value: SuccessPlanPhase; label: string; blurb: string }[] = [
   {
@@ -98,7 +99,7 @@ export default function SuccessPlan() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading success plan…</p>
+          <LoadingState message="Plotting the voyage…" />
         ) : items.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

@@ -38,6 +38,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 import { Inbox, Trash2, Plus } from "lucide-react";
 
 const TYPES: RequestType[] = [
@@ -280,7 +281,7 @@ export default function RequestsHub() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading requests…</p>
+          <LoadingState message="Pulling requests aboard…" />
         ) : requests.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

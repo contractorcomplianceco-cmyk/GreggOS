@@ -84,6 +84,7 @@ import type {
   ScheduledEvent,
   ContactLogEntry,
 } from "@/lib/types";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -1054,7 +1055,7 @@ export default function ClientDetail() {
                         );
                       })()
                     ) : liveAuditDetailLoading ? (
-                      <p className="text-sm text-muted-foreground">Loading live Layer A scoresheet…</p>
+                      <LoadingState message="Reading the depth sounder…" />
                     ) : liveAuditDetailError ? (
                       <p className="text-sm text-red-600">Could not load the live Layer A scoresheet from the portal.</p>
                     ) : null}

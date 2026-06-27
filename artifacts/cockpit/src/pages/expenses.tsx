@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Receipt } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const CATEGORIES: ExpenseCategory[] = [
   "Travel",
@@ -234,9 +235,7 @@ export default function Expenses() {
         <Card className="shadow-sm">
           <CardContent className="p-0">
             {isLoading ? (
-              <p className="p-8 text-sm text-muted-foreground">
-                Loading expenses…
-              </p>
+              <LoadingState message="Opening the ship’s ledger…" />
             ) : expenses.length === 0 ? (
               <div className="p-10 text-center text-sm text-muted-foreground">
                 <Receipt className="h-6 w-6 mx-auto mb-3 opacity-50" />

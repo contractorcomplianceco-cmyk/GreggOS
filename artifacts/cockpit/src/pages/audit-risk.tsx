@@ -23,6 +23,7 @@ import {
   type AuditSummary,
   type AuditFinding,
 } from "@/lib/auditPortal";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 function fmtDate(value: string | null | undefined): string {
   if (!value) return "—";
@@ -119,7 +120,7 @@ function AuditDetailPanel({ summary }: { summary: AuditSummary }) {
   const { data, isLoading, isError, error } = useAuditDetail(summary.id);
 
   if (isLoading) {
-    return <div className="p-6 text-sm text-muted-foreground">Loading audit detail…</div>;
+    return <LoadingState message="Hauling in audit details…" />;
   }
   if (isError || !data) {
     return (
@@ -388,7 +389,7 @@ export default function AuditRisk() {
         </div>
 
         {isLoading ? (
-          <div className="rounded-md border p-8 text-center text-sm text-muted-foreground">Loading audits…</div>
+          <LoadingState message="Casting for audits…" />
         ) : isError ? (
           <div className="rounded-md border border-red-200 bg-red-50 p-6 text-sm text-red-700">
             <div className="font-semibold">Unable to reach the audit portal.</div>

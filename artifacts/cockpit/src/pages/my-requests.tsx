@@ -38,6 +38,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 import { Inbox, Trash2, Plus } from "lucide-react";
 import { TYPE_LABEL, STATUS_LABEL, statusVariant } from "./requests";
 
@@ -178,7 +179,7 @@ export default function MyRequests() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading your requests…</p>
+          <LoadingState message="Checking the lines…" />
         ) : requests.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

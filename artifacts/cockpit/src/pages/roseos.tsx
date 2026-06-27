@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Plus, Trash2, Send, Bot, User } from "lucide-react";
+import { LoadingState, FishingSpinner } from "@/components/layout/FishingSpinner";
 
 const MODES: { value: RoseChatMode; label: string; hint: string }[] = [
   {
@@ -287,7 +288,7 @@ export default function RoseOS() {
                     Pick a mode and start typing to begin a new chat.
                   </div>
                 ) : detailLoading ? (
-                  <p className="text-sm text-muted-foreground">Loading chat…</p>
+                  <LoadingState message="Waking the first mate…" />
                 ) : (
                   (detail?.messages ?? []).map((m) => (
                     <div
@@ -327,8 +328,9 @@ export default function RoseOS() {
                     <div className="h-7 w-7 rounded-full bg-accent text-accent-foreground flex items-center justify-center shrink-0">
                       <Bot className="h-4 w-4" />
                     </div>
-                    <div className="rounded-lg px-4 py-2.5 text-sm bg-slate-100 text-muted-foreground">
-                      Thinking…
+                    <div className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm bg-slate-100 text-muted-foreground">
+                      <FishingSpinner size="sm" label="Thinking" />
+                      Casting a line for an answer…
                     </div>
                   </div>
                 ) : null}

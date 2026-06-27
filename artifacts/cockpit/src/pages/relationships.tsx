@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { PhoneCall, CalendarPlus, Snowflake, Flame, Thermometer } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const OWNERS = ["Gregg", "Landon", "Tara"];
 const CHANNELS = ["Call", "Email", "Meeting", "Text", "Visit"];
@@ -138,7 +139,7 @@ export default function Relationships() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading relationships…</p>
+          <LoadingState message="Tending the lines…" />
         ) : rows.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No relationships match these filters.

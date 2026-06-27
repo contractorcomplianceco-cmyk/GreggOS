@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, AlertTriangle, Lightbulb, Settings2 } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const TYPES: { value: FeedbackType; label: string }[] = [
   { value: "risk", label: "Risk / client issue" },
@@ -221,7 +222,7 @@ export default function FeedbackCenter() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading feedback…</p>
+          <LoadingState message="Listening on the sonar…" />
         ) : items.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

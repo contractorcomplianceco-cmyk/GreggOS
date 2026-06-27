@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plane, MapPin, Trash2, Plus } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const STATUSES: TravelStatus[] = [
   "Proposed",
@@ -229,7 +230,7 @@ export default function TravelPlanner() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading travel plans…</p>
+          <LoadingState message="Charting a course…" />
         ) : plans.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

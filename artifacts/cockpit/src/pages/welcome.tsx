@@ -2,6 +2,7 @@ import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlayCircle, Compass, Target, ArrowRight, Anchor } from "lucide-react";
 import { Link } from "wouter";
+import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
 
 const WALKTHROUGH_STEPS: { title: string; body: string }[] = [
   {
@@ -37,6 +38,7 @@ export default function WelcomeCenter() {
             alt="Sunset over the water from a sportfishing boat"
             className="absolute inset-0 h-full w-full object-cover"
           />
+          <CoastalHeaderFX variant="dark" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#062029]/90 via-[#062029]/55 to-transparent" />
           <div className="relative">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#5fe7e7] flex items-center gap-2">

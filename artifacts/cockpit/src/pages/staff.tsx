@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Users } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const WINDOWS = [
   { value: 7, label: "7 days" },
@@ -132,7 +133,7 @@ export default function StaffOverviewPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading staff signals…</p>
+          <LoadingState message="Mustering the crew…" />
         ) : staff.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

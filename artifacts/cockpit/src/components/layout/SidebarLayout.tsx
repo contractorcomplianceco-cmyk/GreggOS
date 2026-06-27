@@ -6,6 +6,7 @@ import { useGetCurrentUser } from "@workspace/api-client-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import ccaCrest from "@assets/cca-crest-inset_1781474011676.png";
 import { MotivationPopup } from "@/components/MotivationPopup";
+import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -143,6 +144,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover"
           />
+          {/* animated schools + bubbles */}
+          <CoastalHeaderFX variant="dark" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#062029]/90 via-[#06212a]/65 to-[#0d4a57]/25" />
           <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-[#3FE0E0]/50 backdrop-blur-sm">
             <img

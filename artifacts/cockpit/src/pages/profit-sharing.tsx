@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, AlertTriangle } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const STATUSES: ProfitShareStatus[] = [
   "illustrative",
@@ -184,7 +185,7 @@ export default function ProfitSharing() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading projections…</p>
+          <LoadingState message="Splitting the haul…" />
         ) : items.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">

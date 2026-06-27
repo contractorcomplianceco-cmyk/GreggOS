@@ -47,6 +47,7 @@ import {
   Flag,
   Upload,
 } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const STAGES = ["Identified", "Qualifying", "Proposed", "Negotiation", "Closing"];
 const OWNERS = ["Gregg", "Landon", "Tara"];
@@ -195,7 +196,7 @@ export default function Expansion() {
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading pipeline…</p>
+          <LoadingState message="Casting the net…" />
         ) : opportunities.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No open expansion opportunities match these filters.

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Award, GraduationCap } from "lucide-react";
+import { LoadingState } from "@/components/layout/FishingSpinner";
 
 const LEVELS: { name: string; minXp: number }[] = [
   { name: "Awareness", minXp: 0 },
@@ -181,7 +182,7 @@ export default function Training() {
         </Card>
 
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading modules…</p>
+          <LoadingState message="Leveling the lines…" />
         ) : modules.length === 0 ? (
           <Card className="shadow-sm">
             <CardContent className="p-10 text-center text-sm text-muted-foreground">
