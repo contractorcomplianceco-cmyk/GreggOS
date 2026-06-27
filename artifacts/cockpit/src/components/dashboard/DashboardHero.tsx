@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Trophy } from "lucide-react";
 import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
 import { Mahi } from "@/components/icons/CoastalIcons";
@@ -70,6 +71,10 @@ export function DashboardHero({
   /** daily performance target: e.g. lines tended >= goal -> trophy shows */
   goalLabel,
   goalMet = false,
+  /** "full" = main dashboard; "compact" = section page headers */
+  size = "full",
+  /** optional right-aligned action (button/dialog) for section headers */
+  action,
 }: {
   eyebrow?: string;
   greeting: string;
@@ -77,7 +82,10 @@ export function DashboardHero({
   stats?: HeroStat[];
   goalLabel?: string;
   goalMet?: boolean;
+  size?: "full" | "compact";
+  action?: ReactNode;
 }) {
+  const compact = size === "compact";
   const isAlert = (s: HeroStat) => {
     if (s.tone === "alert") return true;
     const n = s.numeric ?? Number(s.value);
@@ -122,18 +130,18 @@ export function DashboardHero({
         src="/img-fish-mark.png"
         alt=""
         aria-hidden="true"
-        className="hero-fish pointer-events-none absolute top-[28%] h-24 w-auto opacity-70 drop-shadow-lg"
+        className={`hero-fish pointer-events-none absolute top-[28%] w-auto opacity-70 drop-shadow-lg ${compact ? "h-12" : "h-24"}`}
       />
       <img
         src="/img-fish-mark.png"
         alt=""
         aria-hidden="true"
-        className="hero-fish-2 pointer-events-none absolute top-[60%] h-16 w-auto opacity-55"
+        className={`hero-fish-2 pointer-events-none absolute top-[60%] w-auto opacity-55 ${compact ? "h-9" : "h-16"}`}
       />
 
       {/* a sportfishing boat drifting + bobbing along the waterline */}
       <div className="hero-boat pointer-events-none absolute bottom-[26%] z-[1]" aria-hidden="true">
-        <HeroBoat className="h-12 w-auto drop-shadow-lg" />
+        <HeroBoat className={`${compact ? "h-8" : "h-12"} w-auto drop-shadow-lg`} />
       </div>
 
       {/* schools + rising bubbles */}
@@ -144,10 +152,15 @@ export function DashboardHero({
       <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#062029]/55 to-transparent" />
 
       {/* content — sizes bumped up for easier reading */}
-      <div className="relative px-6 py-8 md:px-9 md:py-10">
+      <div
+        className={`relative flex flex-wrap items-end justify-between gap-4 ${
+          compact ? "px-5 py-5 md:px-6 md:py-6" : "px-6 py-8 md:px-9 md:py-10"
+        }`}
+      >
+        <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2.5">
           <p
-            className="text-sm font-bold uppercase tracking-[0.22em]"
+            className={`font-bold uppercase tracking-[0.22em] ${compact ? "text-xs" : "text-sm"}`}
             style={{ color: "var(--hero-eyebrow)" }}
           >
             {eyebrow}
@@ -159,11 +172,19 @@ export function DashboardHero({
             </span>
           )}
         </div>
-        <h1 className="mt-2 font-display text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-lg">
+        <h1
+          className={`mt-2 font-display font-bold tracking-tight text-white drop-shadow-lg ${
+            compact ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
+          }`}
+        >
           {greeting}
         </h1>
         {subtitle && (
-          <p className="mt-3 max-w-2xl text-base md:text-lg text-cyan-50/95 leading-relaxed drop-shadow">
+          <p
+            className={`mt-3 max-w-2xl text-cyan-50/95 leading-relaxed drop-shadow ${
+              compact ? "text-sm md:text-base" : "text-base md:text-lg"
+            }`}
+          >
             {subtitle}
           </p>
         )}
@@ -202,6 +223,8 @@ export function DashboardHero({
             })}
           </div>
         )}
+        </div>
+        {action && <div className="relative shrink-0">{action}</div>}
       </div>
     </section>
   );

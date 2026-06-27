@@ -76,6 +76,7 @@ function useNavigation(): NavSection[] {
         { name: "AI Tackle Library", href: "/prompt-library", icon: Sparkles },
         { name: "Feedback Center", href: "/feedback", icon: MessageSquarePlus },
         { name: "Daily Tide Wisdom", href: "/motivation", icon: Lighthouse },
+        { name: "The Dock (Relax)", href: "/the-dock", icon: Boat },
       ],
     },
     ...(isAdmin

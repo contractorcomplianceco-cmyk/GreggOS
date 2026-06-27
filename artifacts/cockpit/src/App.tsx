@@ -24,6 +24,7 @@ import ExpensesPage from "@/pages/expenses";
 import Training from "@/pages/training";
 import PromptLibrary from "@/pages/prompt-library";
 import Motivation from "@/pages/motivation";
+import TheDock from "@/pages/the-dock";
 import FeedbackCenter from "@/pages/feedback";
 import BonusTracker from "@/pages/bonus-tracker";
 import ProfitSharing from "@/pages/profit-sharing";
@@ -197,6 +198,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/training" component={Training} />
             <Route path="/prompt-library" component={PromptLibrary} />
             <Route path="/motivation" component={Motivation} />
+            <Route path="/the-dock" component={TheDock} />
             <Route path="/feedback" component={FeedbackCenter} />
             <Route path="/placement" component={PlacementNetwork} />
             <Route path="/bonus-tracker" component={BonusTracker} />

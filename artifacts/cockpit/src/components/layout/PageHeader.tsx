@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
 
+/**
+ * Section page header. Now renders the shared compact animated coastal hero
+ * (parallax waves, caustic shimmer, swimming fish, drifting boat) so every
+ * section view matches the Today's Catch dashboard and the cockpit feels like
+ * one unified coastal experience.
+ */
 export function PageHeader({
   tag,
   title,
@@ -12,24 +19,18 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="relative border-b border-border pb-6 mb-8 flex flex-wrap items-start justify-between gap-4">
-      <div className="min-w-0">
-        {tag ? (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent flex items-center gap-2">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
-            {tag}
-          </p>
-        ) : null}
-        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground mt-2">
-          {title}
-        </h1>
-        {subtitle ? (
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">{subtitle}</p>
-        ) : null}
-      </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
-      {/* coastal current-line accent riding the bottom border */}
-      <span className="coastal-rule pointer-events-none absolute -bottom-px left-0 h-0.5 w-24 opacity-70" />
-    </header>
+    <div className="mb-8">
+      <DashboardHero
+        size="compact"
+        eyebrow={tag ?? "GreggOS"}
+        greeting={title}
+        subtitle={typeof subtitle === "string" ? subtitle : undefined}
+        action={action}
+      />
+      {/* render non-string subtitles (rare) below the hero */}
+      {subtitle && typeof subtitle !== "string" ? (
+        <p className="mt-3 text-sm text-muted-foreground max-w-2xl">{subtitle}</p>
+      ) : null}
+    </div>
   );
 }
