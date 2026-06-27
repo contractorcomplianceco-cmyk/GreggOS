@@ -1,4 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -106,18 +107,11 @@ export default function Training() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            Executive Development
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground mt-2">
-            Training &amp; Leveling
-          </h1>
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            Build executive capability across compliance, CRM, AI, and client
-            strategy. Complete modules to earn XP and level up.
-          </p>
-        </header>
+        <PageHeader
+          tag="Leveling the Lines"
+          title="Training &amp; Leveling"
+          subtitle="Build executive capability across compliance, CRM, AI, and client strategy. Complete modules to earn XP and level up."
+        />
 
         <Card className="shadow-sm mb-8 overflow-hidden">
           <div className="absolute" />

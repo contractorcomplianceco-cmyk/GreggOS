@@ -367,6 +367,35 @@
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
 
+  /* ---- Ambient mode (The Dock) -----------------------------------------
+     Toggled by a [data-ambient] wrapper. "evening"/"night" dims the room,
+     slows the waves, and shifts the hero palette from daylight teal to
+     evening navy. Transitions are opacity/filter only (cheap, scroll-safe). */
+  [data-ambient] { transition: filter 1.2s ease, background-color 1.2s ease; }
+
+  /* dusk: gentle dim + warmth pull-down */
+  [data-ambient="evening"] { filter: brightness(0.92) saturate(0.96); }
+  [data-ambient="evening"] .hero-wave-1 { animation-duration: 22s; }
+  [data-ambient="evening"] .hero-wave-2 { animation-duration: 34s; }
+  [data-ambient="evening"] .hero-wave-3 { animation-duration: 46s; }
+  [data-ambient="evening"] {
+    --hero-base-1: #134a5c; --hero-base-2: #0d2f3c; --hero-base-3: #061821;
+    --hero-glow: #2a6f8a; --hero-wave-1: #7fb6c8; --hero-wave-2: #3f8fb0;
+    --hero-wave-3: #1f5f7a; --hero-eyebrow: #8fd3e6;
+  }
+
+  /* night: deeper dim, slowest swell, moonlit navy */
+  [data-ambient="night"] { filter: brightness(0.82) saturate(0.9); }
+  [data-ambient="night"] .hero-wave-1 { animation-duration: 30s; }
+  [data-ambient="night"] .hero-wave-2 { animation-duration: 46s; }
+  [data-ambient="night"] .hero-wave-3 { animation-duration: 62s; }
+  [data-ambient="night"] .hero-caustics { animation-duration: 12s; opacity: 0.25; }
+  [data-ambient="night"] {
+    --hero-base-1: #0d2e44; --hero-base-2: #0a2030; --hero-base-3: #04101a;
+    --hero-glow: #1f4f6e; --hero-wave-1: #5f8fb0; --hero-wave-2: #2f6f93;
+    --hero-wave-3: #14465f; --hero-eyebrow: #6fb6d6;
+  }
+
   /* honor reduced-motion: freeze all coastal animation */
   @media (prefers-reduced-motion: reduce) {
     .fs-line, .fs-fish, .fs-bubble,

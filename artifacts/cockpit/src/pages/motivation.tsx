@@ -1,4 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Quote, Target } from "lucide-react";
@@ -15,18 +16,11 @@ export default function Motivation() {
   return (
     <SidebarLayout>
       <div className="p-6 md:p-8 max-w-5xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#15a3b0]">
-            Mindset
-          </p>
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mt-2">
-            Daily Motivation
-          </h1>
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            The mindset behind the cockpit. A focus line surfaces across your
-            pages throughout the day — here is the full set.
-          </p>
-        </header>
+        <PageHeader
+          tag="Daily Tide Wisdom"
+          title="Daily Motivation"
+          subtitle="The mindset behind the cockpit. A focus line surfaces across your pages throughout the day — here is the full set."
+        />
 
         {/* TODAY'S MESSAGE — deeper navy → azure for dimension */}
         <Card className="mb-8 overflow-hidden shadow-md ring-1 ring-[#15a3b0]/30">

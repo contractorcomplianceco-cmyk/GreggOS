@@ -1,4 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -136,19 +137,11 @@ export default function PromptLibrary() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            AI Toolkit
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground mt-2">
-            AI Prompt Library
-          </h1>
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            Copy-ready, high-value prompts for retention, risk, communication,
-            expansion, and call analysis. AI output is advisory — it never
-            approves pricing, refunds, legal, or compliance decisions.
-          </p>
-        </header>
+        <PageHeader
+          tag="AI Tackle Library"
+          title="AI Prompt Library"
+          subtitle="Copy-ready, high-value prompts for retention, risk, communication, expansion, and call analysis. AI output is advisory — it never approves pricing, refunds, legal, or compliance decisions."
+        />
 
         <div className="flex items-center gap-3 mb-5">
           <div className="relative w-full max-w-sm">

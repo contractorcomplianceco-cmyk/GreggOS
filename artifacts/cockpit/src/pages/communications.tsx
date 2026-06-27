@@ -1,4 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
@@ -216,20 +217,11 @@ export default function Communications() {
   return (
     <SidebarLayout>
       <div className="p-8 max-w-7xl mx-auto">
-        <header className="border-b border-border pb-6 mb-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            Gregg&apos;s Toolkit
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground mt-2">
-            Communication Draft Builder
-          </h1>
-          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
-            Generate client-facing message drafts from live account context
-            (recent calls, open tasks, escalations, cadence, expansion). Drafts
-            are for Gregg to review, edit, and send himself — nothing is sent
-            from here.
-          </p>
-        </header>
+        <PageHeader
+          tag="Message in a Bottle"
+          title="Communication Draft Builder"
+          subtitle="Generate client-facing message drafts from live account context (recent calls, open tasks, escalations, cadence, expansion). Drafts are for Gregg to review, edit, and send himself — nothing is sent from here."
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8">
           {/* Generator form */}
