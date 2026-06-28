@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { playSonarPing } from "@/lib/sonar";
 import {
   Mahi,
   Hook,
@@ -76,6 +77,8 @@ function SingleCard({
   }, [item.id, onDone]);
 
   useEffect(() => {
+    // Sonar ping fires with the slide-in for synced audio+visual feedback.
+    playSonarPing(tone);
     const dur = item.duration ?? 6500;
     if (dur > 0) {
       const t = window.setTimeout(dismiss, dur);
@@ -84,7 +87,8 @@ function SingleCard({
     return () => {
       timers.current.forEach(clearTimeout);
     };
-  }, [item.duration, dismiss]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div

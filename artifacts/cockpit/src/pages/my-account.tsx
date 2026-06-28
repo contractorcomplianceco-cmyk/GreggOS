@@ -5,8 +5,11 @@ import { useUser, useClerk } from "@clerk/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { LogOut, Radar } from "lucide-react";
 import { LoadingState } from "@/components/layout/FishingSpinner";
+import { useEffect, useState } from "react";
+import { isSonarEnabled, setSonarEnabled, playSonarPing, primeAudio } from "@/lib/sonar";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -25,6 +28,17 @@ export default function MyAccount() {
   const { data: me, isLoading } = useGetCurrentUser();
   const { user } = useUser();
   const { signOut } = useClerk();
+
+  const [sonarOn, setSonarOn] = useState(true);
+  useEffect(() => {
+    setSonarOn(isSonarEnabled());
+    primeAudio();
+  }, []);
+  const toggleSonar = (on: boolean) => {
+    setSonarOn(on);
+    setSonarEnabled(on);
+    if (on) playSonarPing("info"); // instant confirmation ping
+  };
 
   return (
     <SidebarLayout>
@@ -64,6 +78,46 @@ export default function MyAccount() {
                     </Badge>
                   }
                 />
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-base">Cockpit Preferences</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-start justify-between gap-4 py-2.5">
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#dbf0f2] text-[#0d6473]">
+                      <Radar className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Sonar alert ping</p>
+                      <p className="text-sm text-muted-foreground">
+                        Play a subtle sonar ping when an alert card slides in on The Logbook,
+                        The Net, Today's Catch, and Storm Watch.
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={sonarOn}
+                    onCheckedChange={toggleSonar}
+                    aria-label="Toggle sonar alert ping"
+                    data-testid="switch-sonar"
+                  />
+                </div>
+                {sonarOn && (
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => playSonarPing("alert")}
+                      data-testid="button-test-sonar"
+                    >
+                      <Radar className="mr-1 h-4 w-4" /> Test ping
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

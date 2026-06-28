@@ -2,8 +2,9 @@ import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { CoastalHeaderFX } from "@/components/layout/CoastalHeaderFX";
 import { TideChart } from "@/components/dashboard/TideChart";
 import { DashboardHero, type HeroStat } from "@/components/dashboard/DashboardHero";
+import { AlertCardStack, useAlertCards } from "@/components/dashboard/AlertCard";
 import { TideGauge, Waves } from "@/components/icons/CoastalIcons";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import {
   useListRelationships,
@@ -454,6 +455,43 @@ export default function GreggToday() {
   // Daily performance target: a clean board (no tangled lines / storms) earns the trophy.
   const dailyGoalMet = redFlags.length === 0 && openEscalations.length === 0;
 
+  // Live briefing: branded slide-in alert cards (with sonar ping) for the helm.
+  const { items: alerts, push: pushAlert, dismiss: dismissAlert } = useAlertCards();
+  useEffect(() => {
+    if (criticalClients.length > 0) {
+      pushAlert({
+        id: `tc-critical-${criticalClients.length}`,
+        category: "THE_WATERS",
+        tone: "alert",
+        message: `${criticalClients.length} client${criticalClients.length === 1 ? "" : "s"} at critical risk — rough water ahead.`,
+      });
+    }
+    if (openEscalations.length > 0) {
+      pushAlert({
+        id: `tc-escal-${openEscalations.length}`,
+        category: "PROTECT",
+        tone: "alert",
+        message: `${openEscalations.length} open escalation${openEscalations.length === 1 ? "" : "s"} — don't let it slip the net.`,
+      });
+    }
+    if (overdueTasks.length > 0) {
+      pushAlert({
+        id: `tc-overdue-${overdueTasks.length}`,
+        category: "STORM_WATCH",
+        tone: "alert",
+        message: `${overdueTasks.length} task${overdueTasks.length === 1 ? "" : "s"} overdue — storm on the horizon.`,
+      });
+    }
+    if (dailyGoalMet) {
+      pushAlert({
+        id: "tc-clean-board",
+        category: "THE_CATCH",
+        tone: "info",
+        message: "Clean board — no tangled lines or storms. Nice haul, Captain.",
+      });
+    }
+  }, [criticalClients.length, openEscalations.length, overdueTasks.length, dailyGoalMet, pushAlert]);
+
   const modules = [
     { name: "Travel", href: "/travel", icon: Plane },
     { name: "Expenses", href: "/expenses", icon: Receipt },
@@ -465,6 +503,7 @@ export default function GreggToday() {
 
   return (
     <SidebarLayout>
+      <AlertCardStack items={alerts} onDismiss={dismissAlert} />
       <div className="min-h-full bg-[#eef6f7] text-slate-900 font-sans text-[15px] leading-relaxed">
         {/* HEADER BAR */}
         <header className="sticky top-0 z-20 border-b border-[#cfe6e9] bg-white/95 backdrop-blur px-5 py-3 relative overflow-hidden">

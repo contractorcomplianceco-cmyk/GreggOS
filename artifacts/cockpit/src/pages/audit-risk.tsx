@@ -1,4 +1,5 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
+import { AlertCardStack, useAlertCards } from "@/components/dashboard/AlertCard";
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -347,8 +348,36 @@ export default function AuditRisk() {
   const portalHost = getPortalBaseUrl().replace(/^https?:\/\//, "");
   const online = health.isSuccess && health.data?.status === "ok";
 
+  // Live briefing: branded slide-in alert cards (with sonar ping) for risk shifts.
+  const criticalCount = sortedAudits.filter(
+    (a) => (a.finalLevel || "").toLowerCase() === "critical",
+  ).length;
+  const elevatedCount = sortedAudits.filter(
+    (a) => (a.finalLevel || "").toLowerCase() === "elevated",
+  ).length;
+  const { items: alerts, push: pushAlert, dismiss: dismissAlert } = useAlertCards();
+  useEffect(() => {
+    if (criticalCount > 0) {
+      pushAlert({
+        id: `sw-critical-${criticalCount}`,
+        category: "STORM_WATCH",
+        tone: "alert",
+        message: `${criticalCount} audit${criticalCount === 1 ? "" : "s"} at critical risk — batten down the hatches.`,
+      });
+    }
+    if (elevatedCount > 0) {
+      pushAlert({
+        id: `sw-elevated-${elevatedCount}`,
+        category: "WATCH",
+        tone: "info",
+        message: `${elevatedCount} audit${elevatedCount === 1 ? "" : "s"} at elevated risk — watch the tide.`,
+      });
+    }
+  }, [criticalCount, elevatedCount, pushAlert]);
+
   return (
     <SidebarLayout>
+      <AlertCardStack items={alerts} onDismiss={dismissAlert} />
       <div className="mx-auto max-w-7xl p-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
