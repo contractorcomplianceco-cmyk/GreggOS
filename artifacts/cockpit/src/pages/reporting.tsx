@@ -1,6 +1,7 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
-import { useState } from "react";
+import { AlertCardStack, useAlertCards } from "@/components/dashboard/AlertCard";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
 import {
@@ -82,8 +83,41 @@ export default function Reporting() {
   const exp = expQ.data as ExpansionReport | undefined;
   const act = actQ.data as ActivityReport | undefined;
 
+  // Live briefing: branded slide-in cards fire when noteworthy data arrives.
+  const { items: alerts, push: pushAlert, dismiss: dismissAlert } = useAlertCards();
+  useEffect(() => {
+    if (rel?.goingCold) {
+      pushAlert({
+        id: `cold-${windowDays}-${rel.goingCold}`,
+        category: "THE_WATERS",
+        tone: "alert",
+        message: `${rel.goingCold} relationship${rel.goingCold === 1 ? "" : "s"} going cold — time to reel them back in.`,
+      });
+    }
+    if (rel?.touchesDue) {
+      pushAlert({
+        id: `touches-${windowDays}-${rel.touchesDue}`,
+        category: "ON_THE_LINE",
+        tone: "info",
+        message: `${rel.touchesDue} touch${rel.touchesDue === 1 ? "" : "es"} due in this window.`,
+      });
+    }
+  }, [rel?.goingCold, rel?.touchesDue, windowDays, pushAlert]);
+
+  useEffect(() => {
+    if (act?.overdueTasks) {
+      pushAlert({
+        id: `overdue-${windowDays}-${act.overdueTasks}`,
+        category: "STORM_WATCH",
+        tone: "alert",
+        message: `${act.overdueTasks} task${act.overdueTasks === 1 ? "" : "s"} overdue — storm on the horizon.`,
+      });
+    }
+  }, [act?.overdueTasks, windowDays, pushAlert]);
+
   return (
     <SidebarLayout>
+      <AlertCardStack items={alerts} onDismiss={dismissAlert} />
       <div className="p-8 max-w-7xl mx-auto">
         <div className="mb-6">
           <DashboardHero

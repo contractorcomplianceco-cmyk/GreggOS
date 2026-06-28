@@ -1,8 +1,9 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
+import { AlertCardStack, useAlertCards } from "@/components/dashboard/AlertCard";
 import { StatCard } from "@/components/layout/StatCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import {
@@ -97,6 +98,28 @@ export default function Expansion() {
     0
   );
   const stalledCount = opportunities.filter((o) => o.stalled).length;
+  const bigCatch = opportunities.filter((o) => o.milestone.potentialValue >= 50000).length;
+
+  // Live briefing: branded slide-in cards fire when noteworthy data arrives.
+  const { items: alerts, push: pushAlert, dismiss: dismissAlert } = useAlertCards();
+  useEffect(() => {
+    if (stalledCount > 0) {
+      pushAlert({
+        id: `net-stalled-${stalledCount}`,
+        category: "STORM_WATCH",
+        tone: "alert",
+        message: `${stalledCount} opportunit${stalledCount === 1 ? "y is" : "ies are"} stalled — the net's snagged.`,
+      });
+    }
+    if (bigCatch > 0) {
+      pushAlert({
+        id: `net-bigcatch-${bigCatch}`,
+        category: "THE_CATCH",
+        tone: "info",
+        message: `${bigCatch} big catch${bigCatch === 1 ? "" : "es"} in the net (≥ $50k). Set the hook.`,
+      });
+    }
+  }, [stalledCount, bigCatch, pushAlert]);
 
   const byStage = STAGES.map((stage) => ({
     stage,
@@ -140,6 +163,7 @@ export default function Expansion() {
 
   return (
     <SidebarLayout>
+      <AlertCardStack items={alerts} onDismiss={dismissAlert} />
       <div className="p-8 max-w-7xl mx-auto">
         <div className="mb-6">
           <DashboardHero

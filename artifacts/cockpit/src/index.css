@@ -377,6 +377,42 @@
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
 
+  /* ---- Branded slide-in alert cards (Logbook / Net) --------------------
+     Same language as the welcome video lower-thirds: glassy teal panel,
+     left accent bar, fishing icon. GPU-friendly: only transform + opacity
+     are animated, so it stays smooth during live dashboard operations. */
+  .alert-card {
+    animation: alert-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: transform, opacity;
+  }
+  .alert-card[data-leaving="true"] {
+    animation: alert-card-out 0.4s cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  @keyframes alert-card-in {
+    0%   { transform: translate3d(-115%, 0, 0); opacity: 0; }
+    100% { transform: translate3d(0, 0, 0); opacity: 1; }
+  }
+  @keyframes alert-card-out {
+    0%   { transform: translate3d(0, 0, 0); opacity: 1; }
+    100% { transform: translate3d(-115%, 0, 0); opacity: 0; }
+  }
+  /* the icon eases in just after the panel for a layered, high-end feel */
+  .alert-card-icon {
+    animation: alert-icon-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 0.18s;
+    will-change: transform, opacity;
+  }
+  @keyframes alert-icon-in {
+    0%   { transform: scale(0.4) translate3d(0, 4px, 0); opacity: 0; }
+    100% { transform: scale(1) translate3d(0, 0, 0); opacity: 1; }
+  }
+  /* subtle pulse on the accent bar so live alerts read as "active" */
+  .alert-card-bar { animation: alert-bar-pulse 2.4s ease-in-out infinite; }
+  @keyframes alert-bar-pulse {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; box-shadow: 0 0 12px 0 rgba(95, 231, 231, 0.5); }
+  }
+
   /* ---- Ambient mode (The Dock) -----------------------------------------
      Toggled by a [data-ambient] wrapper. "evening"/"night" dims the room,
      slows the waves, and shifts the hero palette from daylight teal to
@@ -412,8 +448,12 @@
     .school-drift, .school-drift-slow, .lone-fish, .bubble,
     .hero-wave-1, .hero-wave-2, .hero-wave-3, .hero-caustics,
     .hero-fish, .hero-fish-2, .hero-boat, .hero-photo,
-    .hero-chip-fish, .hero-chip-fish-alert, .trophy-pop {
+    .hero-chip-fish, .hero-chip-fish-alert, .trophy-pop,
+    .alert-card, .alert-card-icon, .alert-card-bar {
       animation: none !important;
     }
+    /* still reveal alert cards instantly (no slide) when motion is reduced */
+    .alert-card { opacity: 1 !important; transform: none !important; }
+    .alert-card-icon { opacity: 1 !important; transform: none !important; }
   }
 }
