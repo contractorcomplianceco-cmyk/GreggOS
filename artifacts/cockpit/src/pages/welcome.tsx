@@ -82,25 +82,25 @@ export default function WelcomeCenter() {
             />
           </div>
 
-          {/* CINEMATIC WALKTHROUGH VIDEO */}
+          {/* CINEMATIC WELCOME VIDEO */}
           <Card className="mb-8 overflow-hidden shadow-lg ring-1 ring-[#15a3b0]/30">
             <CardContent className="p-0">
               <div className="flex items-center gap-2 bg-gradient-to-r from-[#072a33] to-[#0d4a57] px-6 py-4 text-white">
                 <PlayCircle className="h-5 w-5 text-[#5fe7e7]" />
-                <h2 className="font-display text-lg font-bold">Captain's walkthrough</h2>
+                <h2 className="font-display text-lg font-bold">Welcome to GreggOS</h2>
                 <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#9fdfe2]">
-                  Sound on · 33s
+                  Sound on · 52s
                 </span>
               </div>
               <div className="aspect-video w-full bg-slate-950">
                 <video
                   className="h-full w-full"
-                  src="/cockpit-walkthrough.mp4"
-                  poster="/walkthrough-poster.jpg"
+                  src="/welcome-video.mp4"
+                  poster="/welcome-poster.jpg"
                   controls
                   playsInline
                   preload="metadata"
-                  data-testid="video-walkthrough"
+                  data-testid="video-welcome"
                 />
               </div>
             </CardContent>
