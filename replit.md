@@ -98,6 +98,7 @@ Decision-boundary disclaimers throughout: the app drafts and organizes; it does 
 - The cockpit mirrors generated types in `lib/types.ts` and casts API responses to them; when you add fields to a schema, add them to the matching `lib/types.ts` interface too or the casts go stale.
 - In-app navigation using `window.location.href` must prepend `import.meta.env.BASE_URL` so it respects the artifact base path.
 - Verify artifacts with `pnpm --filter @workspace/<slug> run typecheck`, not `build` (build needs workflow-provided `PORT`/`BASE_PATH`).
+- Portability (off-Replit): `PORT`/`BASE_PATH` are still injected by Replit workflows, but the vite configs + api-server `index.ts` now fall back to defaults (cockpit 5173/`/`, walkthrough 5174, api 8080) so a plain clone runs without them. The cockpit vite dev server proxies `/api`→`API_PROXY_TARGET` (default `http://localhost:8080`) ONLY when `REPL_ID` is unset (on Replit the shared proxy handles `/api`). Root scripts `dev:api`/`dev:web`/`start:api`/`build:api`/`build:web`/`db:push`/`seed`, plus `README.md` + `.env.example`, document the GitHub→cloud-server path; production needs an nginx-style reverse proxy joining the static cockpit build and `/api` on one origin (no shared proxy off Replit). `.env` is gitignored.
 
 ## Pointers
 

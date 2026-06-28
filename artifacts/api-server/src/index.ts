@@ -1,13 +1,9 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 
-const rawPort = process.env["PORT"];
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
+// PORT is injected by Replit workflows in that environment. Off Replit it
+// falls back to 8080 so the server boots from a fresh clone without extra env.
+const rawPort = process.env["PORT"] ?? "8080";
 
 const port = Number(rawPort);
 

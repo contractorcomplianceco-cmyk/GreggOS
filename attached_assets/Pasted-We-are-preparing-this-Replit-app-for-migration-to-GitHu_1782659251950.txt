@@ -1,0 +1,84 @@
+We are preparing this Replit app for migration to GitHub, Cursor, and then deployment on our existing cloud server as a new isolated project.
+
+Primary goal:
+Make the app run cleanly outside Replit with the least amount of change possible.
+
+Do NOT rebuild the app.
+Do NOT redesign the app.
+Do NOT add new integrations.
+Do NOT add real API keys.
+Do NOT convert the database or storage yet unless absolutely required for the app to boot.
+Do NOT break the current working UI.
+Do NOT make assumptions about production secrets.
+
+Please inspect the project and do the following clean migration-prep pass:
+
+1. Identify the app stack
+   - Framework
+   - Package manager
+   - Build command
+   - Start command
+   - Dev command
+   - Required Node version if applicable
+   - Any Replit-only dependencies or assumptions
+
+2. Make the app portable
+   - Remove or isolate Replit-only assumptions where safe
+   - Make sure it can run from a normal GitHub clone
+   - Make sure the app can run with normal environment variables
+   - Add or update `.env.example`
+   - Do not include real secrets or tokens
+
+3. Stabilize scripts
+   - Ensure `package.json` has working scripts for:
+     - install dependencies
+     - dev
+     - build
+     - start
+   - If this is not a Node app, document the equivalent commands clearly
+
+4. Add deployment notes
+   - Create or update `README.md`
+   - Include:
+     - how to install
+     - how to run locally
+     - how to build
+     - how to start in production
+     - required environment variables
+     - known missing integrations or deferred keys
+     - any current limitations
+
+5. Preserve current behavior
+   - If the app currently uses localStorage, mock data, or Replit storage, leave it working for now
+   - Document that shared backend / database conversion is deferred
+   - The goal is a running app first, not a full audit
+
+6. Check for obvious blockers
+   - Fix build errors
+   - Fix missing imports
+   - Fix broken scripts
+   - Fix hardcoded localhost/Replit URLs only if needed for portability
+   - Do not do large refactors
+
+7. Git preparation
+   - Make sure `.gitignore` excludes:
+     - node_modules
+     - .env
+     - build outputs
+     - logs
+     - cache folders
+   - Make sure safe example files are committed
+   - Do not commit secrets
+
+8. Final output
+   When done, give me:
+   - exact install command
+   - exact dev command
+   - exact build command
+   - exact production start command
+   - list of files changed
+   - list of anything deferred
+   - whether it is ready to push to GitHub
+
+Important:
+We need this app running on our server as soon as possible. Keep the changes small, clean, and migration-focused.

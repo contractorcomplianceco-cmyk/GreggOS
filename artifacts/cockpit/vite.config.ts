@@ -4,13 +4,10 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const rawPort = process.env.PORT;
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
+// PORT / BASE_PATH are injected by Replit workflows in that environment. Off
+// Replit (local dev, generic cloud server) they fall back to sane defaults so
+// a plain `pnpm --filter @workspace/cockpit dev` works from a fresh clone.
+const rawPort = process.env.PORT ?? "5173";
 
 const port = Number(rawPort);
 
@@ -18,13 +15,21 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH;
+const basePath = process.env.BASE_PATH ?? "/";
 
-if (!basePath) {
-  throw new Error(
-    "BASE_PATH environment variable is required but was not provided.",
-  );
-}
+// Off Replit there is no shared proxy routing `/api` to the API server, so the
+// Vite dev server proxies it itself. Set API_PROXY_TARGET to point at the API
+// server (defaults to http://localhost:8080). On Replit (REPL_ID set) the
+// shared proxy handles `/api`, so this proxy is left undefined.
+const apiProxy =
+  process.env.REPL_ID === undefined
+    ? {
+        "/api": {
+          target: process.env.API_PROXY_TARGET ?? "http://localhost:8080",
+          changeOrigin: true,
+        },
+      }
+    : undefined;
 
 export default defineConfig({
   base: basePath,
@@ -63,6 +68,7 @@ export default defineConfig({
     strictPort: true,
     host: "0.0.0.0",
     allowedHosts: true,
+    proxy: apiProxy,
     fs: {
       strict: true,
     },
