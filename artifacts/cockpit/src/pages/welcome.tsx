@@ -1,7 +1,7 @@
 import { SidebarLayout } from "@/components/layout/SidebarLayout";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { Card, CardContent } from "@/components/ui/card";
-import { PlayCircle, Compass, Target, ArrowRight } from "lucide-react";
+import { PlayCircle, Compass, Target, ArrowRight, Pin } from "lucide-react";
 import { Link } from "wouter";
 import { Mahi, Hook, TideGauge, Net, Boat } from "@/components/icons/CoastalIcons";
 
@@ -81,6 +81,37 @@ export default function WelcomeCenter() {
               }
             />
           </div>
+
+          {/* START HERE — pinned section-by-section walkthrough */}
+          <Card className="mb-8 overflow-hidden shadow-lg ring-2 ring-[#f4623a]/40">
+            <CardContent className="p-0">
+              <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-[#0d4a57] to-[#15a3b0] px-6 py-4 text-white">
+                <span className="flex items-center gap-1.5 rounded-full bg-[#f4623a] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                  <Pin className="h-3.5 w-3.5" /> Start Here
+                </span>
+                <Compass className="h-5 w-5 text-[#bff3f3]" />
+                <h2 className="font-display text-lg font-bold">Your guided tour of the cockpit</h2>
+                <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#dffafa]">
+                  Sound on · 1:40
+                </span>
+              </div>
+              <div className="aspect-video w-full bg-slate-950">
+                <video
+                  className="h-full w-full"
+                  src="/walkthrough-video.mp4"
+                  poster="/walkthrough-poster.jpg"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  data-testid="video-walkthrough-tour"
+                />
+              </div>
+              <div className="flex items-center gap-2 px-6 py-3 text-sm text-slate-500">
+                <Compass className="h-4 w-4 text-[#15a3b0]" />
+                New to GreggOS? Watch this first — it walks you through all six sections and how to use each one.
+              </div>
+            </CardContent>
+          </Card>
 
           {/* CINEMATIC WELCOME VIDEO */}
           <Card className="mb-8 overflow-hidden shadow-lg ring-1 ring-[#15a3b0]/30">
