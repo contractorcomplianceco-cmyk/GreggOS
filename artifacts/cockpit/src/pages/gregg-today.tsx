@@ -486,7 +486,7 @@ export default function GreggToday() {
       pushAlert({
         id: "tc-clean-board",
         category: "THE_CATCH",
-        tone: "info",
+        tone: "celebrate",
         message: "Clean board — no tangled lines or storms. Nice haul, Captain.",
       });
     }

@@ -6,10 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { LogOut, Radar } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { LogOut, Radar, Volume2, VolumeX, PartyPopper } from "lucide-react";
 import { LoadingState } from "@/components/layout/FishingSpinner";
 import { useEffect, useState } from "react";
-import { isSonarEnabled, setSonarEnabled, playSonarPing, primeAudio } from "@/lib/sonar";
+import {
+  isSonarEnabled,
+  setSonarEnabled,
+  playSonarPing,
+  playCelebrationChime,
+  primeAudio,
+  getSonarVolume,
+  setSonarVolume,
+} from "@/lib/sonar";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -30,14 +39,25 @@ export default function MyAccount() {
   const { signOut } = useClerk();
 
   const [sonarOn, setSonarOn] = useState(true);
+  const [volume, setVolume] = useState(0.7);
   useEffect(() => {
     setSonarOn(isSonarEnabled());
+    setVolume(getSonarVolume());
     primeAudio();
   }, []);
   const toggleSonar = (on: boolean) => {
     setSonarOn(on);
     setSonarEnabled(on);
     if (on) playSonarPing("info"); // instant confirmation ping
+  };
+  const onVolumeChange = (vals: number[]) => {
+    const v = (vals[0] ?? 70) / 100;
+    setVolume(v);
+    setSonarVolume(v);
+  };
+  // play a preview ping when the user releases the slider
+  const onVolumeCommit = () => {
+    if (sonarOn) playSonarPing("alert");
   };
 
   return (
@@ -107,16 +127,50 @@ export default function MyAccount() {
                   />
                 </div>
                 {sonarOn && (
-                  <div className="pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => playSonarPing("alert")}
-                      data-testid="button-test-sonar"
-                    >
-                      <Radar className="mr-1 h-4 w-4" /> Test ping
-                    </Button>
-                  </div>
+                  <>
+                    {/* Volume */}
+                    <div className="flex items-center gap-3 border-t border-border/60 pt-4">
+                      {volume === 0 ? (
+                        <VolumeX className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      ) : (
+                        <Volume2 className="h-4 w-4 shrink-0 text-[#0d6473]" />
+                      )}
+                      <Slider
+                        value={[Math.round(volume * 100)]}
+                        onValueChange={onVolumeChange}
+                        onValueCommit={onVolumeCommit}
+                        min={0}
+                        max={100}
+                        step={5}
+                        className="flex-1"
+                        aria-label="Sonar volume"
+                        data-testid="slider-sonar-volume"
+                      />
+                      <span className="w-10 shrink-0 text-right text-sm font-semibold tabular-nums text-muted-foreground">
+                        {Math.round(volume * 100)}%
+                      </span>
+                    </div>
+
+                    {/* Preview buttons */}
+                    <div className="flex flex-wrap gap-2 pt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => playSonarPing("alert")}
+                        data-testid="button-test-sonar"
+                      >
+                        <Radar className="mr-1 h-4 w-4" /> Alert ping
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => playCelebrationChime()}
+                        data-testid="button-test-chime"
+                      >
+                        <PartyPopper className="mr-1 h-4 w-4" /> Celebration chime
+                      </Button>
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>

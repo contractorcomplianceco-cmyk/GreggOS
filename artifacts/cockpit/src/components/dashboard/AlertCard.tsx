@@ -38,7 +38,7 @@ export const ALERT_CATEGORY = {
 } as const;
 
 export type AlertCategory = keyof typeof ALERT_CATEGORY;
-export type AlertTone = "info" | "alert";
+export type AlertTone = "info" | "alert" | "celebrate";
 
 export interface AlertItem {
   id: string;
@@ -52,10 +52,12 @@ export interface AlertItem {
 const TONE_BAR: Record<AlertTone, string> = {
   info: "bg-gradient-to-b from-[#5fe7e7] to-[#15a3b0]",
   alert: "bg-gradient-to-b from-[#ff7a4d] to-[#f4623a]",
+  celebrate: "bg-gradient-to-b from-[#ffd56b] to-[#f4a23a]",
 };
 const TONE_ICON: Record<AlertTone, string> = {
   info: "text-[#5fe7e7]",
   alert: "text-[#ff8a63]",
+  celebrate: "text-[#ffd56b]",
 };
 
 function SingleCard({
