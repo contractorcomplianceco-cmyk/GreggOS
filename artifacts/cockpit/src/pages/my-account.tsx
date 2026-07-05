@@ -108,7 +108,7 @@ export default function MyAccount() {
               <CardContent className="pt-0">
                 <div className="flex items-start justify-between gap-4 py-2.5">
                   <div className="flex items-start gap-3">
-                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#dbf0f2] text-[#0d6473]">
+                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f4e9c8] text-[#8a6a1a]">
                       <Radar className="h-5 w-5" />
                     </span>
                     <div>
@@ -133,7 +133,7 @@ export default function MyAccount() {
                       {volume === 0 ? (
                         <VolumeX className="h-4 w-4 shrink-0 text-muted-foreground" />
                       ) : (
-                        <Volume2 className="h-4 w-4 shrink-0 text-[#0d6473]" />
+                        <Volume2 className="h-4 w-4 shrink-0 text-[#8a6a1a]" />
                       )}
                       <Slider
                         value={[Math.round(volume * 100)]}

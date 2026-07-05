@@ -62,45 +62,54 @@
 }
 
 :root {
-  /* Coastal / saltwater modern
-     sand-foam surfaces, deep harbor ink text, seafoam-teal primary,
-     sun-warmed coral as the contrast accent, dock-rope tan + sea-grass green */
-  --background: 196 38% 97%;          /* sea-foam mist */
-  --foreground: 202 45% 14%;          /* deep harbor ink */
-  --card: 0 0% 100%;
-  --card-foreground: 202 45% 14%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 202 45% 14%;
-  --primary: 188 64% 32%;             /* saltwater teal */
-  --primary-foreground: 180 40% 98%;
-  --secondary: 192 44% 92%;           /* shallow-water tint */
-  --secondary-foreground: 197 50% 20%;
-  --muted: 195 30% 94%;
-  --muted-foreground: 200 18% 42%;
-  --accent: 14 88% 60%;               /* sunset coral */
+  /* GREGG — "Boats, Hoes & Tight Lines" sportfishing brand.
+     Blended dark + gold/chrome + sunset warmth. Light mode is a warm
+     parchment/graphite deck with metallic gold as the hero accent,
+     sunset orange as the contrast pop, and a near-black gold-trimmed
+     sidebar that reads like the poster's brushed-steel nameplate. */
+  --background: 40 22% 96%;           /* warm parchment deck */
+  --foreground: 210 30% 10%;          /* black harbor ink */
+  --card: 40 30% 99%;
+  --card-foreground: 210 30% 10%;
+  --popover: 40 30% 99%;
+  --popover-foreground: 210 30% 10%;
+  --primary: 40 62% 44%;              /* metallic GREGG gold */
+  --primary-foreground: 210 40% 6%;
+  --secondary: 42 26% 90%;           /* aged brass tint */
+  --secondary-foreground: 210 28% 16%;
+  --muted: 40 18% 91%;
+  --muted-foreground: 210 12% 40%;
+  --accent: 20 90% 54%;              /* sunset orange */
   --accent-foreground: 0 0% 100%;
-  --destructive: 8 72% 52%;
-  --destructive-foreground: 210 20% 98%;
-  --border: 195 28% 88%;
-  --input: 195 28% 88%;
-  --ring: 188 70% 42%;
+  --destructive: 4 74% 50%;
+  --destructive-foreground: 40 30% 98%;
+  --border: 40 16% 85%;
+  --input: 40 16% 85%;
+  --ring: 40 62% 48%;                 /* gold focus ring */
 
-  --sidebar: 201 60% 12%;             /* deep-sea sidebar (dark on light app) */
-  --sidebar-foreground: 190 30% 90%;
-  --sidebar-primary: 184 80% 55%;     /* bright aqua */
-  --sidebar-primary-foreground: 201 60% 12%;
-  --sidebar-accent: 192 48% 22%;
-  --sidebar-accent-foreground: 184 90% 80%;
-  --sidebar-border: 200 45% 20%;
-  --sidebar-ring: 184 80% 55%;
+  --sidebar: 210 32% 8%;             /* brushed-steel black nameplate */
+  --sidebar-foreground: 42 30% 86%;
+  --sidebar-primary: 42 78% 58%;     /* bright gold */
+  --sidebar-primary-foreground: 210 40% 6%;
+  --sidebar-accent: 210 24% 18%;     /* graphite hover */
+  --sidebar-accent-foreground: 42 82% 68%;
+  --sidebar-border: 42 40% 28%;      /* thin gold trim */
+  --sidebar-ring: 42 78% 58%;
 
-  --chart-1: 188 64% 32%;             /* teal */
-  --chart-2: 14 88% 60%;              /* coral */
-  --chart-3: 152 42% 42%;             /* sea grass */
-  --chart-4: 38 78% 55%;             /* dock-rope gold */
-  --chart-5: 205 70% 48%;             /* open-water blue */
+  --chart-1: 40 62% 46%;             /* gold */
+  --chart-2: 20 90% 54%;             /* sunset orange */
+  --chart-3: 210 8% 55%;             /* chrome / silver */
+  --chart-4: 32 82% 52%;             /* amber */
+  --chart-5: 200 20% 26%;            /* deep steel */
 
-  --radius: 0.6rem;                   /* softer, wave-worn corners */
+  --radius: 0.5rem;                   /* tighter, tooled-metal corners */
+
+  /* GREGG metal accents reused across components */
+  --gregg-gold: #c79a3b;
+  --gregg-gold-bright: #e6c25a;
+  --gregg-sunset: #ef6a1f;
+  --gregg-chrome: #c9ccd1;
+  --gregg-ink: #0c1116;
 
   /* ----------------------------------------------------------------
      Seasonal water-hero palette (DEFAULT = cool teal).
@@ -112,53 +121,53 @@
      hero-wave-*  : the three parallax wave band colors
      hero-eyebrow : accent text color
      ---------------------------------------------------------------- */
-  --hero-base-1: #0e5566;
-  --hero-base-2: #0b4350;
-  --hero-base-3: #062029;
-  --hero-glow:   #1fb6c4;
-  --hero-wave-1: #7df0f0;
-  --hero-wave-2: #3fe0e0;
-  --hero-wave-3: #1fb6c4;
-  --hero-eyebrow: #5fe7e7;
-  --hero-season: "cool";
+  --hero-base-1: #1a1206;
+  --hero-base-2: #120c04;
+  --hero-base-3: #070502;
+  --hero-glow:   #ef6a1f;
+  --hero-wave-1: #f0b357;
+  --hero-wave-2: #d8922f;
+  --hero-wave-3: #a5701f;
+  --hero-eyebrow: #e6c25a;
+  --hero-season: "gregg";
 }
 
 .dark {
-  /* Coastal night — moonlit harbor */
-  --background: 202 52% 8%;
-  --foreground: 190 30% 92%;
-  --card: 201 46% 12%;
-  --card-foreground: 190 30% 92%;
-  --popover: 201 46% 12%;
-  --popover-foreground: 190 30% 92%;
-  --primary: 184 76% 50%;             /* bright aqua */
-  --primary-foreground: 201 60% 10%;
-  --secondary: 200 35% 18%;
-  --secondary-foreground: 190 30% 92%;
-  --muted: 200 35% 18%;
-  --muted-foreground: 195 18% 65%;
-  --accent: 14 86% 62%;               /* sunset coral */
-  --accent-foreground: 0 0% 100%;
-  --destructive: 8 65% 52%;
-  --destructive-foreground: 210 20% 98%;
-  --border: 200 35% 22%;
-  --input: 200 35% 22%;
-  --ring: 184 76% 50%;
+  /* GREGG night — full poster black with gold + sunset + chrome */
+  --background: 210 30% 5%;           /* near-black harbor */
+  --foreground: 42 30% 90%;
+  --card: 210 26% 9%;                 /* brushed graphite panel */
+  --card-foreground: 42 30% 90%;
+  --popover: 210 26% 9%;
+  --popover-foreground: 42 30% 90%;
+  --primary: 42 80% 58%;              /* bright gold */
+  --primary-foreground: 210 40% 6%;
+  --secondary: 210 20% 16%;
+  --secondary-foreground: 42 30% 90%;
+  --muted: 210 18% 15%;
+  --muted-foreground: 42 14% 62%;
+  --accent: 20 92% 56%;              /* sunset orange */
+  --accent-foreground: 210 40% 6%;
+  --destructive: 4 72% 54%;
+  --destructive-foreground: 40 30% 98%;
+  --border: 210 18% 20%;
+  --input: 210 18% 20%;
+  --ring: 42 80% 58%;
 
-  --sidebar: 203 60% 7%;
-  --sidebar-foreground: 190 30% 90%;
-  --sidebar-primary: 184 80% 55%;
-  --sidebar-primary-foreground: 203 60% 7%;
-  --sidebar-accent: 192 48% 20%;
-  --sidebar-accent-foreground: 184 90% 80%;
-  --sidebar-border: 200 45% 16%;
-  --sidebar-ring: 184 80% 55%;
+  --sidebar: 210 34% 4%;
+  --sidebar-foreground: 42 30% 86%;
+  --sidebar-primary: 42 82% 60%;
+  --sidebar-primary-foreground: 210 40% 5%;
+  --sidebar-accent: 210 22% 14%;
+  --sidebar-accent-foreground: 42 84% 68%;
+  --sidebar-border: 42 42% 26%;
+  --sidebar-ring: 42 82% 60%;
 
-  --chart-1: 184 76% 50%;
-  --chart-2: 14 86% 62%;
-  --chart-3: 152 50% 52%;
-  --chart-4: 38 82% 60%;
-  --chart-5: 205 75% 58%;
+  --chart-1: 42 80% 58%;
+  --chart-2: 20 92% 56%;
+  --chart-3: 210 10% 62%;
+  --chart-4: 32 84% 56%;
+  --chart-5: 200 16% 40%;
 }
 
 @layer base {
@@ -167,9 +176,10 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    /* faint sea-foam horizon wash behind the whole app */
+    /* faint gold + sunset horizon wash behind the whole app */
     background-image:
-      radial-gradient(120% 80% at 50% -20%, hsl(188 64% 32% / 0.06), transparent 60%);
+      radial-gradient(120% 80% at 50% -20%, hsl(40 62% 44% / 0.07), transparent 55%),
+      radial-gradient(90% 60% at 100% 0%, hsl(20 90% 54% / 0.05), transparent 60%);
     background-attachment: fixed;
   }
   h1, h2, h3, .font-display {
@@ -182,9 +192,9 @@
   /* Layered wave crest used at the foot of the sidebar / hero panels */
   .coastal-waves {
     background-image:
-      radial-gradient(circle at 20% 100%, hsl(184 80% 55% / 0.18) 0 14px, transparent 15px),
-      radial-gradient(circle at 50% 100%, hsl(184 80% 55% / 0.14) 0 18px, transparent 19px),
-      radial-gradient(circle at 80% 100%, hsl(184 80% 55% / 0.18) 0 14px, transparent 15px);
+      radial-gradient(circle at 20% 100%, hsl(42 78% 58% / 0.20) 0 14px, transparent 15px),
+      radial-gradient(circle at 50% 100%, hsl(42 78% 58% / 0.15) 0 18px, transparent 19px),
+      radial-gradient(circle at 80% 100%, hsl(42 78% 58% / 0.20) 0 14px, transparent 15px);
     background-repeat: repeat-x;
     background-size: 64px 28px;
     background-position: bottom;
@@ -425,9 +435,9 @@
   [data-ambient="evening"] .hero-wave-2 { animation-duration: 34s; }
   [data-ambient="evening"] .hero-wave-3 { animation-duration: 46s; }
   [data-ambient="evening"] {
-    --hero-base-1: #134a5c; --hero-base-2: #0d2f3c; --hero-base-3: #061821;
-    --hero-glow: #2a6f8a; --hero-wave-1: #7fb6c8; --hero-wave-2: #3f8fb0;
-    --hero-wave-3: #1f5f7a; --hero-eyebrow: #8fd3e6;
+    --hero-base-1: #22160a; --hero-base-2: #160e05; --hero-base-3: #0a0602;
+    --hero-glow: #e0611c; --hero-wave-1: #e0a24d; --hero-wave-2: #c4842a;
+    --hero-wave-3: #8f6019; --hero-eyebrow: #e0bd5a;
   }
 
   /* night: deeper dim, slowest swell, moonlit navy */
@@ -437,9 +447,9 @@
   [data-ambient="night"] .hero-wave-3 { animation-duration: 62s; }
   [data-ambient="night"] .hero-caustics { animation-duration: 12s; opacity: 0.25; }
   [data-ambient="night"] {
-    --hero-base-1: #0d2e44; --hero-base-2: #0a2030; --hero-base-3: #04101a;
-    --hero-glow: #1f4f6e; --hero-wave-1: #5f8fb0; --hero-wave-2: #2f6f93;
-    --hero-wave-3: #14465f; --hero-eyebrow: #6fb6d6;
+    --hero-base-1: #140d05; --hero-base-2: #0c0803; --hero-base-3: #050301;
+    --hero-glow: #b04e16; --hero-wave-1: #b8873c; --hero-wave-2: #96691f;
+    --hero-wave-3: #6b4c14; --hero-eyebrow: #c9a848;
   }
 
   /* honor reduced-motion: freeze all coastal animation */

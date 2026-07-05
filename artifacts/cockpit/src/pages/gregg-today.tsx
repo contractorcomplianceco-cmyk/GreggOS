@@ -506,7 +506,7 @@ export default function GreggToday() {
       <AlertCardStack items={alerts} onDismiss={dismissAlert} />
       <div className="min-h-full bg-[#eef6f7] text-slate-900 font-sans text-[15px] leading-relaxed">
         {/* HEADER BAR */}
-        <header className="sticky top-0 z-20 border-b border-[#cfe6e9] bg-white/95 backdrop-blur px-5 py-3 relative overflow-hidden">
+        <header className="sticky top-0 z-20 border-b border-[#efe0b8] bg-white/95 backdrop-blur px-5 py-3 relative overflow-hidden">
           {/* faded underwater backdrop + animated schools/bubbles */}
           <img
             src="/img-sidebar-ocean.png"
@@ -520,10 +520,10 @@ export default function GreggToday() {
               <div
                 className={`h-2.5 w-2.5 rounded-full ${pulse.tone} ${pulse.ring}`}
               />
-              <h1 className="font-display text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
-                GreggOS{" "}
-                <span className="text-[#15a3b0]">Today's Catch</span>
-                <Fish className="h-6 w-6 text-[#15a3b0]" />
+              <h1 className="font-display text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5">
+                <span className="bg-gradient-to-b from-[#d9ad3f] via-[#c79a3b] to-[#9a7318] bg-clip-text text-transparent">GREGG OS</span>{" "}
+                <span className="text-[#c79a3b]">Today's Catch</span>
+                <Fish className="h-6 w-6 text-[#c79a3b]" />
               </h1>
               <span className="hidden sm:inline text-[12px] font-semibold uppercase tracking-[0.2em] text-emerald-600 border border-emerald-200 rounded px-1.5 py-0.5">
                 Lines in the Water
@@ -538,7 +538,7 @@ export default function GreggToday() {
                   {clock} local
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded border border-[#cfe6e9] bg-white shadow-sm px-2.5 py-1.5">
+              <div className="flex items-center gap-2 rounded border border-[#efe0b8] bg-white shadow-sm px-2.5 py-1.5">
                 <span className="text-[13px] uppercase tracking-[0.16em] text-slate-500">
                   Risk Pulse
                 </span>
@@ -573,7 +573,7 @@ export default function GreggToday() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search accounts…"
-                className="w-full rounded border border-[#cfe6e9] bg-white shadow-sm py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#5fc6d0] focus:ring-1 focus:ring-[#5fc6d0] focus:outline-none"
+                className="w-full rounded border border-[#efe0b8] bg-white shadow-sm py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#e0b24a] focus:ring-1 focus:ring-[#e0b24a] focus:outline-none"
                 data-testid="input-search-clients"
               />
             </div>
@@ -585,8 +585,8 @@ export default function GreggToday() {
                   onClick={() => setFilter(f)}
                   className={`rounded px-2.5 py-1 text-[12px] font-semibold uppercase tracking-[0.1em] transition-colors ${
                     filter === f
-                      ? "bg-[#15a3b0] text-white shadow-sm"
-                      : "border border-[#cfe6e9] bg-white text-slate-600 hover:text-slate-900 hover:border-[#5fc6d0] shadow-sm"
+                      ? "bg-[#c79a3b] text-white shadow-sm"
+                      : "border border-[#efe0b8] bg-white text-slate-600 hover:text-slate-900 hover:border-[#e0b24a] shadow-sm"
                   }`}
                   data-testid={`chip-filter-${f}`}
                 >
@@ -705,7 +705,7 @@ export default function GreggToday() {
                           {o.milestone.title}
                         </p>
                       </div>
-                      <span className="shrink-0 rounded bg-[#dbf0f2] px-1.5 py-0.5 text-[12px] font-semibold tabular-nums text-[#0d6473]">
+                      <span className="shrink-0 rounded bg-[#f4e9c8] px-1.5 py-0.5 text-[12px] font-semibold tabular-nums text-[#8a6a1a]">
                         {o.priorityScore}
                       </span>
                     </div>
@@ -768,7 +768,7 @@ export default function GreggToday() {
                           className={`shrink-0 text-[13px] font-bold uppercase tracking-[0.1em] ${
                             c.greggPriority === "Urgent"
                               ? "text-red-500"
-                              : "text-[#15a3b0]"
+                              : "text-[#c79a3b]"
                           }`}
                         >
                           {c.greggPriority}
@@ -848,7 +848,7 @@ export default function GreggToday() {
                       <p className="truncate text-[13px] font-medium text-slate-800">
                         {r.clientName}
                       </p>
-                      <span className="shrink-0 rounded bg-[#dbf0f2] px-1.5 py-0.5 text-[13px] font-semibold uppercase text-[#0d6473]">
+                      <span className="shrink-0 rounded bg-[#f4e9c8] px-1.5 py-0.5 text-[13px] font-semibold uppercase text-[#8a6a1a]">
                         Cold {r.daysSinceTouch ?? "—"}d
                       </span>
                     </div>
@@ -866,7 +866,7 @@ export default function GreggToday() {
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {timeline.map((t) => (
                   <Link key={t.id} href={`/clients/${t.clientId}`}>
-                    <div className="group w-32 shrink-0 rounded border border-slate-200 bg-white shadow-sm p-2 hover:border-[#5fc6d0] cursor-pointer">
+                    <div className="group w-32 shrink-0 rounded border border-slate-200 bg-white shadow-sm p-2 hover:border-[#e0b24a] cursor-pointer">
                       <div className="flex items-center gap-1.5">
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
@@ -874,7 +874,7 @@ export default function GreggToday() {
                               ? "bg-red-500"
                               : t.tone === "amber"
                                 ? "bg-amber-400"
-                                : "bg-[#15a3b0]"
+                                : "bg-[#c79a3b]"
                           }`}
                         />
                         <span className="text-[13px] tabular-nums text-slate-500">
@@ -909,10 +909,10 @@ export default function GreggToday() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
               {insightFeed.map((n) => (
                 <Link key={n.id} href={`/clients/${n.clientId}`}>
-                  <div className="group h-full rounded border border-slate-200 bg-white shadow-sm p-2.5 hover:border-[#5fc6d0] cursor-pointer">
+                  <div className="group h-full rounded border border-slate-200 bg-white shadow-sm p-2.5 hover:border-[#e0b24a] cursor-pointer">
                     <div className="flex items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5 text-[12px] font-semibold text-slate-700">
-                        <Phone className="h-3 w-3 text-[#15a3b0]" />
+                        <Phone className="h-3 w-3 text-[#c79a3b]" />
                         {n.callType}
                       </span>
                       <span className="text-[13px] tabular-nums text-slate-500">
@@ -977,12 +977,12 @@ export default function GreggToday() {
                       <linearGradient id="gCalls" x1="0" y1="0" x2="0" y2="1">
                         <stop
                           offset="0%"
-                          stopColor="#15a3b0"
+                          stopColor="#c79a3b"
                           stopOpacity={0.2}
                         />
                         <stop
                           offset="100%"
-                          stopColor="#15a3b0"
+                          stopColor="#c79a3b"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -1029,7 +1029,7 @@ export default function GreggToday() {
                       type="monotone"
                       dataKey="calls"
                       name="Calls"
-                      stroke="#15a3b0"
+                      stroke="#c79a3b"
                       fill="url(#gCalls)"
                       strokeWidth={2}
                     />
@@ -1177,7 +1177,7 @@ export default function GreggToday() {
                           <td className="px-2 py-1.5 text-right">
                             <ChevronRight
                               className={`inline h-3.5 w-3.5 text-slate-400 transition-transform ${
-                                isOpen ? "rotate-90 text-[#15a3b0]" : ""
+                                isOpen ? "rotate-90 text-[#c79a3b]" : ""
                               }`}
                             />
                           </td>
@@ -1225,7 +1225,7 @@ export default function GreggToday() {
                                 )}
                               </div>
                               <Link href={`/clients/${c.id}`}>
-                                <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#15a3b0] hover:underline cursor-pointer">
+                                <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#c79a3b] hover:underline cursor-pointer">
                                   Open account <ChevronRight className="h-3 w-3" />
                                 </span>
                               </Link>
@@ -1260,9 +1260,9 @@ export default function GreggToday() {
                 const Icon = m.icon;
                 return (
                   <Link key={m.name} href={m.href}>
-                    <div className="group flex flex-col items-center justify-center gap-1.5 rounded border border-slate-200 bg-white py-3 shadow-sm hover:border-[#5fc6d0] hover:bg-[#e7f5f6] cursor-pointer">
-                      <Icon className="h-4 w-4 text-slate-400 group-hover:text-[#15a3b0]" />
-                      <span className="text-[12px] font-medium uppercase tracking-[0.1em] text-slate-500 group-hover:text-[#0d6473]">
+                    <div className="group flex flex-col items-center justify-center gap-1.5 rounded border border-slate-200 bg-white py-3 shadow-sm hover:border-[#e0b24a] hover:bg-[#e7f5f6] cursor-pointer">
+                      <Icon className="h-4 w-4 text-slate-400 group-hover:text-[#c79a3b]" />
+                      <span className="text-[12px] font-medium uppercase tracking-[0.1em] text-slate-500 group-hover:text-[#8a6a1a]">
                         {m.name}
                       </span>
                     </div>
@@ -1292,14 +1292,14 @@ function SectionHeading({
 }) {
   return (
     <div className="flex items-center gap-2 pt-1">
-      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#dbf0f2] text-[#0d6473]">
+      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#f4e9c8] text-[#8a6a1a]">
         <Icon className="h-4 w-4" />
       </span>
       <h2 className="font-display text-base font-bold uppercase tracking-[0.14em] text-slate-700">
         {title}
       </h2>
       {hint && <span className="text-[13px] text-slate-400">{hint}</span>}
-      <span className="ml-2 h-px flex-1 bg-gradient-to-r from-[#cfe6e9] to-transparent" />
+      <span className="ml-2 h-px flex-1 bg-gradient-to-r from-[#efe0b8] to-transparent" />
     </div>
   );
 }
@@ -1321,7 +1321,7 @@ function Panel({
   return (
     <section
       className={`group relative overflow-hidden rounded-lg border bg-white shadow-sm ${
-        isRed ? "border-red-200" : "border-[#cfe6e9]"
+        isRed ? "border-red-200" : "border-[#efe0b8]"
       }`}
     >
       {/* faint game fish gliding in the corner of every panel */}
@@ -1338,7 +1338,7 @@ function Panel({
       >
         <div className="flex items-center gap-2">
           <Icon
-            className={`h-4 w-4 ${isRed ? "text-red-500" : "text-[#15a3b0]"}`}
+            className={`h-4 w-4 ${isRed ? "text-red-500" : "text-[#c79a3b]"}`}
           />
           <h2 className="text-[13px] font-bold uppercase tracking-[0.16em] text-slate-700">
             {title}
@@ -1349,7 +1349,7 @@ function Panel({
             className={`rounded px-1.5 py-0.5 text-[12px] font-bold tabular-nums ${
               isRed
                 ? "bg-red-100 text-red-700"
-                : "bg-[#dbf0f2] text-[#0d6473]"
+                : "bg-[#f4e9c8] text-[#8a6a1a]"
             }`}
           >
             {count}
@@ -1393,7 +1393,7 @@ function FeedList({
           <div className="group flex items-start gap-2 rounded px-1.5 py-1 hover:bg-[#e7f5f6] cursor-pointer">
             <span
               className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${
-                it.tone === "red" ? "bg-red-500" : "bg-[#15a3b0]"
+                it.tone === "red" ? "bg-red-500" : "bg-[#c79a3b]"
               }`}
             />
             <div className="min-w-0">

@@ -50,14 +50,14 @@ export interface AlertItem {
 }
 
 const TONE_BAR: Record<AlertTone, string> = {
-  info: "bg-gradient-to-b from-[#5fe7e7] to-[#15a3b0]",
-  alert: "bg-gradient-to-b from-[#ff7a4d] to-[#f4623a]",
-  celebrate: "bg-gradient-to-b from-[#ffd56b] to-[#f4a23a]",
+  info: "bg-gradient-to-b from-[#e6c25a] to-[#c79a3b]",
+  alert: "bg-gradient-to-b from-[#ff8a45] to-[#ef6a1f]",
+  celebrate: "bg-gradient-to-b from-[#f0c85a] to-[#e0961f]",
 };
 const TONE_ICON: Record<AlertTone, string> = {
-  info: "text-[#5fe7e7]",
-  alert: "text-[#ff8a63]",
-  celebrate: "text-[#ffd56b]",
+  info: "text-[#e6c25a]",
+  alert: "text-[#ff9a55]",
+  celebrate: "text-[#f0c85a]",
 };
 
 function SingleCard({
@@ -94,7 +94,7 @@ function SingleCard({
 
   return (
     <div
-      className="alert-card pointer-events-auto flex w-full max-w-md items-stretch overflow-hidden rounded-2xl border border-[#5fe7e7]/20 bg-[#061c23]/95 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.55)] backdrop-blur-md"
+      className="alert-card pointer-events-auto flex w-full max-w-md items-stretch overflow-hidden rounded-2xl border border-[#e6c25a]/20 bg-[#0c1116]/95 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.55)] backdrop-blur-md"
       data-leaving={leaving ? "true" : undefined}
       data-testid={`alert-card-${item.id}`}
       role="status"
@@ -108,7 +108,7 @@ function SingleCard({
           <Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9fdfe2]">{label}</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#e6c25a]">{label}</p>
           <p className="mt-0.5 text-[15px] font-semibold leading-snug text-white">{item.message}</p>
         </div>
         <button

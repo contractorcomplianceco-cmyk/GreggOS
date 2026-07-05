@@ -68,7 +68,7 @@ export default function WelcomeCenter() {
           <div className="mb-8">
             <DashboardHero
               eyebrow="Welcome Aboard"
-              greeting="Welcome aboard the GreggOS deck"
+              greeting="Welcome aboard the GREGG OS deck"
               photo="/dock-sunset-canoe.jpg"
               subtitle="Grab your gear. Watch the walkthrough, learn the waters, and take the helm of the cockpit built to keep every client on the line and every dollar in the boat."
               action={
@@ -83,15 +83,15 @@ export default function WelcomeCenter() {
           </div>
 
           {/* START HERE — pinned section-by-section walkthrough */}
-          <Card className="mb-8 overflow-hidden shadow-lg ring-2 ring-[#f4623a]/40">
+          <Card className="mb-8 overflow-hidden shadow-lg ring-2 ring-[#ef6a1f]/40">
             <CardContent className="p-0">
-              <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-[#0d4a57] to-[#15a3b0] px-6 py-4 text-white">
-                <span className="flex items-center gap-1.5 rounded-full bg-[#f4623a] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+              <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-[#3a2f14] to-[#c79a3b] px-6 py-4 text-white">
+                <span className="flex items-center gap-1.5 rounded-full bg-[#ef6a1f] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
                   <Pin className="h-3.5 w-3.5" /> Start Here
                 </span>
-                <Compass className="h-5 w-5 text-[#bff3f3]" />
+                <Compass className="h-5 w-5 text-[#f0e2b0]" />
                 <h2 className="font-display text-lg font-bold">Your guided tour of the cockpit</h2>
-                <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#dffafa]">
+                <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#f8f0d8]">
                   Sound on · 1:40
                 </span>
               </div>
@@ -107,19 +107,19 @@ export default function WelcomeCenter() {
                 />
               </div>
               <div className="flex items-center gap-2 px-6 py-3 text-sm text-slate-500">
-                <Compass className="h-4 w-4 text-[#15a3b0]" />
+                <Compass className="h-4 w-4 text-[#c79a3b]" />
                 New to GreggOS? Watch this first — it walks you through all six sections and how to use each one.
               </div>
             </CardContent>
           </Card>
 
           {/* CINEMATIC WELCOME VIDEO */}
-          <Card className="mb-8 overflow-hidden shadow-lg ring-1 ring-[#15a3b0]/30">
+          <Card className="mb-8 overflow-hidden shadow-lg ring-1 ring-[#c79a3b]/30">
             <CardContent className="p-0">
-              <div className="flex items-center gap-2 bg-gradient-to-r from-[#072a33] to-[#0d4a57] px-6 py-4 text-white">
-                <PlayCircle className="h-5 w-5 text-[#5fe7e7]" />
-                <h2 className="font-display text-lg font-bold">Welcome to GreggOS</h2>
-                <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#9fdfe2]">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-[#160f05] to-[#3a2f14] px-6 py-4 text-white">
+                <PlayCircle className="h-5 w-5 text-[#e6c25a]" />
+                <h2 className="font-display text-lg font-bold">Welcome to GREGG OS</h2>
+                <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#e6c25a]">
                   Sound on · 52s
                 </span>
               </div>
@@ -140,7 +140,7 @@ export default function WelcomeCenter() {
           {/* STEP-BY-STEP — now matches the live navigation */}
           <div className="mb-8">
             <div className="mb-4 flex items-center gap-2">
-              <Compass className="h-6 w-6 text-[#15a3b0]" />
+              <Compass className="h-6 w-6 text-[#c79a3b]" />
               <h2 className="font-display text-xl font-bold text-foreground">
                 Chart your course, step by step
               </h2>
@@ -151,12 +151,12 @@ export default function WelcomeCenter() {
                 return (
                   <Card key={step.title} className="shadow-sm ring-1 ring-slate-200/70 transition-shadow hover:shadow-md">
                     <CardContent className="flex items-start gap-4 p-5">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0d4a57] to-[#15a3b0] text-white shadow-sm">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#3a2f14] to-[#c79a3b] text-white shadow-sm">
                         <Icon className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold tabular-nums text-[#15a3b0]">
+                          <span className="text-xs font-bold tabular-nums text-[#c79a3b]">
                             Step {i + 1}
                           </span>
                         </div>
@@ -167,7 +167,7 @@ export default function WelcomeCenter() {
                           {step.body}
                         </p>
                         <Link href={step.href}>
-                          <span className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-[#0d6473] hover:text-[#15a3b0]">
+                          <span className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-[#8a6a1a] hover:text-[#c79a3b]">
                             {step.cta}
                             <ArrowRight className="h-3.5 w-3.5" />
                           </span>
@@ -184,7 +184,7 @@ export default function WelcomeCenter() {
           <Card className="shadow-sm ring-1 ring-slate-200/70">
             <CardContent className="p-6">
               <div className="mb-3 flex items-center gap-2">
-                <Target className="h-6 w-6 text-[#15a3b0]" />
+                <Target className="h-6 w-6 text-[#c79a3b]" />
                 <h2 className="font-display text-xl font-bold text-foreground">
                   Why we fish these waters
                 </h2>

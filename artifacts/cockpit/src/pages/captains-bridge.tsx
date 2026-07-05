@@ -69,7 +69,7 @@ const TOOLS: Tool[] = [
     desc: "Inbox, compose & client email",
     url: "https://mail.zoho.com",
     icon: Mail,
-    accent: "from-[#0d4a57] to-[#15a3b0]",
+    accent: "from-[#3a2f14] to-[#c79a3b]",
   },
   {
     id: "ringcentral",
@@ -77,7 +77,7 @@ const TOOLS: Tool[] = [
     desc: "Calls, voicemail & messaging",
     url: "https://app.ringcentral.com",
     icon: Phone,
-    accent: "from-[#0a3a45] to-[#1f7a8c]",
+    accent: "from-[#1a1206] to-[#a5701f]",
   },
   {
     id: "zoho-people",
@@ -85,7 +85,7 @@ const TOOLS: Tool[] = [
     desc: "Attendance ▸ My Data ▸ Check-in / out",
     url: "https://people.zoho.com",
     icon: Clock,
-    accent: "from-[#0d6473] to-[#3FE0E0]",
+    accent: "from-[#8a6a1a] to-[#e6c25a]",
     note: "Opens Zoho People — go to Attendance to clock in/out.",
   },
   {
@@ -94,7 +94,7 @@ const TOOLS: Tool[] = [
     desc: "Workforce Now — pay & HR",
     url: "https://workforcenow.adp.com",
     icon: DollarSign,
-    accent: "from-[#13414f] to-[#f4623a]",
+    accent: "from-[#2a2110] to-[#ef6a1f]",
     note: "Workforce Now. (RUN users: my.adp.com)",
   },
 ];
@@ -140,7 +140,7 @@ export default function CaptainsBridge() {
                   href={t.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative overflow-hidden rounded-2xl border border-[#cfe6e9] bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                  className="group relative overflow-hidden rounded-2xl border border-[#efe0b8] bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <div className={`flex h-24 items-center justify-center bg-gradient-to-br ${t.accent}`}>
                     <Icon className="h-10 w-10 text-white/90" />
@@ -148,7 +148,7 @@ export default function CaptainsBridge() {
                   <div className="p-4">
                     <div className="flex items-center justify-between">
                       <p className="font-display text-base font-bold text-slate-800">{t.name}</p>
-                      <ExternalLink className="h-4 w-4 text-slate-300 group-hover:text-[#15a3b0]" />
+                      <ExternalLink className="h-4 w-4 text-slate-300 group-hover:text-[#c79a3b]" />
                     </div>
                     <p className="mt-0.5 text-sm text-slate-500">{t.desc}</p>
                     {t.note && <p className="mt-2 text-xs text-slate-400">{t.note}</p>}
@@ -175,13 +175,13 @@ export default function CaptainsBridge() {
                       href={s.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex items-center gap-3 rounded-xl border border-[#cfe6e9] bg-[#f7fbfc] px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-[#15a3b0] hover:bg-white hover:shadow-sm"
+                      className="group flex items-center gap-3 rounded-xl border border-[#efe0b8] bg-[#f7fbfc] px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-[#c79a3b] hover:bg-white hover:shadow-sm"
                     >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0d4a57] to-[#15a3b0] text-white">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#3a2f14] to-[#c79a3b] text-white">
                         <Icon className="h-4 w-4" />
                       </span>
-                      <span className="font-semibold text-slate-700 group-hover:text-[#0d6473]">{s.label}</span>
-                      <ExternalLink className="ml-auto h-4 w-4 text-slate-300 group-hover:text-[#15a3b0]" />
+                      <span className="font-semibold text-slate-700 group-hover:text-[#8a6a1a]">{s.label}</span>
+                      <ExternalLink className="ml-auto h-4 w-4 text-slate-300 group-hover:text-[#c79a3b]" />
                     </a>
                   );
                 })}
@@ -222,8 +222,8 @@ function ClockInReminder() {
   if (!show) return null;
 
   return (
-    <div className="mb-8 flex flex-wrap items-center gap-3 rounded-2xl border border-[#f4623a]/30 bg-gradient-to-r from-[#fff3ee] to-[#fdece4] px-5 py-4 shadow-sm">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4623a] text-white">
+    <div className="mb-8 flex flex-wrap items-center gap-3 rounded-2xl border border-[#ef6a1f]/30 bg-gradient-to-r from-[#fff3ee] to-[#fdece4] px-5 py-4 shadow-sm">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ef6a1f] text-white">
         <AlarmClock className="h-5 w-5" />
       </span>
       <div className="min-w-0 flex-1">
@@ -234,7 +234,7 @@ function ClockInReminder() {
         href="https://people.zoho.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-lg bg-[#0d6473] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#15a3b0]"
+        className="rounded-lg bg-[#8a6a1a] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#c79a3b]"
       >
         Clock in
       </a>
@@ -292,14 +292,14 @@ function CallList() {
     <Card className="shadow-sm">
       <CardContent className="p-0">
         <div className="flex items-center gap-2 border-b border-[#e0eff1] px-5 py-3.5">
-          <PhoneCall className="h-4 w-4 text-[#15a3b0]" />
+          <PhoneCall className="h-4 w-4 text-[#c79a3b]" />
           <h3 className="font-display text-base font-bold text-slate-800">Who to call today</h3>
-          <span className="rounded-full bg-[#dbf0f2] px-2 py-0.5 text-xs font-bold text-[#0d6473]">{remaining} left</span>
+          <span className="rounded-full bg-[#f4e9c8] px-2 py-0.5 text-xs font-bold text-[#8a6a1a]">{remaining} left</span>
           <a
             href="https://crm.zoho.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto text-xs font-semibold text-[#0d6473] hover:text-[#15a3b0]"
+            className="ml-auto text-xs font-semibold text-[#8a6a1a] hover:text-[#c79a3b]"
           >
             Open CRM ▸
           </a>
@@ -312,18 +312,18 @@ function CallList() {
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Name"
-            className="min-w-0 flex-1 rounded-lg border border-[#cfe6e9] px-3 py-2 text-sm outline-none focus:border-[#15a3b0]"
+            className="min-w-0 flex-1 rounded-lg border border-[#efe0b8] px-3 py-2 text-sm outline-none focus:border-[#c79a3b]"
           />
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}
             placeholder="Phone (optional)"
-            className="min-w-0 flex-1 rounded-lg border border-[#cfe6e9] px-3 py-2 text-sm outline-none focus:border-[#15a3b0]"
+            className="min-w-0 flex-1 rounded-lg border border-[#efe0b8] px-3 py-2 text-sm outline-none focus:border-[#c79a3b]"
           />
           <button
             onClick={add}
-            className="flex items-center gap-1 rounded-lg bg-[#0d6473] px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#15a3b0]"
+            className="flex items-center gap-1 rounded-lg bg-[#8a6a1a] px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#c79a3b]"
           >
             <Plus className="h-4 w-4" /> Add
           </button>
@@ -341,7 +341,7 @@ function CallList() {
                   <button
                     onClick={() => toggle(c.id)}
                     className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${
-                      c.done ? "border-[#15a3b0] bg-[#15a3b0] text-white" : "border-[#bcd9dd] text-transparent hover:border-[#15a3b0]"
+                      c.done ? "border-[#c79a3b] bg-[#c79a3b] text-white" : "border-[#e6d3a6] text-transparent hover:border-[#c79a3b]"
                     }`}
                     aria-label="Mark called"
                   >
@@ -357,7 +357,7 @@ function CallList() {
                   {c.phone && (
                     <a
                       href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}
-                      className="rounded-md p-1.5 text-[#0d6473] hover:bg-[#dbf0f2]"
+                      className="rounded-md p-1.5 text-[#8a6a1a] hover:bg-[#f4e9c8]"
                       aria-label="Call"
                     >
                       <PhoneCall className="h-4 w-4" />
@@ -399,16 +399,16 @@ function NotesPad() {
     <Card className="shadow-sm">
       <CardContent className="p-0">
         <div className="flex items-center gap-2 border-b border-[#e0eff1] px-5 py-3.5">
-          <StickyNote className="h-4 w-4 text-[#15a3b0]" />
+          <StickyNote className="h-4 w-4 text-[#c79a3b]" />
           <h3 className="font-display text-base font-bold text-slate-800">Captain's notes</h3>
-          <span className={`ml-auto text-xs font-semibold text-[#15a3b0] transition-opacity ${saved ? "opacity-100" : "opacity-0"}`}>Saved ✓</span>
+          <span className={`ml-auto text-xs font-semibold text-[#c79a3b] transition-opacity ${saved ? "opacity-100" : "opacity-0"}`}>Saved ✓</span>
         </div>
         <div className="p-4">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Jot anything — reminders, follow-ups, ideas. Saves automatically on this device."
-            className="h-56 w-full resize-none rounded-xl border border-[#cfe6e9] bg-[#f7fbfc] p-3 text-sm leading-relaxed text-slate-700 outline-none focus:border-[#15a3b0] focus:bg-white"
+            className="h-56 w-full resize-none rounded-xl border border-[#efe0b8] bg-[#f7fbfc] p-3 text-sm leading-relaxed text-slate-700 outline-none focus:border-[#c79a3b] focus:bg-white"
           />
         </div>
       </CardContent>

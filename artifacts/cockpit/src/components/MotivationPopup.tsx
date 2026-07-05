@@ -49,8 +49,8 @@ export function MotivationPopup() {
 
   return (
     <div className="pointer-events-none fixed bottom-5 right-5 z-50 w-[min(22rem,calc(100vw-2.5rem))] animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="pointer-events-auto relative overflow-hidden rounded-xl bg-gradient-to-br from-[#072a33] via-[#0d4a57] to-[#15a3b0] p-5 text-white shadow-2xl ring-1 ring-[#15a3b0]/40">
-        <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#15a3b0]/30 blur-2xl" />
+      <div className="pointer-events-auto relative overflow-hidden rounded-xl bg-gradient-to-br from-[#160f05] via-[#3a2f14] to-[#c79a3b] p-5 text-white shadow-2xl ring-1 ring-[#c79a3b]/40">
+        <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[#c79a3b]/30 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
         <button
           type="button"
@@ -63,8 +63,8 @@ export function MotivationPopup() {
         </button>
         <div className="relative">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#5fe7e7]" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9fd8ff]">
+            <Sparkles className="h-4 w-4 text-[#e6c25a]" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f2cf7a]">
               {slot.greeting} &middot; Daily Drive
             </p>
           </div>
@@ -72,7 +72,7 @@ export function MotivationPopup() {
             {message}
           </p>
           <Link href="/motivation">
-            <span className="mt-3 inline-flex cursor-pointer items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fd8ff] transition-colors hover:text-white">
+            <span className="mt-3 inline-flex cursor-pointer items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2cf7a] transition-colors hover:text-white">
               More motivation
               <ArrowRight className="h-3 w-3" />
             </span>

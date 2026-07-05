@@ -272,7 +272,7 @@ export default function TheDock() {
       >
         <div className="p-5 md:p-8 max-w-6xl mx-auto space-y-8">
           {/* ===== HERO with rotating photo backdrop ===== */}
-          <div className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-[#15a3b0]/30">
+          <div className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-[#c79a3b]/30">
             {PHOTOS.map((p, i) => (
               <img
                 key={p.src}
@@ -310,7 +310,7 @@ export default function TheDock() {
                     else { setAutoAmbient(false); setPhase(opt.k); }
                   }}
                   className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    active ? "border-[#15a3b0] bg-[#15a3b0] text-white shadow-sm" : "border-[#cfe6e9] bg-white text-slate-600 hover:border-[#5fc6d0]"
+                    active ? "border-[#c79a3b] bg-[#c79a3b] text-white shadow-sm" : "border-[#efe0b8] bg-white text-slate-600 hover:border-[#e0b24a]"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -329,12 +329,12 @@ export default function TheDock() {
             <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
               <Card className="shadow-sm">
                 <CardContent className="p-5 space-y-3">
-                  <input value={cf.species} onChange={(e) => setCf({ ...cf, species: e.target.value })} placeholder="Species (e.g. Snook)" className="w-full rounded-lg border border-[#cfe6e9] px-3 py-2 text-sm focus:border-[#5fc6d0] focus:outline-none" />
+                  <input value={cf.species} onChange={(e) => setCf({ ...cf, species: e.target.value })} placeholder="Species (e.g. Snook)" className="w-full rounded-lg border border-[#efe0b8] px-3 py-2 text-sm focus:border-[#e0b24a] focus:outline-none" />
                   <div className="flex gap-2">
-                    <input value={cf.weight} onChange={(e) => setCf({ ...cf, weight: e.target.value })} placeholder="Weight (lbs)" inputMode="decimal" className="w-1/2 rounded-lg border border-[#cfe6e9] px-3 py-2 text-sm focus:border-[#5fc6d0] focus:outline-none" />
-                    <input value={cf.spot} onChange={(e) => setCf({ ...cf, spot: e.target.value })} placeholder="Spot" className="w-1/2 rounded-lg border border-[#cfe6e9] px-3 py-2 text-sm focus:border-[#5fc6d0] focus:outline-none" />
+                    <input value={cf.weight} onChange={(e) => setCf({ ...cf, weight: e.target.value })} placeholder="Weight (lbs)" inputMode="decimal" className="w-1/2 rounded-lg border border-[#efe0b8] px-3 py-2 text-sm focus:border-[#e0b24a] focus:outline-none" />
+                    <input value={cf.spot} onChange={(e) => setCf({ ...cf, spot: e.target.value })} placeholder="Spot" className="w-1/2 rounded-lg border border-[#efe0b8] px-3 py-2 text-sm focus:border-[#e0b24a] focus:outline-none" />
                   </div>
-                  <button onClick={addCatch} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#15a3b0] px-3 py-2 text-sm font-semibold text-white hover:bg-[#0d6473]">
+                  <button onClick={addCatch} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#c79a3b] px-3 py-2 text-sm font-semibold text-white hover:bg-[#8a6a1a]">
                     <Plus className="h-4 w-4" /> Log the catch
                   </button>
                   {personalBest && (
@@ -351,7 +351,7 @@ export default function TheDock() {
                 <CardContent className="p-4">
                   {catches.length === 0 ? (
                     <div className="flex h-full min-h-[160px] flex-col items-center justify-center gap-2 text-center text-slate-400">
-                      <Mahi className="h-9 w-9 text-[#9cc7cd]" />
+                      <Mahi className="h-9 w-9 text-[#d8bf82]" />
                       <p className="text-sm">No catches logged yet. Land one and brag about it.</p>
                     </div>
                   ) : (
@@ -360,7 +360,7 @@ export default function TheDock() {
                         const isBest = personalBest?.id === c.id;
                         return (
                           <div key={c.id} className="flex items-center gap-3 py-2.5">
-                            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${isBest ? "bg-amber-100 text-amber-600" : "bg-[#dbf0f2] text-[#0d6473]"}`}>
+                            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${isBest ? "bg-amber-100 text-amber-600" : "bg-[#f4e9c8] text-[#8a6a1a]"}`}>
                               {isBest ? <Trophy className="h-4 w-4" /> : <Mahi className="h-4 w-4" />}
                             </span>
                             <div className="min-w-0 flex-1">
@@ -392,7 +392,7 @@ export default function TheDock() {
                   <FinderGroup label="What's your style?" opts={FINDER_Q.vibe} value={vibe} onPick={setVibe} />
                   {!dreamBoat && (
                     <p className="flex items-center gap-2 text-sm text-slate-500">
-                      <Sparkles className="h-4 w-4 text-[#15a3b0]" /> Pick both to reveal your dream boat.
+                      <Sparkles className="h-4 w-4 text-[#c79a3b]" /> Pick both to reveal your dream boat.
                     </p>
                   )}
                 </CardContent>
@@ -402,10 +402,10 @@ export default function TheDock() {
                   <div>
                     <div className="relative h-44 w-full overflow-hidden">
                       <img src={dreamBoat.img} alt={dreamBoat.name} className="h-full w-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#062029]/70 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c1116]/70 to-transparent" />
                       <div className="absolute bottom-2 left-3 right-3">
                         <p className="font-display text-lg font-bold text-white drop-shadow">{dreamBoat.name}</p>
-                        <p className="text-xs text-cyan-50/90">{dreamBoat.tagline}</p>
+                        <p className="text-xs text-amber-50/90">{dreamBoat.tagline}</p>
                       </div>
                     </div>
                     <CardContent className="p-4">
@@ -418,7 +418,7 @@ export default function TheDock() {
                   </div>
                 ) : (
                   <CardContent className="flex h-full min-h-[260px] flex-col items-center justify-center gap-3 p-6 text-center text-slate-400">
-                    <Boat className="h-10 w-10 text-[#9cc7cd]" />
+                    <Boat className="h-10 w-10 text-[#d8bf82]" />
                     <p className="text-sm">Your dream boat will surface here.</p>
                   </CardContent>
                 )}
@@ -441,13 +441,13 @@ export default function TheDock() {
                       onDragStart={() => { dragId.current = d.id; }}
                       onClick={() => togglePin(d.id)}
                       className={`group relative cursor-pointer overflow-hidden rounded-xl border p-4 text-left transition-all ${
-                        pinned ? "border-[#15a3b0] bg-gradient-to-br from-[#dff3f5] to-white shadow-md active:cursor-grabbing" : "border-[#cfe6e9] bg-white hover:border-[#5fc6d0] hover:shadow-sm"
+                        pinned ? "border-[#c79a3b] bg-gradient-to-br from-[#f6edd2] to-white shadow-md active:cursor-grabbing" : "border-[#efe0b8] bg-white hover:border-[#e0b24a] hover:shadow-sm"
                       }`}
                       title={pinned ? "Drag me into the feed →" : "Tap to pin"}
                     >
                       <div className="mb-2 flex items-center justify-between">
-                        <span className="rounded bg-[#dbf0f2] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#0d6473]">{d.kind}</span>
-                        {pinned ? <Pin className="h-4 w-4 fill-[#15a3b0] text-[#15a3b0]" /> : <PinOff className="h-4 w-4 text-slate-300 group-hover:text-[#5fc6d0]" />}
+                        <span className="rounded bg-[#f4e9c8] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#8a6a1a]">{d.kind}</span>
+                        {pinned ? <Pin className="h-4 w-4 fill-[#c79a3b] text-[#c79a3b]" /> : <PinOff className="h-4 w-4 text-slate-300 group-hover:text-[#e0b24a]" />}
                       </div>
                       <p className="font-display text-sm font-bold leading-snug text-slate-800">{d.title}</p>
                       <p className="mt-0.5 text-xs text-slate-500">{d.sub}</p>
@@ -466,10 +466,10 @@ export default function TheDock() {
                   if (d) shareToFeed(d);
                   dragId.current = null;
                 }}
-                className={`flex flex-col rounded-xl border-2 border-dashed p-3 transition-colors ${dragOver ? "border-[#15a3b0] bg-[#dff3f5]" : "border-[#cfe6e9] bg-white/60"}`}
+                className={`flex flex-col rounded-xl border-2 border-dashed p-3 transition-colors ${dragOver ? "border-[#c79a3b] bg-[#f6edd2]" : "border-[#efe0b8] bg-white/60"}`}
               >
                 <div className="mb-2 flex items-center gap-2 px-1">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#dbf0f2] text-[#0d6473]"><Share2 className="h-4 w-4" /></span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#f4e9c8] text-[#8a6a1a]"><Share2 className="h-4 w-4" /></span>
                   <p className="font-display text-sm font-bold text-slate-800">Dock Feed</p>
                   <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-600">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Live
@@ -478,16 +478,16 @@ export default function TheDock() {
                 <p className="mb-2 px-1 text-[11px] text-slate-400">Simulated activity from around the docks. Drop a pinned dream here to post it.</p>
                 <div className="max-h-[320px] space-y-2 overflow-y-auto pr-1">
                   {feed.map((it) => (
-                    <div key={it.id} className={`rounded-lg border p-2.5 ${it.mine ? "border-[#15a3b0] bg-[#eafafa]" : "border-[#e0eff1] bg-white"}`}>
+                    <div key={it.id} className={`rounded-lg border p-2.5 ${it.mine ? "border-[#c79a3b] bg-[#eafafa]" : "border-[#e0eff1] bg-white"}`}>
                       <div className="flex items-center gap-2">
-                        <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white ${it.mine ? "bg-[#15a3b0]" : "bg-[#7fa9b3]"}`}>
+                        <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white ${it.mine ? "bg-[#c79a3b]" : "bg-[#c2a566]"}`}>
                           {it.author.replace(/[^A-Za-z]/g, "").slice(0, 1).toUpperCase()}
                         </span>
                         <span className="text-xs font-bold text-slate-700">{it.author}</span>
-                        <span className="ml-auto rounded bg-[#dbf0f2] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#0d6473]">{it.kind}</span>
+                        <span className="ml-auto rounded bg-[#f4e9c8] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#8a6a1a]">{it.kind}</span>
                       </div>
                       <p className="mt-1 text-xs text-slate-600">{it.text}</p>
-                      <button onClick={() => likeItem(it.id)} className="mt-1 flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#f4623a]">
+                      <button onClick={() => likeItem(it.id)} className="mt-1 flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#ef6a1f]">
                         <Heart className="h-3 w-3" /> {it.likes}
                       </button>
                     </div>
@@ -507,12 +507,12 @@ export default function TheDock() {
                   <button
                     key={t.id}
                     onClick={() => toggleTrip(t.id)}
-                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${done ? "border-[#15a3b0] bg-gradient-to-br from-[#dff3f5] to-white" : "border-[#cfe6e9] bg-white hover:border-[#5fc6d0] hover:shadow-sm"}`}
+                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${done ? "border-[#c79a3b] bg-gradient-to-br from-[#f6edd2] to-white" : "border-[#efe0b8] bg-white hover:border-[#e0b24a] hover:shadow-sm"}`}
                   >
-                    {done ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#15a3b0]" /> : <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-300" />}
+                    {done ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#c79a3b]" /> : <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-300" />}
                     <div className="min-w-0">
-                      <p className={`font-display text-sm font-bold ${done ? "text-[#0d6473] line-through" : "text-slate-800"}`}>{t.place}</p>
-                      <p className="text-xs font-medium text-[#15a3b0]">{t.target}</p>
+                      <p className={`font-display text-sm font-bold ${done ? "text-[#8a6a1a] line-through" : "text-slate-800"}`}>{t.place}</p>
+                      <p className="text-xs font-medium text-[#c79a3b]">{t.target}</p>
                       <p className="text-xs text-slate-500">{t.note}</p>
                     </div>
                   </button>
@@ -534,7 +534,7 @@ export default function TheDock() {
                     <div key={k.name} className="p-3">
                       <div className="flex items-center justify-between">
                         <p className="font-display text-sm font-bold text-slate-800">{k.name}</p>
-                        <span className="rounded bg-[#dbf0f2] px-1.5 py-0.5 text-[10px] font-semibold text-[#0d6473]">{k.use}</span>
+                        <span className="rounded bg-[#f4e9c8] px-1.5 py-0.5 text-[10px] font-semibold text-[#8a6a1a]">{k.use}</span>
                       </div>
                       <p className="mt-1 text-xs text-slate-500">{k.steps}</p>
                     </div>
@@ -565,19 +565,19 @@ export default function TheDock() {
               {STATIONS.map((s) => {
                 const active = station.id === s.id;
                 return (
-                  <button key={s.id} onClick={() => setStation(s)} className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-left transition-all ${active ? "border-[#15a3b0] bg-gradient-to-br from-[#dff3f5] to-white shadow-md" : "border-[#cfe6e9] bg-white hover:border-[#5fc6d0] hover:shadow-sm"}`}>
-                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${active ? "bg-[#15a3b0] text-white" : "bg-[#dbf0f2] text-[#0d6473]"}`}>
+                  <button key={s.id} onClick={() => setStation(s)} className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-left transition-all ${active ? "border-[#c79a3b] bg-gradient-to-br from-[#f6edd2] to-white shadow-md" : "border-[#efe0b8] bg-white hover:border-[#e0b24a] hover:shadow-sm"}`}>
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${active ? "bg-[#c79a3b] text-white" : "bg-[#f4e9c8] text-[#8a6a1a]"}`}>
                       {active ? <Play className="h-4 w-4 translate-x-0.5" /> : <Music2 className="h-4 w-4" />}
                     </span>
                     <div className="min-w-0">
                       <p className="font-display text-sm font-bold text-slate-800">{s.title}</p>
-                      <p className="flex items-center gap-1 text-xs text-slate-500"><Waves className="h-3 w-3 text-[#15a3b0]" />{s.mood}</p>
+                      <p className="flex items-center gap-1 text-xs text-slate-500"><Waves className="h-3 w-3 text-[#c79a3b]" />{s.mood}</p>
                     </div>
                   </button>
                 );
               })}
             </div>
-            <div className="overflow-hidden rounded-xl border border-[#cfe6e9] shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-[#efe0b8] shadow-sm">
               <iframe
                 key={station.id}
                 title={`Spotify — ${station.title}`}
@@ -603,7 +603,7 @@ export default function TheDock() {
 function SectionTitle({ icon: Icon, title, hint }: { icon: React.ComponentType<{ className?: string }>; title: string; hint?: string }) {
   return (
     <div className="mb-4 flex flex-wrap items-center gap-2">
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dbf0f2] text-[#0d6473]"><Icon className="h-5 w-5" /></span>
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f4e9c8] text-[#8a6a1a]"><Icon className="h-5 w-5" /></span>
       <h2 className="font-display text-xl font-bold text-slate-800">{title}</h2>
       {hint && <span className="text-sm text-slate-400">{hint}</span>}
     </div>
@@ -615,7 +615,7 @@ function FinderGroup({ label, opts, value, onPick }: { label: string; opts: { v:
       <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{label}</p>
       <div className="flex flex-wrap gap-2">
         {opts.map((o) => (
-          <button key={o.v} onClick={() => onPick(o.v)} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${value === o.v ? "bg-[#15a3b0] text-white shadow-sm" : "border border-[#cfe6e9] bg-white text-slate-700 hover:border-[#5fc6d0]"}`}>
+          <button key={o.v} onClick={() => onPick(o.v)} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${value === o.v ? "bg-[#c79a3b] text-white shadow-sm" : "border border-[#efe0b8] bg-white text-slate-700 hover:border-[#e0b24a]"}`}>
             {o.label}
           </button>
         ))}
@@ -640,7 +640,7 @@ function BiteRow({ label, sub, rating }: { label: string; sub: string; rating: n
       </div>
       <div className="flex gap-0.5">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Mahi key={i} className={`h-3.5 w-3.5 ${i < rating ? "text-[#15a3b0]" : "text-slate-200"}`} />
+          <Mahi key={i} className={`h-3.5 w-3.5 ${i < rating ? "text-[#c79a3b]" : "text-slate-200"}`} />
         ))}
       </div>
     </div>

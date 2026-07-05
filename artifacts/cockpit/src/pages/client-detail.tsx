@@ -159,7 +159,7 @@ const STATUS_HEX: Record<ClientStatus, string> = {
   Active: "#16a34a",
   "At Risk": "#dc2626",
   Onboarding: "#1d6fd6",
-  "Renewal Pending": "#0e9bb8",
+  "Renewal Pending": "#c79a3b",
   Stalled: "#64748b",
 };
 
@@ -196,7 +196,7 @@ const AUDIT_BADGE: Record<AuditStatus, string> = {
   "Not Started": "bg-slate-100 text-slate-700 border-slate-300",
   Scheduled: "bg-blue-50 text-blue-700 border-blue-300",
   "In Progress": "bg-blue-50 text-blue-700 border-blue-300",
-  "Under Review": "bg-cyan-50 text-cyan-700 border-cyan-300",
+  "Under Review": "bg-amber-50 text-amber-700 border-amber-300",
   Passed: "bg-green-50 text-green-700 border-green-300",
   Remediation: "bg-amber-50 text-amber-700 border-amber-300",
   Failed: "bg-red-50 text-red-700 border-red-300",
@@ -927,7 +927,7 @@ export default function ClientDetail() {
             label="Expansion Pipeline"
             value={money(data.pipelineValue)}
             sub={`${data.roadmap.length} opportunities`}
-            accent="#0e9bb8"
+            accent="#c79a3b"
             targetId="section-roadmap"
           />
         </div>
@@ -1161,7 +1161,7 @@ export default function ClientDetail() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <SectionTitle icon={<GitBranch className="h-4 w-4" />}>Expansion Roadmap</SectionTitle>
-                  <span className="text-sm font-medium text-cyan-700">{money(data.pipelineValue)} pipeline</span>
+                  <span className="text-sm font-medium text-amber-700">{money(data.pipelineValue)} pipeline</span>
                 </div>
               </CardHeader>
               <CardContent>
@@ -1172,17 +1172,17 @@ export default function ClientDetail() {
                     {data.roadmap.map((x) => {
                       const stageIdx = ROADMAP_STAGES.indexOf(x.stage);
                       return (
-                        <div key={x.id} className={`rounded-md border p-3 ${x.pinned ? "border-cyan-300 bg-cyan-50/40" : ""}`}>
+                        <div key={x.id} className={`rounded-md border p-3 ${x.pinned ? "border-amber-300 bg-amber-50/40" : ""}`}>
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-1.5 font-medium text-sm">
-                              {x.pinned && <Pin className="h-3.5 w-3.5 text-cyan-700" />}
+                              {x.pinned && <Pin className="h-3.5 w-3.5 text-amber-700" />}
                               {x.title}
                               {x.priorityBoost > 0 && (
-                                <Badge variant="outline" className="border-cyan-300 text-cyan-700">+{x.priorityBoost} boost</Badge>
+                                <Badge variant="outline" className="border-amber-300 text-amber-700">+{x.priorityBoost} boost</Badge>
                               )}
                             </div>
                             <div className="flex items-center gap-2 whitespace-nowrap">
-                              <div className="text-sm font-semibold text-cyan-700">{money(x.potentialValue)}</div>
+                              <div className="text-sm font-semibold text-amber-700">{money(x.potentialValue)}</div>
                               <div className="flex items-center gap-0.5">
                                 <Button
                                   variant="ghost"
@@ -1237,9 +1237,9 @@ export default function ClientDetail() {
                               <div key={stage} className="flex-1 flex flex-col items-center gap-1">
                                 <div
                                   className="h-1.5 w-full rounded-full"
-                                  style={{ backgroundColor: i <= stageIdx ? "#0e9bb8" : "#e2e8f0" }}
+                                  style={{ backgroundColor: i <= stageIdx ? "#c79a3b" : "#e2e8f0" }}
                                 />
-                                <span className={`text-[10px] ${i === stageIdx ? "font-semibold text-cyan-700" : "text-muted-foreground"}`}>
+                                <span className={`text-[10px] ${i === stageIdx ? "font-semibold text-amber-700" : "text-muted-foreground"}`}>
                                   {stage}
                                 </span>
                               </div>
@@ -1265,7 +1265,7 @@ export default function ClientDetail() {
                   <ol className="relative space-y-3 border-l pl-4">
                     {activity.map((a) => (
                       <li key={a.id} className="relative">
-                        <span className="absolute -left-[1.3rem] top-1 h-2 w-2 rounded-full bg-cyan-600" />
+                        <span className="absolute -left-[1.3rem] top-1 h-2 w-2 rounded-full bg-amber-600" />
                         <div className="flex items-baseline justify-between gap-2">
                           <span className="text-sm font-medium">{a.summary}</span>
                           <span className="text-xs text-muted-foreground whitespace-nowrap">{fmtDateTime(a.createdAt)}</span>

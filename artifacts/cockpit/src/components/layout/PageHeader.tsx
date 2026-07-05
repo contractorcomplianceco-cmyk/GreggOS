@@ -61,7 +61,7 @@ export function PageHeader({
     <div className="mb-8">
       <DashboardHero
         size="compact"
-        eyebrow={tag ?? "GreggOS"}
+        eyebrow={tag ?? "GREGG OS"}
         greeting={title}
         subtitle={typeof subtitle === "string" ? subtitle : undefined}
         action={action}

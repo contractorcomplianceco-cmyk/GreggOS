@@ -14,9 +14,9 @@ import { Waves } from "@/components/icons/CoastalIcons";
 const NOAA_BASE = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
 
 // teal / coral coastal tokens
-const TEAL = "#15a3b0";
-const TEAL_DEEP = "#0d6473";
-const CORAL = "#f4623a";
+const TEAL = "#c79a3b";
+const TEAL_DEEP = "#8a6a1a";
+const CORAL = "#ef6a1f";
 
 const DEFAULT_STATION = { id: "8726520", name: "St. Petersburg, FL" };
 
@@ -140,12 +140,12 @@ export function TideChart({
       {/* live badge */}
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-          <MapPin className="h-3 w-3 text-[#15a3b0]" />
+          <MapPin className="h-3 w-3 text-[#c79a3b]" />
           <span className="truncate">{stationName}</span>
         </div>
         <div className="flex items-center gap-2">
           {status === "ok" && (
-            <span className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#0d6473]">
+            <span className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#8a6a1a]">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Live
             </span>
@@ -153,7 +153,7 @@ export function TideChart({
           <button
             type="button"
             onClick={() => setReloadKey((k) => k + 1)}
-            className="text-slate-400 hover:text-[#15a3b0] transition-colors"
+            className="text-slate-400 hover:text-[#c79a3b] transition-colors"
             aria-label="Refresh tide data"
           >
             <RefreshCw
@@ -170,8 +170,8 @@ export function TideChart({
       )}
 
       {status === "error" && (
-        <div className="flex items-center gap-2 rounded-md border border-[#cfe6e9] bg-[#f1f8f9] px-2.5 py-3 text-[11px] text-slate-500">
-          <WifiOff className="h-4 w-4 shrink-0 text-[#15a3b0]" />
+        <div className="flex items-center gap-2 rounded-md border border-[#efe0b8] bg-[#f1f8f9] px-2.5 py-3 text-[11px] text-slate-500">
+          <WifiOff className="h-4 w-4 shrink-0 text-[#c79a3b]" />
           <span>
             Tide station unreachable right now. Tap refresh to recast the line.
           </span>
@@ -191,7 +191,7 @@ export function TideChart({
               </div>
               <div
                 className={`flex items-center gap-1 text-[10px] font-semibold ${
-                  view.rising ? "text-[#0d6473]" : "text-[#f4623a]"
+                  view.rising ? "text-[#8a6a1a]" : "text-[#ef6a1f]"
                 }`}
               >
                 {view.rising ? (
@@ -261,7 +261,7 @@ export function TideChart({
                   className="flex shrink-0 items-center gap-1 rounded border border-[#e0eff1] bg-white px-1.5 py-0.5"
                 >
                   <Waves
-                    className={`h-3 w-3 ${e.type === "H" ? "text-[#15a3b0]" : "text-[#f4623a]"}`}
+                    className={`h-3 w-3 ${e.type === "H" ? "text-[#c79a3b]" : "text-[#ef6a1f]"}`}
                   />
                   <span className="text-[9px] font-bold uppercase text-slate-500">
                     {e.type === "H" ? "Hi" : "Lo"}

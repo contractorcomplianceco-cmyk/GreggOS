@@ -47,7 +47,7 @@ export function FishingSpinner({
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
-            className="text-[#9bb4bb]"
+            className="text-[#cbb488]"
           />
           {/* hook curve */}
           <path
@@ -56,7 +56,7 @@ export function FishingSpinner({
             strokeWidth="2"
             strokeLinecap="round"
             fill="none"
-            className="text-[#0d4a57]"
+            className="text-[#3a2f14]"
           />
 
           {/* hooked game fish — wiggles as it fights */}
@@ -64,33 +64,33 @@ export function FishingSpinner({
             {/* body */}
             <path
               d="M2 8 C10 -4 34 -4 44 8 C34 20 10 20 2 8 Z"
-              fill="#15a3b0"
+              fill="#c79a3b"
             />
             {/* belly highlight */}
             <path
               d="M8 9 C16 2 32 2 40 9 C32 14 16 14 8 9 Z"
-              fill="#5fe7e7"
+              fill="#e6c25a"
               opacity="0.7"
             />
             {/* coral lateral stripe */}
             <path
               d="M12 9 C20 6 32 6 40 9"
-              stroke="#f4623a"
+              stroke="#ef6a1f"
               strokeWidth="1.6"
               strokeLinecap="round"
               fill="none"
             />
             {/* tail */}
-            <path d="M2 8 L-7 1 L-5 8 L-7 15 Z" fill="#0d6473" />
+            <path d="M2 8 L-7 1 L-5 8 L-7 15 Z" fill="#8a6a1a" />
             {/* dorsal fin */}
-            <path d="M16 0 C22 -6 30 -6 34 0 Z" fill="#0d6473" />
+            <path d="M16 0 C22 -6 30 -6 34 0 Z" fill="#8a6a1a" />
             {/* eye */}
-            <circle cx="40" cy="7" r="1.6" fill="#06212a" />
+            <circle cx="40" cy="7" r="1.6" fill="#0c1116" />
           </g>
         </g>
 
         {/* bubbles escaping near the fish's mouth */}
-        <g className="text-[#bdeef5]">
+        <g className="text-[#f2e2b0]">
           <circle className="fs-bubble" cx="72" cy="56" r="2.4" fill="currentColor" />
           <circle className="fs-bubble fs-bubble-2" cx="68" cy="58" r="1.6" fill="currentColor" />
           <circle className="fs-bubble fs-bubble-3" cx="74" cy="60" r="1.2" fill="currentColor" />

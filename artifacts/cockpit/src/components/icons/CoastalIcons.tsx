@@ -3,9 +3,9 @@ import type { SVGProps } from "react";
 /**
  * Custom fishing-themed icon set for GreggOS.
  * Drop-in replacements for lucide icons: 24x24 viewBox, stroke = currentColor,
- * so they inherit text color and size utilities (h-4 w-4, text-[#15a3b0], …).
+ * so they inherit text color and size utilities (h-4 w-4, text-[#c79a3b], …).
  *
- * Usage matches lucide: <Mahi className="h-4 w-4 text-[#15a3b0]" />
+ * Usage matches lucide: <Mahi className="h-4 w-4 text-[#c79a3b]" />
  */
 type IconProps = SVGProps<SVGSVGElement>;
 

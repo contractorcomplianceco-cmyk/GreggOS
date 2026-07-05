@@ -1,20 +1,20 @@
 /* ============================================================
    AUTO-GENERATED — do not edit by hand.
    Written by scripts/seasonal-hero/update.mjs (weekday 07:00 ET cron).
-   Imported after index.css so these override the default cool-teal hero.
+   Imported after index.css so these override the default hero.
 
-   Generated: 2026-07-03T18:24:07.346Z
-   Source:    open-meteo SST (SST 32.7°C)
-   Warmth:    1.000  ->  season "warm"
+   GREGG brand hero: black base, sunset-gold waterline, gold eyebrow.
+   The cron nudges warmth (more sunset orange in summer, deeper amber
+   in winter) but always stays inside the GREGG gold/sunset family.
    ============================================================ */
 :root {
-  --hero-base-1: #15596b;
-  --hero-base-2: #173f4a;
-  --hero-base-3: #0a232b;
-  --hero-glow:   #ff8a5c;
-  --hero-wave-1: #ffd2a8;
-  --hero-wave-2: #ff9e6d;
-  --hero-wave-3: #f4623a;
-  --hero-eyebrow: #ffb38a;
-  --hero-season: "warm";
+  --hero-base-1: #1a1206;
+  --hero-base-2: #120c04;
+  --hero-base-3: #070502;
+  --hero-glow:   #ef6a1f;
+  --hero-wave-1: #f0b357;
+  --hero-wave-2: #d8922f;
+  --hero-wave-3: #a5701f;
+  --hero-eyebrow: #e6c25a;
+  --hero-season: "gregg";
 }

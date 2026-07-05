@@ -96,7 +96,7 @@ export function DashboardHero({
   };
 
   return (
-    <section className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-[#15a3b0]/30">
+    <section className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-[#c79a3b]/30">
       {/* optional real-photo backdrop (bottom-most layer) */}
       {photo && (
         <img
@@ -143,13 +143,13 @@ export function DashboardHero({
         src="/img-fish-mark.png"
         alt=""
         aria-hidden="true"
-        className={`hero-fish pointer-events-none absolute top-[28%] w-auto opacity-70 drop-shadow-lg ${compact ? "h-12" : "h-24"}`}
+        className={`hero-fish pointer-events-none absolute top-[28%] w-auto opacity-70 drop-shadow-lg [filter:sepia(1)_saturate(3)_hue-rotate(2deg)_brightness(1.05)] ${compact ? "h-12" : "h-24"}`}
       />
       <img
         src="/img-fish-mark.png"
         alt=""
         aria-hidden="true"
-        className={`hero-fish-2 pointer-events-none absolute top-[60%] w-auto opacity-55 ${compact ? "h-9" : "h-16"}`}
+        className={`hero-fish-2 pointer-events-none absolute top-[60%] w-auto opacity-55 [filter:sepia(1)_saturate(3)_hue-rotate(2deg)_brightness(1.05)] ${compact ? "h-9" : "h-16"}`}
       />
 
       {/* a sportfishing boat drifting + bobbing along the waterline */}
@@ -165,11 +165,11 @@ export function DashboardHero({
       <div
         className={`absolute inset-0 bg-gradient-to-r ${
           photo
-            ? "from-[#062029]/90 via-[#062029]/55 to-[#062029]/20"
-            : "from-[#062029]/85 via-[#062029]/35 to-transparent md:to-[#062029]/0"
+            ? "from-[#0c1116]/90 via-[#0c1116]/55 to-[#0c1116]/20"
+            : "from-[#0c1116]/85 via-[#0c1116]/35 to-transparent md:to-[#0c1116]/0"
         }`}
       />
-      <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#062029]/55 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0c1116]/55 to-transparent" />
 
       {/* content — sizes bumped up for easier reading */}
       <div
@@ -201,7 +201,7 @@ export function DashboardHero({
         </h1>
         {subtitle && (
           <p
-            className={`mt-3 max-w-2xl text-cyan-50/95 leading-relaxed drop-shadow ${
+            className={`mt-3 max-w-2xl text-amber-50/95 leading-relaxed drop-shadow ${
               compact ? "text-sm md:text-base" : "text-base md:text-lg"
             }`}
           >
@@ -218,14 +218,14 @@ export function DashboardHero({
                   key={s.label}
                   className={`flex items-center gap-2.5 rounded-xl px-4 py-3 backdrop-blur-sm ring-1 transition-colors ${
                     alert
-                      ? "bg-[#f4623a]/25 ring-[#f4623a]/50"
+                      ? "bg-[#ef6a1f]/25 ring-[#ef6a1f]/50"
                       : "bg-white/10 ring-white/25"
                   }`}
                 >
                   {/* gamified fish motif: calm teal -> agitated coral, faster wiggle when alert */}
                   <Mahi
                     className={`h-6 w-6 shrink-0 ${
-                      alert ? "text-[#ff7a4d] hero-chip-fish-alert" : "text-[#5fe7e7] hero-chip-fish"
+                      alert ? "text-[#ff8a45] hero-chip-fish-alert" : "text-[#e6c25a] hero-chip-fish"
                     }`}
                   />
                   <span
@@ -235,7 +235,7 @@ export function DashboardHero({
                   >
                     {s.value}
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.1em] text-cyan-50/90 leading-tight">
+                  <span className="text-xs font-semibold uppercase tracking-[0.1em] text-amber-50/90 leading-tight">
                     {s.label}
                   </span>
                 </div>
@@ -263,23 +263,23 @@ function HeroBoat({ className }: { className?: string }) {
       {/* hull */}
       <path
         d="M8 44 H104 L94 60 a6 6 0 0 1 -5 3 H22 a6 6 0 0 1 -5 -3 Z"
-        fill="#0b3a47"
-        stroke="#2a6b78"
+        fill="#1c2129"
+        stroke="#5a4a22"
         strokeWidth="1.5"
       />
       {/* white sheer stripe */}
-      <path d="M10 45 H102" stroke="#e8f6f8" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M10 45 H102" stroke="#f7efd8" strokeWidth="2.5" strokeLinecap="round" />
       {/* cabin / console */}
-      <path d="M40 44 V30 a4 4 0 0 1 4 -4 H62 a4 4 0 0 1 4 4 V44 Z" fill="#15a3b0" />
-      <rect x="45" y="31" width="16" height="8" rx="1.5" fill="#bdeef5" />
+      <path d="M40 44 V30 a4 4 0 0 1 4 -4 H62 a4 4 0 0 1 4 4 V44 Z" fill="#c79a3b" />
+      <rect x="45" y="31" width="16" height="8" rx="1.5" fill="#f2e2b0" />
       {/* T-top */}
-      <path d="M38 26 H70" stroke="#0b3a47" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M44 26 V22 M64 26 V22" stroke="#0b3a47" strokeWidth="2" strokeLinecap="round" />
+      <path d="M38 26 H70" stroke="#1c2129" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M44 26 V22 M64 26 V22" stroke="#1c2129" strokeWidth="2" strokeLinecap="round" />
       {/* outrigger rod with a line */}
-      <path d="M66 30 L96 8" stroke="#f4623a" strokeWidth="2" strokeLinecap="round" />
+      <path d="M66 30 L96 8" stroke="#ef6a1f" strokeWidth="2" strokeLinecap="round" />
       <circle cx="96" cy="8" r="2" fill="#ffd2a8" />
       {/* bow rail */}
-      <path d="M12 44 C 16 38, 24 36, 30 36" stroke="#2a6b78" strokeWidth="1.5" fill="none" />
+      <path d="M12 44 C 16 38, 24 36, 30 36" stroke="#5a4a22" strokeWidth="1.5" fill="none" />
     </svg>
   );
 }

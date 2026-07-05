@@ -37,7 +37,7 @@ const STATUS_COLORS: Record<ClientStatus, string> = {
   Active: "#16a34a",
   "At Risk": "#dc2626",
   Onboarding: "#1d6fd6",
-  "Renewal Pending": "#0e9bb8",
+  "Renewal Pending": "#c79a3b",
   Stalled: "#64748b",
 };
 
