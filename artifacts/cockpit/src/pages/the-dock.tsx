@@ -153,10 +153,21 @@ const BEER_GALLERY: GalleryPic[] = [
   { src: "/gregg-pinup-2.jpg", caption: "Sunset, suds & sailfish. Cheers, Captain." },
   { src: "/gregg-pinup-3.jpg", caption: "Cheers to good times at Sunset Cove." },
   { src: "/gregg-cold-beer.jpg", caption: "Ice-cold and waiting on the bar." },
+  { src: "/gregg-poster-a.jpg", caption: "Gone Fishin' — the Florida Keys." },
+  { src: "/gregg-poster-b.jpg", caption: "Cold beer, tight lines — the Tiki Dock." },
+  { src: "/gregg-poster-c.jpg", caption: "Sunset cruise — adventure awaits." },
 ];
 
-// wall-art posters hung in the bar room
-const BAR_POSTERS = ["/gregg-pinup-1.jpg", "/gregg-pinup-3.jpg", "/gregg-pinup-2.jpg"];
+// wall-art posters hung in the bar room (six framed prints, tilted)
+const BAR_POSTERS = [
+  "/gregg-poster-a.jpg",
+  "/gregg-pinup-1.jpg",
+  "/gregg-poster-b.jpg",
+  "/gregg-pinup-3.jpg",
+  "/gregg-poster-c.jpg",
+  "/gregg-pinup-2.jpg",
+];
+const POSTER_TILT = [-2.5, 1.5, -1, 2, -1.5, 1];
 
 // ---- Beer O'Clock toasts --------------------------------------------------
 const BEER_TOASTS = [
@@ -232,6 +243,23 @@ export default function TheDock() {
     }
     prevBeerRef.current = beerMode;
   }, [beerMode]);
+  // ---------- interactive neon marlin sign ----------
+  const [marlinOn, setMarlinOn] = useState(true);
+  const [marlinIgniteKey, setMarlinIgniteKey] = useState(0);
+  const buzzRef = useRef<HTMLAudioElement | null>(null);
+  const toggleMarlin = () => {
+    setMarlinOn((on) => {
+      const next = !on;
+      if (next) {
+        setMarlinIgniteKey((k) => k + 1); // retrigger ignite flicker
+        // play a short buzz only if the room ambience is unmuted
+        const b = buzzRef.current;
+        if (b && !barMuted) { b.currentTime = 0; b.volume = 0.45; b.play().catch(() => {}); }
+      }
+      return next;
+    });
+  };
+
   // toggle bar ambience (muted by default; only plays in beer mode)
   const toggleBarAudio = () => {
     const a = ambienceRef.current;
@@ -366,6 +394,7 @@ export default function TheDock() {
     <SidebarLayout>
       {/* bar ambience audio (muted until user unmutes) */}
       <audio ref={ambienceRef} src="/bar-ambience.mp3" loop preload="none" />
+      <audio ref={buzzRef} src="/neon-buzz.mp3" preload="none" />
 
       {/* ===== CINEMATIC "ENTER THE PRIVATE BAR" REVEAL ===== */}
       {revealPlaying && (
@@ -505,8 +534,23 @@ export default function TheDock() {
                 >
                   <DoorOpen className="h-3.5 w-3.5" /> Re-enter the bar
                 </button>
+                {/* interactive neon marlin sign — click to flip it on/off */}
+                <button
+                  onClick={toggleMarlin}
+                  title={marlinOn ? "Neon sign: ON — click to switch off" : "Neon sign: OFF — click to buzz it on"}
+                  aria-pressed={marlinOn}
+                  className="group absolute bottom-3 left-3 z-10 flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-2.5 py-2 backdrop-blur-sm transition-colors hover:bg-black/60"
+                >
+                  <span key={marlinIgniteKey} className={marlinOn ? "marlin-neon-ignite" : ""}>
+                    <NeonMarlin on={marlinOn} className="h-8 w-16" />
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/60 group-hover:text-white/90">
+                    {marlinOn ? "Sign On" : "Sign Off"}
+                  </span>
+                </button>
+
                 {/* rotating toast on the counter */}
-                <p key={toastIdx} className="beer-cheers absolute inset-x-0 bottom-3 text-center text-sm font-semibold text-[#ffd15a] md:text-base">
+                <p key={toastIdx} className="beer-cheers pointer-events-none absolute inset-x-0 bottom-4 px-32 text-center text-sm font-semibold text-[#ffd15a] md:text-base">
                   {BEER_TOASTS[toastIdx]}
                 </p>
               </div>
@@ -589,19 +633,20 @@ export default function TheDock() {
                 <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#ffb15a]">
                   <Beer className="h-4 w-4" /> On the bar walls
                 </p>
-                <div className="grid grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-5 lg:grid-cols-6">
                   {BAR_POSTERS.map((src, i) => (
                     <div
                       key={src}
-                      className="group relative overflow-hidden rounded-lg border-2 border-[#3a2410] bg-black shadow-[0_8px_24px_-8px_rgba(0,0,0,0.8)]"
-                      style={{ transform: `rotate(${[-2, 1, -1][i]}deg)` }}
+                      className="group relative aspect-[3/4] overflow-hidden rounded-md border-[3px] border-[#2a1a0c] bg-black shadow-[0_10px_26px_-8px_rgba(0,0,0,0.85)] ring-1 ring-[#e6c25a]/20 transition-transform duration-300 hover:z-10 hover:!rotate-0 hover:scale-[1.06]"
+                      style={{ transform: `rotate(${POSTER_TILT[i] ?? 0}deg)` }}
                     >
-                      <img src={src} alt="GREGG bar poster" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <img src={src} alt="GREGG bar poster" className="h-full w-full object-cover" />
                       {/* framed glass sheen */}
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/12 via-transparent to-black/10" />
                     </div>
                   ))}
                 </div>
+                <p className="mt-3 text-[11px] text-[#ffb15a]/60">Original GREGG bar art. Hover a print for a closer look.</p>
               </div>
               </div>
             </section>
@@ -880,6 +925,39 @@ export default function TheDock() {
         </div>
       </div>
     </SidebarLayout>
+  );
+}
+
+/* ---- interactive neon marlin sign ---- */
+function NeonMarlin({ on, className }: { on: boolean; className?: string }) {
+  return (
+    <svg
+      className={`${className ?? ""} ${on ? "marlin-neon-on marlin-neon-buzz" : "marlin-neon-off"}`}
+      viewBox="0 0 120 60"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      {/* neon tubing marlin: bill, body, sail fin, forked tail */}
+      <g
+        stroke={on ? "#5fe7e7" : "#2a4a4d"}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      >
+        {/* long bill */}
+        <path d="M4 34 L34 30" />
+        {/* body */}
+        <path d="M34 30 C 48 20, 78 20, 96 30 C 84 36, 60 40, 40 36 Z" />
+        {/* tall sail dorsal fin */}
+        <path d="M44 24 C 50 8, 66 8, 74 22" />
+        {/* forked tail */}
+        <path d="M96 30 L112 20 M96 30 L112 40" />
+        {/* eye */}
+        <circle cx="40" cy="30" r="1.6" fill={on ? "#eafcff" : "#2a4a4d"} stroke="none" />
+      </g>
+    </svg>
   );
 }
 
