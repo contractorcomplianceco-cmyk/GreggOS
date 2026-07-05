@@ -504,9 +504,69 @@
   /* photo card gently tilts on hover in the stack */
   .beer-card-stack > * { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease; }
 
+  /* ============================================================
+     Cinematic "enter the private bar" reveal
+     Sequence: black room -> neon buzzes on (flicker) -> bar scene
+     fades up behind letterbox bars -> letterbox retracts.
+     ============================================================ */
+  .bar-reveal { animation: bar-reveal-fade 0.5s ease forwards; }
+  @keyframes bar-reveal-fade {
+    0% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+  /* the darkened room that the neon lights up */
+  .bar-scene-img {
+    animation: bar-scene-lights 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: filter, transform, opacity;
+  }
+  @keyframes bar-scene-lights {
+    0%   { filter: brightness(0.04) saturate(0.4); transform: scale(1.14); opacity: 0.5; }
+    22%  { filter: brightness(0.05) saturate(0.4); }        /* dark */
+    26%  { filter: brightness(0.55) saturate(0.9); }        /* buzz */
+    30%  { filter: brightness(0.09) saturate(0.5); }        /* off */
+    35%  { filter: brightness(0.75) saturate(1); }          /* buzz */
+    39%  { filter: brightness(0.12) saturate(0.6); }        /* off */
+    46%  { filter: brightness(0.95) saturate(1.05); }       /* on-ish */
+    50%  { filter: brightness(0.4)  saturate(0.9); }        /* dip */
+    100% { filter: brightness(1) saturate(1.08); transform: scale(1); opacity: 1; }
+  }
+  /* the big neon BEER O'CLOCK sign that buzzes to life */
+  .bar-neon-sign {
+    animation: bar-neon-on 3.2s steps(1, end) forwards;
+  }
+  @keyframes bar-neon-on {
+    0%, 24%  { opacity: 0; }
+    26% { opacity: 1; }
+    30% { opacity: 0.1; }
+    35% { opacity: 1; }
+    39% { opacity: 0.15; }
+    46% { opacity: 1; }
+    50% { opacity: 0.5; }
+    55%, 100% { opacity: 1; }
+  }
+  /* cinematic letterbox bars that retract after the reveal */
+  .bar-letterbox-top, .bar-letterbox-bottom {
+    animation: bar-letterbox 3.4s ease-in-out forwards;
+    will-change: transform;
+  }
+  .bar-letterbox-bottom { transform-origin: bottom; }
+  .bar-letterbox-top { transform-origin: top; }
+  @keyframes bar-letterbox {
+    0%, 70% { transform: scaleY(1); }
+    100% { transform: scaleY(0.28); }
+  }
+  /* "tap to enter" prompt gently pulses */
+  .bar-enter-pulse { animation: bar-enter-pulse 1.6s ease-in-out infinite; }
+  @keyframes bar-enter-pulse {
+    0%, 100% { opacity: 0.6; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-2px); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .beer-neon, .beer-cheers, .beer-bubble-rise { animation: none !important; }
-    .beer-neon { opacity: 1 !important; }
+    .beer-neon, .beer-cheers, .beer-bubble-rise,
+    .bar-scene-img, .bar-neon-sign, .bar-letterbox-top, .bar-letterbox-bottom,
+    .bar-enter-pulse { animation: none !important; }
+    .beer-neon, .bar-neon-sign, .bar-scene-img { opacity: 1 !important; filter: none !important; }
   }
 
   /* honor reduced-motion: freeze all coastal animation */

@@ -24,6 +24,9 @@ import {
   Beer,
   Shuffle,
   RotateCcw,
+  Volume2,
+  VolumeX,
+  DoorOpen,
 } from "lucide-react";
 import { Boat, Waves, Mahi, Hook, Net, TideGauge } from "@/components/icons/CoastalIcons";
 
@@ -148,7 +151,12 @@ const BEER_GALLERY: GalleryPic[] = [
   { src: "/dock-gregg-tightlines.jpg", caption: "Tight lines. Stress gone. Life on." },
   { src: "/gregg-pinup-1.jpg", caption: "Sportfishing & Beer — sunset sessions." },
   { src: "/gregg-pinup-2.jpg", caption: "Sunset, suds & sailfish. Cheers, Captain." },
+  { src: "/gregg-pinup-3.jpg", caption: "Cheers to good times at Sunset Cove." },
+  { src: "/gregg-cold-beer.jpg", caption: "Ice-cold and waiting on the bar." },
 ];
+
+// wall-art posters hung in the bar room
+const BAR_POSTERS = ["/gregg-pinup-1.jpg", "/gregg-pinup-3.jpg", "/gregg-pinup-2.jpg"];
 
 // ---- Beer O'Clock toasts --------------------------------------------------
 const BEER_TOASTS = [
@@ -206,15 +214,44 @@ export default function TheDock() {
   const shufflePics = () =>
     setGallery((g) => [...g].sort(() => Math.random() - 0.5));
 
-  // when beer mode turns on, auto-swap the radio to a party station
+  // when beer mode turns on, auto-swap the radio to a party station,
+  // play the cinematic "enter the bar" reveal, and arm the bar ambience.
   const [station, setStation] = useState<Station>(STATIONS[0]);
+  const [revealPlaying, setRevealPlaying] = useState(false);
+  const [barMuted, setBarMuted] = useState(true);
+  const ambienceRef = useRef<HTMLAudioElement | null>(null);
   const prevBeerRef = useRef(false);
   useEffect(() => {
     if (beerMode && !prevBeerRef.current) {
       const party = STATIONS.find((s) => s.party);
       if (party) setStation(party);
+      setRevealPlaying(true);
+      const t = window.setTimeout(() => setRevealPlaying(false), 3600);
+      prevBeerRef.current = beerMode;
+      return () => window.clearTimeout(t);
     }
     prevBeerRef.current = beerMode;
+  }, [beerMode]);
+  // toggle bar ambience (muted by default; only plays in beer mode)
+  const toggleBarAudio = () => {
+    const a = ambienceRef.current;
+    if (!a) return;
+    if (barMuted) {
+      a.muted = false;
+      a.volume = 0.5;
+      a.play().catch(() => { /* autoplay blocked until gesture; this IS a gesture */ });
+      setBarMuted(false);
+    } else {
+      a.pause();
+      setBarMuted(true);
+    }
+  };
+  // stop ambience if leaving beer mode
+  useEffect(() => {
+    if (!beerMode && ambienceRef.current) {
+      ambienceRef.current.pause();
+      setBarMuted(true);
+    }
   }, [beerMode]);
 
   // ---------- photo deck ----------
@@ -327,6 +364,44 @@ export default function TheDock() {
 
   return (
     <SidebarLayout>
+      {/* bar ambience audio (muted until user unmutes) */}
+      <audio ref={ambienceRef} src="/bar-ambience.mp3" loop preload="none" />
+
+      {/* ===== CINEMATIC "ENTER THE PRIVATE BAR" REVEAL ===== */}
+      {revealPlaying && (
+        <div
+          className="bar-reveal fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black"
+          onClick={() => setRevealPlaying(false)}
+          role="dialog"
+          aria-label="Entering the private bar"
+        >
+          {/* the bar scene the neon lights up */}
+          <img
+            src="/gregg-bar-interior.jpg"
+            alt=""
+            aria-hidden="true"
+            className="bar-scene-img absolute inset-0 h-full w-full object-cover"
+          />
+          {/* warm vignette */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_50%,transparent_40%,rgba(0,0,0,0.75))]" />
+          {/* big neon sign that buzzes to life */}
+          <div className="bar-neon-sign relative z-10 text-center">
+            <p className="beer-neon font-display text-5xl font-extrabold uppercase tracking-tight text-[#ffd15a] md:text-7xl">
+              Beer O'Clock
+            </p>
+            <p className="beer-neon mt-2 font-display text-lg font-bold uppercase tracking-[0.3em] text-[#ff9e2c] md:text-2xl">
+              Gregg's Private Bar
+            </p>
+          </div>
+          {/* cinematic letterbox bars */}
+          <div className="bar-letterbox-top pointer-events-none absolute inset-x-0 top-0 h-[16vh] bg-black" />
+          <div className="bar-letterbox-bottom pointer-events-none absolute inset-x-0 bottom-0 h-[16vh] bg-black" />
+          <p className="bar-enter-pulse absolute bottom-[6vh] left-1/2 z-10 -translate-x-1/2 text-xs font-semibold uppercase tracking-[0.2em] text-[#ffd15a]/80">
+            Tap to enter →
+          </p>
+        </div>
+      )}
+
       <div
         data-ambient={ambientAttr}
         className={`min-h-full font-sans text-[15px] leading-relaxed transition-colors duration-700 ${
@@ -396,20 +471,50 @@ export default function TheDock() {
 
           {/* ===== BEER O'CLOCK MODE (only when active) ===== */}
           {beerMode && (
-            <section className="relative overflow-hidden rounded-2xl border border-[#ff7a1a]/40 bg-gradient-to-b from-[#1a0a04] to-[#0a0402] p-5 shadow-[0_0_40px_-10px_rgba(255,122,26,0.5)] md:p-7">
-              {/* neon glow blobs */}
-              <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-[#ff7a1a]/25 blur-3xl" />
-              <div className="pointer-events-none absolute -right-10 bottom-0 h-52 w-52 rounded-full bg-[#e0531a]/20 blur-3xl" />
-
-              {/* neon banner + rotating toast */}
-              <div className="relative mb-6 text-center">
-                <p className="beer-neon font-display text-3xl font-extrabold uppercase tracking-tight text-[#ffd15a] md:text-4xl">
-                  Beer O'Clock
-                </p>
-                <p key={toastIdx} className="beer-cheers mt-2 text-sm font-semibold text-[#ffb15a] md:text-base">
+            <section className="relative overflow-hidden rounded-2xl border border-[#ff7a1a]/40 bg-gradient-to-b from-[#1a0a04] to-[#0a0402] shadow-[0_0_40px_-10px_rgba(255,122,26,0.5)]">
+              {/* ---- cinematic bar backdrop banner ---- */}
+              <div className="relative h-56 w-full overflow-hidden md:h-72">
+                <img
+                  src="/gregg-bar-interior.jpg"
+                  alt="Gregg's private sportfishing bar"
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0402] via-[#0a0402]/40 to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_30%,transparent_45%,rgba(10,4,2,0.7))]" />
+                {/* neon sign + welcome */}
+                <div className="absolute inset-x-0 top-5 text-center">
+                  <p className="beer-neon font-display text-3xl font-extrabold uppercase tracking-tight text-[#ffd15a] md:text-5xl">
+                    Beer O'Clock
+                  </p>
+                  <p className="beer-neon mt-1 text-[11px] font-bold uppercase tracking-[0.3em] text-[#ff9e2c] md:text-sm">
+                    Gregg's Private Bar
+                  </p>
+                </div>
+                {/* ambience toggle */}
+                <button
+                  onClick={toggleBarAudio}
+                  className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-[#ffd15a]/40 bg-black/50 px-3 py-1.5 text-xs font-semibold text-[#ffd15a] backdrop-blur-sm transition-colors hover:bg-black/70"
+                >
+                  {barMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                  {barMuted ? "Bar ambience off" : "Bar ambience on"}
+                </button>
+                {/* re-play the cinematic entrance */}
+                <button
+                  onClick={() => { setRevealPlaying(true); window.setTimeout(() => setRevealPlaying(false), 3600); }}
+                  className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-[#ffd15a]/40 bg-black/50 px-3 py-1.5 text-xs font-semibold text-[#ffd15a] backdrop-blur-sm transition-colors hover:bg-black/70"
+                >
+                  <DoorOpen className="h-3.5 w-3.5" /> Re-enter the bar
+                </button>
+                {/* rotating toast on the counter */}
+                <p key={toastIdx} className="beer-cheers absolute inset-x-0 bottom-3 text-center text-sm font-semibold text-[#ffd15a] md:text-base">
                   {BEER_TOASTS[toastIdx]}
                 </p>
               </div>
+
+              <div className="relative p-5 md:p-7">
+              {/* neon glow blobs */}
+              <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-[#ff7a1a]/25 blur-3xl" />
+              <div className="pointer-events-none absolute -right-10 bottom-0 h-52 w-52 rounded-full bg-[#e0531a]/20 blur-3xl" />
 
               <div className="relative grid gap-6 lg:grid-cols-[1fr_320px]">
                 {/* shuffleable photo stack */}
@@ -477,6 +582,27 @@ export default function TheDock() {
                   </button>
                   <p className="mt-3 text-[10px] text-[#ffb15a]/60">Saved on this device. Pace yourself, Captain.</p>
                 </div>
+              </div>
+
+              {/* ---- pin-up poster wall ---- */}
+              <div className="relative mt-8">
+                <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#ffb15a]">
+                  <Beer className="h-4 w-4" /> On the bar walls
+                </p>
+                <div className="grid grid-cols-3 gap-3 md:gap-4">
+                  {BAR_POSTERS.map((src, i) => (
+                    <div
+                      key={src}
+                      className="group relative overflow-hidden rounded-lg border-2 border-[#3a2410] bg-black shadow-[0_8px_24px_-8px_rgba(0,0,0,0.8)]"
+                      style={{ transform: `rotate(${[-2, 1, -1][i]}deg)` }}
+                    >
+                      <img src={src} alt="GREGG bar poster" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      {/* framed glass sheen */}
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+                    </div>
+                  ))}
+                </div>
+              </div>
               </div>
             </section>
           )}
