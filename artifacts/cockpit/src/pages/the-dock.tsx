@@ -21,6 +21,9 @@ import {
   Clock,
   CheckCircle2,
   Circle,
+  Beer,
+  Shuffle,
+  RotateCcw,
 } from "lucide-react";
 import { Boat, Waves, Mahi, Hook, Net, TideGauge } from "@/components/icons/CoastalIcons";
 
@@ -128,12 +131,36 @@ function write(key: string, val: unknown) {
 }
 
 // ---- Spotify stations -----------------------------------------------------
-type Station = { id: string; title: string; mood: string; playlist: string };
+type Station = { id: string; title: string; mood: string; playlist: string; party?: boolean };
 const STATIONS: Station[] = [
   { id: "guitar", title: "Dockside Acoustic", mood: "Easy coastal guitar", playlist: "37i9dQZF1DX0jgyAiPl8Af" },
   { id: "chill", title: "Chill Hits", mood: "Sunny & easy", playlist: "37i9dQZF1DX4WYpdgoIcn6" },
   { id: "lofi", title: "Calm Waters", mood: "Wind-down lo-fi", playlist: "37i9dQZF1DWWQRwui0ExPn" },
+  { id: "party", title: "Beer O'Clock Party", mood: "Cold ones & good times", playlist: "37i9dQZF1DXaXB8fQg7xif", party: true },
+  { id: "country", title: "Dock Country", mood: "Boots, boats & beer", playlist: "37i9dQZF1DX1lVhptIYRda", party: true },
 ];
+
+// ---- Beer O'Clock gallery -------------------------------------------------
+type GalleryPic = { src: string; caption: string };
+const BEER_GALLERY: GalleryPic[] = [
+  { src: "/dock-gregg-couple.jpg", caption: "Cold ones on the water. This is the life." },
+  { src: "/dock-gregg-poster.jpg", caption: "Boats, Hoes & Gregg — sun up, lines in." },
+  { src: "/dock-gregg-tightlines.jpg", caption: "Tight lines. Stress gone. Life on." },
+  { src: "/gregg-pinup-1.jpg", caption: "Sportfishing & Beer — sunset sessions." },
+  { src: "/gregg-pinup-2.jpg", caption: "Sunset, suds & sailfish. Cheers, Captain." },
+];
+
+// ---- Beer O'Clock toasts --------------------------------------------------
+const BEER_TOASTS = [
+  "It's Beer O'Clock, Captain 🍻",
+  "Sun's over the yardarm somewhere.",
+  "Lines in, cold one out.",
+  "Here's to tight lines and colder beer.",
+  "Work hard, fish harder, cheers hardest.",
+  "No wake zone — just chill and sip.",
+  "The only tab that matters is a bottle tab.",
+];
+const LS_BEERS = "greggos.beercount.v1";
 
 // time -> ambient phase
 function phaseForHour(h: number): "day" | "evening" | "night" {
@@ -144,8 +171,9 @@ function phaseForHour(h: number): "day" | "evening" | "night" {
 
 export default function TheDock() {
   // ---------- ambient mode ----------
+  type Phase = "day" | "evening" | "night" | "beer";
   const [autoAmbient, setAutoAmbient] = useState(true);
-  const [phase, setPhase] = useState<"day" | "evening" | "night">(() => phaseForHour(new Date().getHours()));
+  const [phase, setPhase] = useState<Phase>(() => phaseForHour(new Date().getHours()));
   useEffect(() => {
     if (!autoAmbient) return;
     const tick = () => setPhase(phaseForHour(new Date().getHours()));
@@ -153,7 +181,41 @@ export default function TheDock() {
     const iv = setInterval(tick, 60_000);
     return () => clearInterval(iv);
   }, [autoAmbient]);
+  const beerMode = phase === "beer";
   const ambientAttr = phase === "day" ? undefined : phase;
+
+  // ---------- beer o'clock ----------
+  const [beers, setBeers] = useState(0);
+  useEffect(() => setBeers(read<number>(LS_BEERS, 0)), []);
+  const [cheersKey, setCheersKey] = useState(0);
+  const addBeer = () => {
+    setBeers((n) => { const next = n + 1; write(LS_BEERS, next); return next; });
+    setCheersKey((k) => k + 1);
+  };
+  const resetBeers = () => { setBeers(0); write(LS_BEERS, 0); };
+  // rotating toast
+  const [toastIdx, setToastIdx] = useState(0);
+  useEffect(() => {
+    if (!beerMode) return;
+    const iv = setInterval(() => setToastIdx((i) => (i + 1) % BEER_TOASTS.length), 5000);
+    return () => clearInterval(iv);
+  }, [beerMode]);
+  // shuffleable photo stack (top card index order)
+  const [gallery, setGallery] = useState<GalleryPic[]>(BEER_GALLERY);
+  const nextPic = () => setGallery((g) => [...g.slice(1), g[0]]);
+  const shufflePics = () =>
+    setGallery((g) => [...g].sort(() => Math.random() - 0.5));
+
+  // when beer mode turns on, auto-swap the radio to a party station
+  const [station, setStation] = useState<Station>(STATIONS[0]);
+  const prevBeerRef = useRef(false);
+  useEffect(() => {
+    if (beerMode && !prevBeerRef.current) {
+      const party = STATIONS.find((s) => s.party);
+      if (party) setStation(party);
+    }
+    prevBeerRef.current = beerMode;
+  }, [beerMode]);
 
   // ---------- photo deck ----------
   const [photo, setPhoto] = useState(0);
@@ -259,8 +321,7 @@ export default function TheDock() {
     });
   };
 
-  // ---------- spotify ----------
-  const [station, setStation] = useState<Station>(STATIONS[0]);
+  // ---------- spotify ---------- (station state declared above w/ beer logic)
 
   const dragId = useRef<string | null>(null);
 
@@ -268,7 +329,9 @@ export default function TheDock() {
     <SidebarLayout>
       <div
         data-ambient={ambientAttr}
-        className="min-h-full bg-[#eef6f7] text-slate-900 font-sans text-[15px] leading-relaxed"
+        className={`min-h-full font-sans text-[15px] leading-relaxed transition-colors duration-700 ${
+          beerMode ? "bg-[#0a0402] text-[#ffe6c4]" : "bg-[#f6f1e6] text-slate-900"
+        }`}
       >
         <div className="p-5 md:p-8 max-w-6xl mx-auto space-y-8">
           {/* ===== HERO with rotating photo backdrop ===== */}
@@ -299,9 +362,11 @@ export default function TheDock() {
               { k: "day", label: "Day", icon: Sun },
               { k: "evening", label: "Evening", icon: Sunset },
               { k: "night", label: "Night", icon: Moon },
+              { k: "beer", label: "Beer O'Clock", icon: Beer },
             ] as const).map((opt) => {
               const active = opt.k === "auto" ? autoAmbient : (!autoAmbient && phase === opt.k);
               const Icon = opt.icon;
+              const isBeer = opt.k === "beer";
               return (
                 <button
                   key={opt.k}
@@ -310,7 +375,13 @@ export default function TheDock() {
                     else { setAutoAmbient(false); setPhase(opt.k); }
                   }}
                   className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    active ? "border-[#c79a3b] bg-[#c79a3b] text-white shadow-sm" : "border-[#efe0b8] bg-white text-slate-600 hover:border-[#e0b24a]"
+                    active
+                      ? isBeer
+                        ? "border-[#ff7a1a] bg-gradient-to-r from-[#ff7a1a] to-[#e0531a] text-white shadow-[0_0_14px_-2px_rgba(255,122,26,0.8)]"
+                        : "border-[#c79a3b] bg-[#c79a3b] text-white shadow-sm"
+                      : isBeer
+                        ? "border-[#ffb15a] bg-white text-[#c2510f] hover:border-[#ff7a1a] hover:bg-[#fff4e6]"
+                        : "border-[#efe0b8] bg-white text-slate-600 hover:border-[#e0b24a]"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -319,9 +390,96 @@ export default function TheDock() {
               );
             })}
             <span className="text-xs text-slate-400">
-              {phase === "day" ? "Bright & breezy" : phase === "evening" ? "Golden hour — winding down" : "Moonlit & quiet"}
+              {phase === "day" ? "Bright & breezy" : phase === "evening" ? "Golden hour — winding down" : phase === "night" ? "Moonlit & quiet" : "🍻 Neon lights, cold ones, good times"}
             </span>
           </div>
+
+          {/* ===== BEER O'CLOCK MODE (only when active) ===== */}
+          {beerMode && (
+            <section className="relative overflow-hidden rounded-2xl border border-[#ff7a1a]/40 bg-gradient-to-b from-[#1a0a04] to-[#0a0402] p-5 shadow-[0_0_40px_-10px_rgba(255,122,26,0.5)] md:p-7">
+              {/* neon glow blobs */}
+              <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-[#ff7a1a]/25 blur-3xl" />
+              <div className="pointer-events-none absolute -right-10 bottom-0 h-52 w-52 rounded-full bg-[#e0531a]/20 blur-3xl" />
+
+              {/* neon banner + rotating toast */}
+              <div className="relative mb-6 text-center">
+                <p className="beer-neon font-display text-3xl font-extrabold uppercase tracking-tight text-[#ffd15a] md:text-4xl">
+                  Beer O'Clock
+                </p>
+                <p key={toastIdx} className="beer-cheers mt-2 text-sm font-semibold text-[#ffb15a] md:text-base">
+                  {BEER_TOASTS[toastIdx]}
+                </p>
+              </div>
+
+              <div className="relative grid gap-6 lg:grid-cols-[1fr_320px]">
+                {/* shuffleable photo stack */}
+                <div className="flex flex-col items-center">
+                  <div className="beer-card-stack relative mx-auto h-[420px] w-full max-w-[340px]">
+                    {gallery.slice(0, 4).map((pic, i) => {
+                      const offsets = [
+                        { r: "0deg", x: "0px", y: "0px", z: 40 },
+                        { r: "-5deg", x: "-14px", y: "10px", z: 30 },
+                        { r: "4deg", x: "14px", y: "20px", z: 20 },
+                        { r: "-2deg", x: "-6px", y: "30px", z: 10 },
+                      ];
+                      const o = offsets[i];
+                      const top = i === 0;
+                      return (
+                        <div
+                          key={pic.src}
+                          onClick={top ? nextPic : undefined}
+                          style={{
+                            transform: `translate(${o.x}, ${o.y}) rotate(${o.r})`,
+                            zIndex: o.z,
+                          }}
+                          className={`absolute inset-0 overflow-hidden rounded-2xl border-4 border-white/90 bg-black shadow-2xl ${top ? "cursor-pointer hover:!-translate-y-1" : ""}`}
+                          title={top ? "Click for the next print" : undefined}
+                        >
+                          <img src={pic.src} alt={pic.caption} className="h-full w-full object-cover" />
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-3">
+                            <p className="text-xs font-semibold text-[#ffd15a]">{pic.caption}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-5 flex gap-2">
+                    <button onClick={nextPic} className="inline-flex items-center gap-1.5 rounded-lg border border-[#ff7a1a]/50 bg-white/5 px-3 py-2 text-xs font-semibold text-[#ffd15a] transition-colors hover:bg-[#ff7a1a]/20">
+                      <RotateCcw className="h-3.5 w-3.5" /> Next print
+                    </button>
+                    <button onClick={shufflePics} className="inline-flex items-center gap-1.5 rounded-lg border border-[#ff7a1a]/50 bg-white/5 px-3 py-2 text-xs font-semibold text-[#ffd15a] transition-colors hover:bg-[#ff7a1a]/20">
+                      <Shuffle className="h-3.5 w-3.5" /> Shuffle the deck
+                    </button>
+                  </div>
+                </div>
+
+                {/* cold-one counter */}
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-[#ff7a1a]/30 bg-white/5 p-6 text-center backdrop-blur-sm">
+                  <div className="relative mb-2">
+                    <span key={cheersKey} className="beer-cheers block text-7xl" role="img" aria-label="beers">🍻</span>
+                    {/* rising bubbles */}
+                    <span className="beer-bubble-rise absolute left-1/2 top-2 h-1.5 w-1.5 rounded-full bg-[#ffd15a]" />
+                    <span className="beer-bubble-rise absolute left-1/3 top-4 h-1 w-1 rounded-full bg-[#ffe08a]" style={{ animationDelay: "0.7s" }} />
+                    <span className="beer-bubble-rise absolute right-1/3 top-3 h-1 w-1 rounded-full bg-[#ffe08a]" style={{ animationDelay: "1.3s" }} />
+                  </div>
+                  <p className="font-display text-5xl font-extrabold tabular-nums text-[#ffd15a]">{beers}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-[#ffb15a]">
+                    {beers === 1 ? "Cold one cracked" : "Cold ones cracked"}
+                  </p>
+                  <button
+                    onClick={addBeer}
+                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#ff7a1a] to-[#e0531a] px-5 py-3 text-sm font-bold text-white shadow-[0_0_18px_-4px_rgba(255,122,26,0.9)] transition-transform active:scale-95"
+                  >
+                    <Beer className="h-5 w-5" /> Crack a cold one
+                  </button>
+                  <button onClick={resetBeers} className="mt-2 text-[11px] font-semibold text-[#ffb15a]/70 hover:text-[#ffd15a]">
+                    Reset the tab
+                  </button>
+                  <p className="mt-3 text-[10px] text-[#ffb15a]/60">Saved on this device. Pace yourself, Captain.</p>
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* ===== CATCH LOG / BRAG BOARD ===== */}
           <section>
@@ -566,8 +724,8 @@ export default function TheDock() {
                 const active = station.id === s.id;
                 return (
                   <button key={s.id} onClick={() => setStation(s)} className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-left transition-all ${active ? "border-[#c79a3b] bg-gradient-to-br from-[#f6edd2] to-white shadow-md" : "border-[#efe0b8] bg-white hover:border-[#e0b24a] hover:shadow-sm"}`}>
-                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${active ? "bg-[#c79a3b] text-white" : "bg-[#f4e9c8] text-[#8a6a1a]"}`}>
-                      {active ? <Play className="h-4 w-4 translate-x-0.5" /> : <Music2 className="h-4 w-4" />}
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${active ? (s.party ? "bg-[#ff7a1a] text-white" : "bg-[#c79a3b] text-white") : "bg-[#f4e9c8] text-[#8a6a1a]"}`}>
+                      {active ? <Play className="h-4 w-4 translate-x-0.5" /> : s.party ? <Beer className="h-4 w-4" /> : <Music2 className="h-4 w-4" />}
                     </span>
                     <div className="min-w-0">
                       <p className="font-display text-sm font-bold text-slate-800">{s.title}</p>
