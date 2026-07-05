@@ -136,9 +136,9 @@ export default function WelcomeCenter() {
             <CardContent className="p-0">
               <div className="flex items-center gap-2 bg-gradient-to-r from-[#160f05] to-[#3a2f14] px-6 py-4 text-white">
                 <PlayCircle className="h-5 w-5 text-[#e6c25a]" />
-                <h2 className="font-display text-lg font-bold">Welcome to GREGG OS</h2>
+                <h2 className="font-display text-lg font-bold">Welcome to GREGG OS — with your first mate</h2>
                 <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#e6c25a]">
-                  Sound on · 52s
+                  Sound on · 34s
                 </span>
               </div>
               <div className="aspect-video w-full bg-slate-950">
