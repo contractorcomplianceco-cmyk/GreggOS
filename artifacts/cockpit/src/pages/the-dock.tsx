@@ -143,31 +143,22 @@ const STATIONS: Station[] = [
   { id: "country", title: "Dock Country", mood: "Boots, boats & beer", playlist: "37i9dQZF1DX1lVhptIYRda", party: true },
 ];
 
-// ---- Beer O'Clock gallery -------------------------------------------------
+// ---- Beer O'Clock prints --------------------------------------------------
+// The nine original GREGG bar prints. Both the shuffleable photo stack and the
+// bar-wall gallery rotate through this same set of 9 prints.
 type GalleryPic = { src: string; caption: string };
-const BEER_GALLERY: GalleryPic[] = [
-  { src: "/dock-gregg-couple.jpg", caption: "Cold ones on the water. This is the life." },
-  { src: "/dock-gregg-poster.jpg", caption: "Boats, Hoes & Gregg — sun up, lines in." },
-  { src: "/dock-gregg-tightlines.jpg", caption: "Tight lines. Stress gone. Life on." },
-  { src: "/gregg-pinup-1.jpg", caption: "Sportfishing & Beer — sunset sessions." },
-  { src: "/gregg-pinup-2.jpg", caption: "Sunset, suds & sailfish. Cheers, Captain." },
-  { src: "/gregg-pinup-3.jpg", caption: "Cheers to good times at Sunset Cove." },
-  { src: "/gregg-cold-beer.jpg", caption: "Ice-cold and waiting on the bar." },
+const PRINTS: GalleryPic[] = [
+  { src: "/gregg-poster-d.jpg", caption: "The Hunt — marlin on, hold fast." },
   { src: "/gregg-poster-a.jpg", caption: "Gone Fishin' — the Florida Keys." },
+  { src: "/gregg-pinup-1.jpg", caption: "Sportfishing & Beer — sunset sessions." },
+  { src: "/gregg-poster-e.jpg", caption: "Shipshape — keep her bright and proud." },
   { src: "/gregg-poster-b.jpg", caption: "Cold beer, tight lines — the Tiki Dock." },
+  { src: "/gregg-pinup-3.jpg", caption: "Cheers to good times at Sunset Cove." },
+  { src: "/gregg-poster-f.jpg", caption: "First Light — lines out at dawn." },
   { src: "/gregg-poster-c.jpg", caption: "Sunset cruise — adventure awaits." },
+  { src: "/gregg-pinup-2.jpg", caption: "Sunset, suds & sailfish. Cheers, Captain." },
 ];
-
-// wall-art posters hung in the bar room (six framed prints, tilted)
-const BAR_POSTERS = [
-  "/gregg-poster-a.jpg",
-  "/gregg-pinup-1.jpg",
-  "/gregg-poster-b.jpg",
-  "/gregg-pinup-3.jpg",
-  "/gregg-poster-c.jpg",
-  "/gregg-pinup-2.jpg",
-];
-const POSTER_TILT = [-2.5, 1.5, -1, 2, -1.5, 1];
+const POSTER_TILT = [-2.5, 1.5, -1, 2, -1.5, 1, -2, 1.5, -1];
 
 // ---- Beer O'Clock toasts --------------------------------------------------
 const BEER_TOASTS = [
@@ -220,7 +211,7 @@ export default function TheDock() {
     return () => clearInterval(iv);
   }, [beerMode]);
   // shuffleable photo stack (top card index order)
-  const [gallery, setGallery] = useState<GalleryPic[]>(BEER_GALLERY);
+  const [gallery, setGallery] = useState<GalleryPic[]>(PRINTS);
   const nextPic = () => setGallery((g) => [...g.slice(1), g[0]]);
   const shufflePics = () =>
     setGallery((g) => [...g].sort(() => Math.random() - 0.5));
@@ -232,33 +223,61 @@ export default function TheDock() {
   const [barMuted, setBarMuted] = useState(true);
   const ambienceRef = useRef<HTMLAudioElement | null>(null);
   const prevBeerRef = useRef(false);
-  useEffect(() => {
-    if (beerMode && !prevBeerRef.current) {
-      const party = STATIONS.find((s) => s.party);
-      if (party) setStation(party);
-      setRevealPlaying(true);
-      const t = window.setTimeout(() => setRevealPlaying(false), 3600);
-      prevBeerRef.current = beerMode;
-      return () => window.clearTimeout(t);
-    }
-    prevBeerRef.current = beerMode;
-  }, [beerMode]);
+
   // ---------- interactive neon marlin sign ----------
   const [marlinOn, setMarlinOn] = useState(true);
   const [marlinIgniteKey, setMarlinIgniteKey] = useState(0);
   const buzzRef = useRef<HTMLAudioElement | null>(null);
+
+  // Fire the neon buzz SFX (only makes noise if the buzz element is ready).
+  // Volume is respected even when bar ambience is muted, because the buzz is
+  // a distinct one-shot; but if the user has explicitly muted, keep it quiet.
+  const playBuzz = (volume = 0.45) => {
+    const b = buzzRef.current;
+    if (!b) return;
+    try { b.currentTime = 0; b.volume = volume; b.muted = false; void b.play().catch(() => {}); } catch { /* ignore */ }
+  };
+
+  // Ignite the marlin sign: switch it on + retrigger the flicker + buzz.
+  const igniteMarlin = (withSound: boolean) => {
+    setMarlinOn(true);
+    setMarlinIgniteKey((k) => k + 1);
+    if (withSound) playBuzz();
+  };
+
   const toggleMarlin = () => {
     setMarlinOn((on) => {
       const next = !on;
       if (next) {
         setMarlinIgniteKey((k) => k + 1); // retrigger ignite flicker
-        // play a short buzz only if the room ambience is unmuted
-        const b = buzzRef.current;
-        if (b && !barMuted) { b.currentTime = 0; b.volume = 0.45; b.play().catch(() => {}); }
+        if (!barMuted) playBuzz();
       }
       return next;
     });
   };
+
+  // Trigger the cinematic reveal and time the neon marlin buzz-on to match
+  // the moment the room lights power up (~1.0s into the 3.2s room-lights
+  // animation), so it feels like the bar sign igniting as the lights dim.
+  const runReveal = () => {
+    setRevealPlaying(true);
+    setMarlinOn(false); // start dark so it visibly powers up
+    // neon buzz-to-life + sound, synced to the lights-on beat
+    const ignite = window.setTimeout(() => igniteMarlin(true), 1000);
+    const done = window.setTimeout(() => setRevealPlaying(false), 3600);
+    return () => { window.clearTimeout(ignite); window.clearTimeout(done); };
+  };
+
+  useEffect(() => {
+    if (beerMode && !prevBeerRef.current) {
+      const party = STATIONS.find((s) => s.party);
+      if (party) setStation(party);
+      prevBeerRef.current = beerMode;
+      return runReveal();
+    }
+    prevBeerRef.current = beerMode;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [beerMode]);
 
   // toggle bar ambience (muted by default; only plays in beer mode)
   const toggleBarAudio = () => {
@@ -422,6 +441,12 @@ export default function TheDock() {
               Gregg's Private Bar
             </p>
           </div>
+          {/* neon marlin buzzing to life in sync with the room lights */}
+          <div className="absolute inset-x-0 bottom-[24vh] z-10 flex justify-center">
+            <span key={marlinIgniteKey} className={marlinOn ? "marlin-neon-ignite" : ""}>
+              <NeonMarlin on={marlinOn} className="h-16 w-32 md:h-20 md:w-40" />
+            </span>
+          </div>
           {/* cinematic letterbox bars */}
           <div className="bar-letterbox-top pointer-events-none absolute inset-x-0 top-0 h-[16vh] bg-black" />
           <div className="bar-letterbox-bottom pointer-events-none absolute inset-x-0 bottom-0 h-[16vh] bg-black" />
@@ -529,7 +554,7 @@ export default function TheDock() {
                 </button>
                 {/* re-play the cinematic entrance */}
                 <button
-                  onClick={() => { setRevealPlaying(true); window.setTimeout(() => setRevealPlaying(false), 3600); }}
+                  onClick={() => runReveal()}
                   className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-[#ffd15a]/40 bg-black/50 px-3 py-1.5 text-xs font-semibold text-[#ffd15a] backdrop-blur-sm transition-colors hover:bg-black/70"
                 >
                   <DoorOpen className="h-3.5 w-3.5" /> Re-enter the bar
@@ -632,21 +657,23 @@ export default function TheDock() {
               <div className="relative mt-8">
                 <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#ffb15a]">
                   <Beer className="h-4 w-4" /> On the bar walls
+                  <span className="ml-1 rounded-full bg-[#ff7a1a]/20 px-2 py-0.5 text-[10px] font-bold text-[#ffd15a]">9 prints</span>
                 </p>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-5 lg:grid-cols-6">
-                  {BAR_POSTERS.map((src, i) => (
+                <div className="grid grid-cols-3 gap-3 md:gap-5 lg:grid-cols-9">
+                  {PRINTS.map((p, i) => (
                     <div
-                      key={src}
-                      className="group relative aspect-[3/4] overflow-hidden rounded-md border-[3px] border-[#2a1a0c] bg-black shadow-[0_10px_26px_-8px_rgba(0,0,0,0.85)] ring-1 ring-[#e6c25a]/20 transition-transform duration-300 hover:z-10 hover:!rotate-0 hover:scale-[1.06]"
+                      key={p.src}
+                      title={p.caption}
+                      className="group relative aspect-[3/4] overflow-hidden rounded-md border-[3px] border-[#2a1a0c] bg-black shadow-[0_10px_26px_-8px_rgba(0,0,0,0.85)] ring-1 ring-[#e6c25a]/20 transition-transform duration-300 hover:z-10 hover:!rotate-0 hover:scale-[1.08]"
                       style={{ transform: `rotate(${POSTER_TILT[i] ?? 0}deg)` }}
                     >
-                      <img src={src} alt="GREGG bar poster" className="h-full w-full object-cover" />
+                      <img src={p.src} alt={p.caption} className="h-full w-full object-cover" />
                       {/* framed glass sheen */}
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/12 via-transparent to-black/10" />
                     </div>
                   ))}
                 </div>
-                <p className="mt-3 text-[11px] text-[#ffb15a]/60">Original GREGG bar art. Hover a print for a closer look.</p>
+                <p className="mt-3 text-[11px] text-[#ffb15a]/60">Nine original GREGG bar prints. Hover a print for a closer look.</p>
               </div>
               </div>
             </section>
