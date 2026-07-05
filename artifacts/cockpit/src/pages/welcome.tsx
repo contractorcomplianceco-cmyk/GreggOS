@@ -110,7 +110,7 @@ export default function WelcomeCenter() {
                 <Compass className="h-5 w-5 text-[#f0e2b0]" />
                 <h2 className="font-display text-lg font-bold">Your guided tour of the cockpit</h2>
                 <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-[#f8f0d8]">
-                  Sound on · 1:40
+                  Sound on · 57s
                 </span>
               </div>
               <div className="aspect-video w-full bg-slate-950">
@@ -126,7 +126,7 @@ export default function WelcomeCenter() {
               </div>
               <div className="flex items-center gap-2 px-6 py-3 text-sm text-slate-500">
                 <Compass className="h-4 w-4 text-[#c79a3b]" />
-                New to GreggOS? Watch this first — it walks you through all six sections and how to use each one.
+                New to GREGG OS? Marina walks you through every section and how to use each one — watch this first.
               </div>
             </CardContent>
           </Card>
