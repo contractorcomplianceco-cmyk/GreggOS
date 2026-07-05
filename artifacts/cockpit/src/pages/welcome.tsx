@@ -62,8 +62,26 @@ const WALKTHROUGH_STEPS: Step[] = [
 export default function WelcomeCenter() {
   return (
     <SidebarLayout>
-      <div className="min-h-full bg-[#eef6f7] text-[15px] leading-relaxed">
+      <div className="min-h-full bg-[#f6f1e6] text-[15px] leading-relaxed">
         <div className="p-6 md:p-8 max-w-5xl mx-auto">
+          {/* GREGG brand badge — centerpiece */}
+          <div className="mb-8 flex flex-col items-center text-center">
+            <div className="relative">
+              <div className="pointer-events-none absolute -inset-6 rounded-full bg-[radial-gradient(circle,rgba(239,106,31,0.28),transparent_70%)] blur-xl" />
+              <img
+                src="/gregg-badge.png"
+                alt="GREGG — Fishing, Boats & Hoes"
+                className="relative h-44 w-44 rounded-full object-cover ring-4 ring-[#e6c25a]/70 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.55)] md:h-56 md:w-56"
+              />
+            </div>
+            <p className="mt-4 font-display text-2xl font-extrabold tracking-tight md:text-3xl">
+              <span className="bg-gradient-to-b from-[#d9ad3f] via-[#c79a3b] to-[#9a7318] bg-clip-text text-transparent">GREGG OS</span>
+            </p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#a5701f]">
+              Boats · Business · Tight Lines
+            </p>
+          </div>
+
           {/* shared animated coastal hero */}
           <div className="mb-8">
             <DashboardHero

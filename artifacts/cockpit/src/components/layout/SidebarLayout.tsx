@@ -10,55 +10,6 @@ import { Mahi, Hook, AnchorMark, Boat, Net, TideGauge, CompassRose, Lighthouse }
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-/** GREGG crown-shield mark (gold), matching the brand poster logo. */
-function GreggShield({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 48 48"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="gregg-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f7e6a6" />
-          <stop offset="0.5" stopColor="#e6c25a" />
-          <stop offset="1" stopColor="#a9781a" />
-        </linearGradient>
-      </defs>
-      {/* crown */}
-      <path
-        d="M14 11 L18 15 L24 8 L30 15 L34 11 L33 18 H15 Z"
-        fill="url(#gregg-gold)"
-        stroke="#7c560f"
-        strokeWidth="0.8"
-        strokeLinejoin="round"
-      />
-      {/* shield */}
-      <path
-        d="M12 20 H36 V30 C36 36 30 40 24 42 C18 40 12 36 12 30 Z"
-        fill="url(#gregg-gold)"
-        stroke="#7c560f"
-        strokeWidth="0.8"
-        strokeLinejoin="round"
-      />
-      {/* G */}
-      <text
-        x="24"
-        y="34"
-        textAnchor="middle"
-        fontFamily="'Cabinet Grotesk','General Sans',sans-serif"
-        fontWeight="800"
-        fontSize="15"
-        fill="#1a1206"
-      >
-        G
-      </text>
-    </svg>
-  );
-}
-
 type IconComponent = ComponentType<{ className?: string }>;
 type NavItem = { name: string; href: string; icon: IconComponent };
 type NavSection = { label: string; items: NavItem[] };
@@ -207,8 +158,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 "radial-gradient(80% 120% at 12% 0%, rgba(239,106,31,0.28), transparent 60%)",
             }}
           />
-          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-black/40 ring-1 ring-[#e6c25a]/70 shadow-[0_0_18px_-4px_rgba(230,194,90,0.7)] backdrop-blur-sm">
-            <GreggShield className="h-8 w-8" />
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-[#e6c25a]/80 shadow-[0_0_18px_-4px_rgba(230,194,90,0.8)]">
+            <img
+              src="/gregg-badge.png"
+              alt="GREGG — Fishing, Boats & Hoes"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="relative leading-tight min-w-0">
             <p className="font-display text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5 drop-shadow">
