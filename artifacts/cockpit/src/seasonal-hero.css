@@ -4,18 +4,18 @@
    Imported after index.css so these override the default GREGG hero.
    Palette always stays inside the GREGG black + gold/sunset family.
 
-   Generated: 2026-07-16T11:01:37.467Z
-   Source:    open-meteo SST (SST 32.3°C)
-   Warmth:    1.000  ->  season "gregg-sunset"
+   Generated: 2026-07-20T11:09:42.029Z
+   Source:    open-meteo SST (SST 30.6°C)
+   Warmth:    0.913  ->  season "gregg-sunset"
    ============================================================ */
 :root {
-  --hero-base-1: #1e1407;
-  --hero-base-2: #140d05;
+  --hero-base-1: #1d1407;
+  --hero-base-2: #130d05;
   --hero-base-3: #080502;
-  --hero-glow:   #ef6a1f;
-  --hero-wave-1: #f5bd63;
-  --hero-wave-2: #e09a34;
-  --hero-wave-3: #b5761f;
-  --hero-eyebrow: #e6c25a;
+  --hero-glow:   #ea691f;
+  --hero-wave-1: #f2bb61;
+  --hero-wave-2: #dd9833;
+  --hero-wave-3: #b1741f;
+  --hero-eyebrow: #e4c159;
   --hero-season: "gregg-sunset";
 }
